@@ -1,94 +1,263 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html class="dark" lang="ko">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AutonomousCompanyMVP Monitoring</title>
+  <title>Sovereign Ops | AutonomousCompanyMVP</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: '#0e0e0e',
+            surface: '#131313',
+            'surface-high': '#1f1f1f',
+            'on-surface': '#e8e6e3',
+            'on-muted': '#9ca3af',
+            primary: '#00e5ff',
+            'primary-dim': '#00b8d4',
+            error: '#ff6b6b',
+            ok: '#5eead4',
+          },
+          fontFamily: {
+            headline: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+            body: ['"DM Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          boxShadow: {
+            glow: '0 0 24px rgba(0, 229, 255, 0.12)',
+            'glow-sm': '0 0 12px rgba(0, 229, 255, 0.08)',
+          },
+        },
+      },
+    };
+  </script>
   <style>
-    :root { color-scheme: dark; }
-    body { font-family: "Segoe UI", sans-serif; margin: 0; background: #0b1220; color: #e5e7eb; }
-    .wrap { max-width: 1080px; margin: 0 auto; padding: 24px; }
-    h1 { margin: 0 0 8px; font-size: 28px; }
-    .muted { color: #94a3b8; margin-bottom: 16px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-    .card { background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 14px; }
-    .label { font-size: 12px; color: #94a3b8; }
-    .value { font-size: 22px; font-weight: 700; margin-top: 8px; }
-    .ok { color: #22c55e; }
-    .bad { color: #ef4444; }
-    table { width: 100%; border-collapse: collapse; margin-top: 14px; background: #111827; border-radius: 10px; overflow: hidden; }
-    th, td { border-bottom: 1px solid #1f2937; padding: 10px; text-align: left; font-size: 14px; }
-    th { color: #94a3b8; font-weight: 600; }
-    code { font-size: 12px; color: #93c5fd; }
-    .actions { margin: 14px 0; display: flex; gap: 8px; }
-    button { background: #2563eb; color: white; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
-    pre { background: #0f172a; border: 1px solid #1f2937; padding: 12px; border-radius: 10px; overflow: auto; max-height: 280px; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .glass-panel {
+      background: rgba(31, 31, 31, 0.55);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+    }
+    .ghost-border { border: 0.5px solid rgba(255, 255, 255, 0.08); }
+    .mesh-bg {
+      background-color: #0e0e0e;
+      background-image:
+        radial-gradient(ellipse 120% 80% at 20% -20%, rgba(0, 229, 255, 0.14), transparent 50%),
+        radial-gradient(ellipse 80% 60% at 100% 10%, rgba(94, 234, 212, 0.06), transparent 45%),
+        radial-gradient(ellipse 60% 40% at 50% 100%, rgba(0, 184, 212, 0.05), transparent 40%);
+    }
+    .shimmer-title {
+      background: linear-gradient(105deg, #e8e6e3 0%, #00e5ff 45%, #5eead4 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: fade-up 0.5s ease forwards; }
   </style>
 </head>
-<body>
-  <div class="wrap">
-    <h1>Autonomous Company Monitoring Dashboard</h1>
-    <div class="muted" id="generatedAt">Loading...</div>
-
-    <div class="grid" id="cards"></div>
-
-    <h2>Gate Status</h2>
-    <table>
-      <thead>
-        <tr><th>Item</th><th>Status</th></tr>
-      </thead>
-      <tbody id="gateRows"></tbody>
-    </table>
-
-    <h2>Artifact Paths</h2>
-    <table>
-      <thead>
-        <tr><th>File</th><th>Path</th></tr>
-      </thead>
-      <tbody id="pathRows"></tbody>
-    </table>
-
-    <div class="actions">
-      <button onclick="loadStatus()">Refresh</button>
+<body class="mesh-bg text-on-surface font-body min-h-screen selection:bg-primary/25">
+  <!-- Top bar (ref: stitch/sovereign_intelligence_dashboard_gold) -->
+  <header class="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between px-6 md:px-8 border-b ghost-border bg-neutral-950/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,229,255,0.06)]">
+    <div class="flex items-center gap-4 md:gap-8">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary text-2xl">hub</span>
+        <div>
+          <p class="font-headline font-bold text-lg tracking-tight shimmer-title leading-none">Sovereign Ops</p>
+          <p class="text-[10px] font-mono uppercase tracking-[0.2em] text-on-muted mt-0.5">AutonomousCompany MVP</p>
+        </div>
+      </div>
+      <nav class="hidden lg:flex items-center gap-6 text-[11px] font-headline uppercase tracking-widest text-on-muted">
+        <span class="text-primary border-b-2 border-primary pb-1">Overview</span>
+        <a class="hover:text-on-surface transition-colors" href="/api/status" target="_blank" rel="noopener">API JSON</a>
+        <a class="hover:text-on-surface transition-colors" href="/metrics" target="_blank" rel="noopener">Prometheus</a>
+      </nav>
     </div>
-    <pre id="raw"></pre>
-  </div>
+    <div class="flex items-center gap-3">
+      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel ghost-border">
+        <span class="w-2 h-2 rounded-full bg-primary animate-pulse shadow-glow-sm"></span>
+        <span id="livePulse" class="text-[10px] font-mono text-on-muted uppercase tracking-wider">Live sync</span>
+      </div>
+      <button type="button" onclick="loadStatus()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-headline uppercase tracking-wider hover:bg-primary/20 transition-all">
+        <span class="material-symbols-outlined text-base">sync</span>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <!-- Slim rail -->
+  <aside class="fixed left-0 top-0 z-40 w-[72px] h-full pt-20 pb-8 flex flex-col items-center border-r ghost-border bg-neutral-950/80 backdrop-blur-xl">
+    <div class="flex flex-col items-center gap-6 py-4 w-full text-primary bg-primary/10 border-r-2 border-primary">
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+      <span class="font-mono text-[9px] uppercase tracking-widest text-center leading-tight">Ops</span>
+    </div>
+    <div class="mt-6 flex flex-col items-center gap-4 text-on-muted hover:text-primary/80 transition-colors cursor-default py-2 w-full">
+      <span class="material-symbols-outlined text-xl">security</span>
+    </div>
+    <div class="mt-auto mb-4 text-on-muted">
+      <span class="material-symbols-outlined text-xl">description</span>
+    </div>
+  </aside>
+
+  <main class="pl-[72px] pt-20 pb-12 px-4 md:px-8 max-w-[1600px] mx-auto">
+    <p id="generatedAt" class="text-xs font-mono text-on-muted mb-6 animate-in">Loading status…</p>
+
+    <!-- KPI strip -->
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 mb-10">
+      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] group hover:shadow-glow transition-shadow animate-in">
+        <div class="flex justify-between items-start">
+          <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Sharpe</span>
+          <span class="material-symbols-outlined text-primary/60 text-lg">trending_up</span>
+        </div>
+        <p id="kpiSharpe" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
+      </div>
+      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] hover:shadow-glow transition-shadow animate-in">
+        <div class="flex justify-between items-start">
+          <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">MDD</span>
+          <span class="material-symbols-outlined text-error/80 text-lg">trending_down</span>
+        </div>
+        <p id="kpiMdd" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
+      </div>
+      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] hover:shadow-glow transition-shadow animate-in">
+        <div class="flex justify-between items-start">
+          <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Win rate</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-primary shadow-glow-sm animate-pulse"></span>
+        </div>
+        <p id="kpiWin" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
+      </div>
+      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] hover:shadow-glow transition-shadow animate-in">
+        <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Cum. return</span>
+        <p id="kpiCum" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
+      </div>
+      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] hover:shadow-glow transition-shadow animate-in">
+        <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Latency p99</span>
+        <p id="kpiLat" class="text-2xl font-mono font-medium mt-2"><span id="kpiLatVal">—</span> <span class="text-sm text-on-muted">ms</span></p>
+      </div>
+      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] border-primary/20 hover:shadow-glow transition-shadow animate-in">
+        <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Fills</span>
+        <p id="kpiFills" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
+        <p id="runIdLine" class="text-[10px] font-mono text-on-muted truncate mt-1" title="">run_id —</p>
+      </div>
+    </section>
+
+    <div class="grid lg:grid-cols-2 gap-6 mb-8">
+      <section class="glass-panel ghost-border rounded-2xl overflow-hidden">
+        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+          <h2 class="font-headline font-semibold text-sm uppercase tracking-widest text-on-surface">Gate status</h2>
+          <span class="material-symbols-outlined text-on-muted text-lg">verified_user</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-on-muted text-xs uppercase tracking-wider border-b border-white/5">
+                <th class="px-5 py-3 font-medium">Check</th>
+                <th class="px-5 py-3 font-medium">State</th>
+              </tr>
+            </thead>
+            <tbody id="gateRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="glass-panel ghost-border rounded-2xl overflow-hidden">
+        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+          <h2 class="font-headline font-semibold text-sm uppercase tracking-widest text-on-surface">Artifacts</h2>
+          <span class="material-symbols-outlined text-on-muted text-lg">folder_open</span>
+        </div>
+        <div class="overflow-x-auto max-h-[280px] overflow-y-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-on-muted text-xs uppercase tracking-wider border-b border-white/5 sticky top-0 bg-surface-high/90 backdrop-blur">
+                <th class="px-5 py-3 font-medium">Key</th>
+                <th class="px-5 py-3 font-medium">Path</th>
+              </tr>
+            </thead>
+            <tbody id="pathRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <details class="glass-panel ghost-border rounded-2xl overflow-hidden group">
+      <summary class="px-5 py-4 cursor-pointer font-headline text-sm uppercase tracking-widest text-on-muted hover:text-on-surface transition-colors list-none flex items-center justify-between">
+        Raw payload
+        <span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+      </summary>
+      <pre id="raw" class="text-xs font-mono text-primary/90 bg-black/40 p-5 overflow-auto max-h-[360px] border-t border-white/5 leading-relaxed"></pre>
+    </details>
+  </main>
 
   <script>
-    function badge(v) {
-      return v ? '<span class="ok">OK</span>' : '<span class="bad">FAIL</span>';
+    function fmt(v) {
+      if (v === null || v === undefined) return '—';
+      if (typeof v === 'number' && Number.isFinite(v)) {
+        if (Math.abs(v) < 0.01 && v !== 0) return v.toExponential(2);
+        return v.toLocaleString(undefined, { maximumFractionDigits: 4 });
+      }
+      return String(v);
+    }
+
+    function badge(ok) {
+      if (ok) {
+        return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 text-ok text-xs font-mono font-medium border border-emerald-500/30">PASS</span>';
+      }
+      return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/15 text-error text-xs font-mono font-medium border border-red-500/30">FAIL</span>';
     }
 
     async function loadStatus() {
-      const r = await fetch('/api/status', { cache: 'no-store' });
-      const d = await r.json();
-      document.getElementById('generatedAt').textContent = `Generated at (UTC): ${d.generated_at_utc}`;
+      const pulse = document.getElementById('livePulse');
+      pulse.textContent = 'Fetching…';
+      try {
+        const r = await fetch('/api/status', { cache: 'no-store' });
+        const d = await r.json();
+        document.getElementById('generatedAt').textContent = `Generated (UTC): ${d.generated_at_utc || '—'}`;
+        pulse.textContent = 'Live sync';
 
-      const m = d.metrics || {};
-      const cards = [
-        ['Sharpe', m.sharpe],
-        ['MDD', m.mdd],
-        ['Win Rate', m.win_rate],
-        ['Cumulative Return', m.cum_return],
-        ['Latency p99 (ms)', m.latency_p99_ms]
-      ];
-      document.getElementById('cards').innerHTML = cards.map(([k,v]) =>
-        `<div class="card"><div class="label">${k}</div><div class="value">${v ?? '-'}</div></div>`
-      ).join('');
+        const m = d.metrics || {};
+        document.getElementById('kpiSharpe').textContent = fmt(m.sharpe);
+        document.getElementById('kpiMdd').textContent = fmt(m.mdd);
+        document.getElementById('kpiWin').textContent = fmt(m.win_rate);
+        document.getElementById('kpiCum').textContent = fmt(m.cum_return);
+        document.getElementById('kpiLatVal').textContent = fmt(m.latency_p99_ms);
 
-      const gates = d.gates || {};
-      const gateRows = Object.entries(gates).map(([k, v]) =>
-        `<tr><td>${k}</td><td>${badge(Boolean(v))}</td></tr>`
-      ).join('');
-      document.getElementById('gateRows').innerHTML = gateRows;
+        const s = d.summary || {};
+        document.getElementById('kpiFills').textContent = s.n_fills != null ? fmt(s.n_fills) : '—';
+        const rid = s.run_id || '';
+        const ridEl = document.getElementById('runIdLine');
+        ridEl.textContent = rid ? `run ${rid.slice(0, 8)}…` : 'run_id —';
+        ridEl.title = rid || '';
 
-      const paths = d.paths || {};
-      const pathRows = Object.entries(paths).map(([k,v]) =>
-        `<tr><td>${k}</td><td><code>${v}</code></td></tr>`
-      ).join('');
-      document.getElementById('pathRows').innerHTML = pathRows;
+        const gates = d.gates || {};
+        document.getElementById('gateRows').innerHTML = Object.entries(gates).map(([k, v]) => `
+          <tr class="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+            <td class="px-5 py-3 font-mono text-xs text-on-muted">${k}</td>
+            <td class="px-5 py-3">${badge(Boolean(v))}</td>
+          </tr>
+        `).join('');
 
-      document.getElementById('raw').textContent = JSON.stringify(d, null, 2);
+        const paths = d.paths || {};
+        document.getElementById('pathRows').innerHTML = Object.entries(paths).map(([k, v]) => `
+          <tr class="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+            <td class="px-5 py-3 font-mono text-xs text-primary/90">${k}</td>
+            <td class="px-5 py-3 font-mono text-[11px] text-on-muted break-all">${v}</td>
+          </tr>
+        `).join('');
+
+        document.getElementById('raw').textContent = JSON.stringify(d, null, 2);
+      } catch (e) {
+        pulse.textContent = 'Error';
+        document.getElementById('generatedAt').textContent = `Error: ${e.message || e} — start server: python scripts/monitoring_server.py`;
+      }
     }
 
     loadStatus();
