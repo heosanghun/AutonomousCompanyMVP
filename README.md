@@ -241,3 +241,24 @@ Open in browser:
 API endpoint for machine check:
 
 - [http://127.0.0.1:8787/api/status](http://127.0.0.1:8787/api/status)
+
+## Cloudflare Pages + Backend (Functions)
+
+This repository supports Cloudflare backend endpoints via Pages Functions:
+
+- `/api/status`
+- `/api/chat` (Gemini)
+- `/metrics`
+
+Deploy with Functions:
+
+```bash
+npx wrangler pages deploy web/monitoring --project-name autonomouscompany --branch main --functions functions
+```
+
+Set production secrets:
+
+```bash
+npx wrangler pages secret put GEMINI_API_KEY --project-name autonomouscompany
+npx wrangler pages secret put GEMINI_MODEL --project-name autonomouscompany
+```

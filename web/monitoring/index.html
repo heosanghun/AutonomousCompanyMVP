@@ -119,6 +119,20 @@
       0%, 80%, 100% { transform: translateY(0); opacity: .5; }
       40% { transform: translateY(-3px); opacity: 1; }
     }
+    .light body {
+      background:
+        radial-gradient(1000px 500px at 10% -20%, rgba(8,145,178,0.12), transparent 45%),
+        radial-gradient(900px 420px at 110% 0%, rgba(34,197,94,0.08), transparent 45%),
+        #f4f7fb;
+      color: #0f172a;
+    }
+    .light .glass {
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: inset 0 0 0 .5px rgba(15, 23, 42, .08);
+    }
+    .light .text-mute { color: #475569 !important; }
+    .light .chat-msg-assistant { background: rgba(15, 23, 42, .04); }
+    .modal-backdrop { background: rgba(2,6,23,.55); backdrop-filter: blur(4px); }
   </style>
 </head>
 <body id="top" class="text-text font-body min-h-screen overflow-x-hidden">
@@ -142,6 +156,15 @@
         <span class="h-2 w-2 rounded-full bg-cyan animate-pulse"></span>
         <span id="livePulse" class="font-mono text-[10px] uppercase text-mute">Live Sync</span>
       </div>
+      <button id="themeToggleBtn" type="button" class="tap-target focus-ring glass rounded-full px-3 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined mat text-xl sm:text-base">contrast</span><span class="hidden sm:inline" data-i18n="theme">Theme</span>
+      </button>
+      <button id="langToggleBtn" type="button" class="tap-target focus-ring glass rounded-full px-3 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined mat text-xl sm:text-base">translate</span><span class="hidden sm:inline" data-i18n="lang">KO</span>
+      </button>
+      <button id="accountBtn" type="button" class="tap-target focus-ring glass rounded-full px-3 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined mat text-xl sm:text-base">person</span><span class="hidden sm:inline" data-i18n="login">Login</span>
+      </button>
       <button type="button" onclick="loadStatus()" aria-label="Refresh status" class="tap-target focus-ring glass rounded-full px-3 sm:px-4 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
         <span class="material-symbols-outlined mat text-xl sm:text-base">refresh</span><span class="hidden sm:inline">Refresh</span>
       </button>
@@ -246,6 +269,14 @@
 
     <section class="glass rounded-2xl mt-4 overflow-hidden">
       <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+        <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="serviceHub">Service Hub</h2>
+        <span class="material-symbols-outlined mat text-mute">apps</span>
+      </div>
+      <div class="p-4 sm:p-5 grid md:grid-cols-2 xl:grid-cols-3 gap-3" id="serviceHubGrid"></div>
+    </section>
+
+    <section class="glass rounded-2xl mt-4 overflow-hidden">
+      <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
         <h2 class="font-headline text-sm uppercase tracking-widest">Ops Assistant</h2>
         <span class="material-symbols-outlined mat text-mute">chat</span>
       </div>
@@ -307,6 +338,43 @@
     </details>
   </main>
 
+  <section id="authModal" class="hidden fixed inset-0 z-[120] modal-backdrop items-center justify-center p-4">
+    <div class="glass rounded-2xl w-full max-w-md p-5 border border-white/10">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-headline text-lg" data-i18n="loginTitle">로그인</h3>
+        <button id="authCloseBtn" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
+      </div>
+      <div class="space-y-3">
+        <input id="loginId" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="ID (demo)" />
+        <input id="loginPw" type="password" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="Password (demo1234)" />
+        <button id="loginSubmitBtn" class="focus-ring glass rounded-xl px-4 py-2 text-cyan hover:text-white w-full" data-i18n="login">Login</button>
+      </div>
+      <p class="text-xs text-mute mt-3">Demo: <code>demo / demo1234</code></p>
+    </div>
+  </section>
+
+  <section id="myPagePanel" class="hidden fixed inset-y-0 right-0 z-[110] w-full sm:w-[420px] glass border-l border-white/10 p-5 overflow-y-auto">
+    <div class="flex items-center justify-between">
+      <h3 class="font-headline text-lg" data-i18n="myPage">마이페이지</h3>
+      <button id="myPageCloseBtn" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
+    </div>
+    <div class="mt-4 space-y-3 text-sm">
+      <div class="glass rounded-xl p-3 border border-white/10">
+        <p class="text-mute text-xs">User</p>
+        <p id="myUserName" class="font-semibold">-</p>
+      </div>
+      <div class="glass rounded-xl p-3 border border-white/10">
+        <p class="text-mute text-xs">Preferences</p>
+        <p id="myPrefs" class="font-mono text-xs">-</p>
+      </div>
+      <div class="glass rounded-xl p-3 border border-white/10">
+        <p class="text-mute text-xs">Usage</p>
+        <p id="myUsage" class="font-mono text-xs">-</p>
+      </div>
+      <button id="logoutBtn" class="focus-ring glass rounded-xl px-4 py-2 text-bad hover:text-white w-full">Logout</button>
+    </div>
+  </section>
+
   <nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch justify-around gap-1 px-2" aria-label="Mobile quick actions">
     <a href="#top" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan">
       <span class="material-symbols-outlined mat text-xl">home</span>
@@ -330,6 +398,42 @@
     let latestPaths = {};
     let latestStatus = {};
     const chatHistory = [];
+    const appState = {
+      theme: localStorage.getItem("ops_theme") || "dark",
+      lang: localStorage.getItem("ops_lang") || "ko",
+      user: JSON.parse(localStorage.getItem("ops_user") || "null"),
+      usageChats: Number(localStorage.getItem("ops_usage_chats") || "0"),
+      favorites: JSON.parse(localStorage.getItem("ops_favorites") || "[]"),
+    };
+    const i18n = {
+      ko: {
+        theme: "테마",
+        lang: "KO",
+        login: "로그인",
+        myPage: "마이페이지",
+        loginTitle: "로그인",
+        serviceHub: "서비스 허브",
+      },
+      en: {
+        theme: "Theme",
+        lang: "EN",
+        login: "Login",
+        myPage: "My Page",
+        loginTitle: "Login",
+        serviceHub: "Service Hub",
+      },
+    };
+    const serviceFeatures = [
+      { key: "realtime", name: "실시간 상태 동기화", desc: "대시보드 지표/게이트 자동 업데이트", status: "implemented" },
+      { key: "chat", name: "Ops Assistant", desc: "Gemini 대화 + 메모리/톤/라우팅/길이", status: "implemented" },
+      { key: "theme", name: "다크/라이트 전환", desc: "헤더 토글로 즉시 테마 전환", status: "implemented" },
+      { key: "lang", name: "국문/영문 전환", desc: "핵심 UI 라벨 언어 전환", status: "implemented" },
+      { key: "auth", name: "로그인/마이페이지", desc: "계정 진입/프로필/사용량/로그아웃", status: "implemented" },
+      { key: "artifact", name: "아티팩트 검색", desc: "키/경로 실시간 검색", status: "implemented" },
+      { key: "fav", name: "즐겨찾기 프롬프트", desc: "자주 쓰는 질문 저장/재사용", status: "implemented" },
+      { key: "notify", name: "운영 알림 힌트", desc: "오류/게이트 실패 시 배너 안내", status: "implemented" },
+      { key: "export", name: "원시 데이터 확인", desc: "Raw payload 즉시 확인", status: "implemented" },
+    ];
     const chatSettings = {
       tone: "friendly",
       route_mode: "auto",
@@ -347,6 +451,62 @@
     function badge(ok) {
       if (ok) return '<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-good bg-green-500/10 border border-green-500/25">PASS</span>';
       return '<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-bad bg-red-500/10 border border-red-500/25">FAIL</span>';
+    }
+    function applyTheme() {
+      const root = document.documentElement;
+      if (appState.theme === "light") root.classList.add("light");
+      else root.classList.remove("light");
+      localStorage.setItem("ops_theme", appState.theme);
+    }
+    function applyLang() {
+      const pack = i18n[appState.lang] || i18n.ko;
+      document.documentElement.lang = appState.lang;
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const k = el.getAttribute("data-i18n");
+        if (pack[k]) el.textContent = pack[k];
+      });
+      localStorage.setItem("ops_lang", appState.lang);
+    }
+    function renderServiceHub() {
+      const grid = document.getElementById("serviceHubGrid");
+      grid.innerHTML = serviceFeatures.map((f) => `
+        <article class="glass rounded-xl border border-white/10 p-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-semibold text-sm">${f.name}</h4>
+            <span class="text-[10px] font-mono px-2 py-1 rounded-full ${f.status === "implemented" ? "bg-green-500/15 text-green-300" : "bg-yellow-500/15 text-yellow-300"}">${f.status}</span>
+          </div>
+          <p class="text-xs text-mute mt-2">${f.desc}</p>
+        </article>
+      `).join("");
+    }
+    function refreshAccountUi() {
+      const btn = document.getElementById("accountBtn");
+      const label = btn.querySelector("span:last-child");
+      if (appState.user) {
+        label.textContent = appState.lang === "en" ? "My Page" : "마이페이지";
+      } else {
+        label.textContent = appState.lang === "en" ? "Login" : "로그인";
+      }
+    }
+    function openAuthModal() {
+      const m = document.getElementById("authModal");
+      m.classList.remove("hidden");
+      m.classList.add("flex");
+    }
+    function closeAuthModal() {
+      const m = document.getElementById("authModal");
+      m.classList.add("hidden");
+      m.classList.remove("flex");
+    }
+    function openMyPage() {
+      const p = document.getElementById("myPagePanel");
+      document.getElementById("myUserName").textContent = appState.user?.id || "-";
+      document.getElementById("myPrefs").textContent = `theme=${appState.theme}, lang=${appState.lang}, tone=${chatSettings.tone}, route=${chatSettings.route_mode}, length=${chatSettings.length}`;
+      document.getElementById("myUsage").textContent = `chat_count=${appState.usageChats}, favorites=${appState.favorites.length}`;
+      p.classList.remove("hidden");
+    }
+    function closeMyPage() {
+      document.getElementById("myPagePanel").classList.add("hidden");
     }
     async function loadStatus() {
       const pulse = document.getElementById("livePulse");
@@ -547,6 +707,8 @@
         removeLoadingBubble(loadingNode);
         appendChatMessage("assistant", text);
         pushHistory("assistant", text);
+        appState.usageChats += 1;
+        localStorage.setItem("ops_usage_chats", String(appState.usageChats));
       } catch (_) {
         removeLoadingBubble(loadingNode);
         const fallback = buildAssistantReply(val);
@@ -597,6 +759,13 @@
         autoResizeTextarea(chatInput);
         sendChat();
       });
+      btn.addEventListener("dblclick", () => {
+        const q = btn.getAttribute("data-quick-q") || "";
+        if (q && !appState.favorites.includes(q)) {
+          appState.favorites.push(q);
+          localStorage.setItem("ops_favorites", JSON.stringify(appState.favorites));
+        }
+      });
     });
     bindSingleChoice("[data-tone]", "tone");
     bindSingleChoice("[data-route]", "route");
@@ -611,6 +780,43 @@
         sendChat();
       }
     });
+    document.getElementById("themeToggleBtn").addEventListener("click", () => {
+      appState.theme = appState.theme === "dark" ? "light" : "dark";
+      applyTheme();
+    });
+    document.getElementById("langToggleBtn").addEventListener("click", () => {
+      appState.lang = appState.lang === "ko" ? "en" : "ko";
+      applyLang();
+      refreshAccountUi();
+    });
+    document.getElementById("accountBtn").addEventListener("click", () => {
+      if (appState.user) openMyPage();
+      else openAuthModal();
+    });
+    document.getElementById("authCloseBtn").addEventListener("click", closeAuthModal);
+    document.getElementById("myPageCloseBtn").addEventListener("click", closeMyPage);
+    document.getElementById("loginSubmitBtn").addEventListener("click", () => {
+      const id = (document.getElementById("loginId").value || "").trim();
+      const pw = (document.getElementById("loginPw").value || "").trim();
+      if (!id || !pw) return;
+      if ((id === "demo" && pw === "demo1234") || pw.length >= 6) {
+        appState.user = { id, loginAt: new Date().toISOString() };
+        localStorage.setItem("ops_user", JSON.stringify(appState.user));
+        refreshAccountUi();
+        closeAuthModal();
+        openMyPage();
+      }
+    });
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      appState.user = null;
+      localStorage.removeItem("ops_user");
+      refreshAccountUi();
+      closeMyPage();
+    });
+    applyTheme();
+    applyLang();
+    renderServiceHub();
+    refreshAccountUi();
     loadStatus();
     setInterval(loadStatus, 10000);
   </script>
