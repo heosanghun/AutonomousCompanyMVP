@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "goal": "Autonomous company bootstrapped from automated trading.",
+  "phases": [
+    {
+      "id": "phase_a_supervised_autonomy",
+      "name": "Supervised Autonomy",
+      "description": "Build stable execution, strict risk controls, and complete auditability.",
+      "success_criteria": {
+        "validation_ok": true,
+        "kill_switch": false,
+        "mdd_max": 0.15,
+        "latency_p99_ms_max": 5.0
+      }
+    },
+    {
+      "id": "phase_b_limited_autonomy",
+      "name": "Limited Autonomy",
+      "description": "Add automated approvals, drift handling, and weekly governance reports.",
+      "success_criteria": {
+        "validation_ok": true,
+        "kill_switch": false,
+        "mdd_max": 0.12,
+        "latency_p99_ms_max": 5.0
+      }
+    },
+    {
+      "id": "phase_c_full_autonomy",
+      "name": "Full Autonomy",
+      "description": "Operate diversified revenue loops with policy-governed capital allocation.",
+      "success_criteria": {
+        "validation_ok": true,
+        "kill_switch": false,
+        "mdd_max": 0.1,
+        "latency_p99_ms_max": 5.0
+      }
+    }
+  ]
+}

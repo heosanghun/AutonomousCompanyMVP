@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AutonomousCompanyMVP Monitoring</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { font-family: "Segoe UI", sans-serif; margin: 0; background: #0b1220; color: #e5e7eb; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 24px; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    .muted { color: #94a3b8; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 14px; }
+    .label { font-size: 12px; color: #94a3b8; }
+    .value { font-size: 22px; font-weight: 700; margin-top: 8px; }
+    .ok { color: #22c55e; }
+    .bad { color: #ef4444; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; background: #111827; border-radius: 10px; overflow: hidden; }
+    th, td { border-bottom: 1px solid #1f2937; padding: 10px; text-align: left; font-size: 14px; }
+    th { color: #94a3b8; font-weight: 600; }
+    code { font-size: 12px; color: #93c5fd; }
+    .actions { margin: 14px 0; display: flex; gap: 8px; }
+    button { background: #2563eb; color: white; border: none; border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+    pre { background: #0f172a; border: 1px solid #1f2937; padding: 12px; border-radius: 10px; overflow: auto; max-height: 280px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Autonomous Company Monitoring Dashboard</h1>
+    <div class="muted" id="generatedAt">Loading...</div>
+
+    <div class="grid" id="cards"></div>
+
+    <h2>Gate Status</h2>
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Status</th></tr>
+      </thead>
+      <tbody id="gateRows"></tbody>
+    </table>
+
+    <h2>Artifact Paths</h2>
+    <table>
+      <thead>
+        <tr><th>File</th><th>Path</th></tr>
+      </thead>
+      <tbody id="pathRows"></tbody>
+    </table>
+
+    <div class="actions">
+      <button onclick="loadStatus()">Refresh</button>
+    </div>
+    <pre id="raw"></pre>
+  </div>
+
+  <script>
+    function badge(v) {
+      return v ? '<span class="ok">OK</span>' : '<span class="bad">FAIL</span>';
+    }
+
+    async function loadStatus() {
+      const r = await fetch('/api/status', { cache: 'no-store' });
+      const d = await r.json();
+      document.getElementById('generatedAt').textContent = `Generated at (UTC): ${d.generated_at_utc}`;
+
+      const m = d.metrics || {};
+      const cards = [
+        ['Sharpe', m.sharpe],
+        ['MDD', m.mdd],
+        ['Win Rate', m.win_rate],
+        ['Cumulative Return', m.cum_return],
+        ['Latency p99 (ms)', m.latency_p99_ms]
+      ];
+      document.getElementById('cards').innerHTML = cards.map(([k,v]) =>
+        `<div class="card"><div class="label">${k}</div><div class="value">${v ?? '-'}</div></div>`
+      ).join('');
+
+      const gates = d.gates || {};
+      const gateRows = Object.entries(gates).map(([k, v]) =>
+        `<tr><td>${k}</td><td>${badge(Boolean(v))}</td></tr>`
+      ).join('');
+      document.getElementById('gateRows').innerHTML = gateRows;
+
+      const paths = d.paths || {};
+      const pathRows = Object.entries(paths).map(([k,v]) =>
+        `<tr><td>${k}</td><td><code>${v}</code></td></tr>`
+      ).join('');
+      document.getElementById('pathRows').innerHTML = pathRows;
+
+      document.getElementById('raw').textContent = JSON.stringify(d, null, 2);
+    }
+
+    loadStatus();
+    setInterval(loadStatus, 10000);
+  </script>
+</body>
+</html>

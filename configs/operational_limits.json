@@ -1,0 +1,9 @@
+{
+  "max_daily_loss_pct_equity": 0.02,
+  "max_weekly_loss_pct_equity": 0.05,
+  "max_notional_usd_per_order": 500,
+  "max_open_notional_usd": 5000,
+  "max_leverage": 1,
+  "review_cadence_days": 7,
+  "notes": "Tune per entity and venue; changes above human_approval_policy thresholds require sign-off."
+}

@@ -1,0 +1,12 @@
+{
+  "execution_mode": "paper",
+  "symbol": "BTCUSDT",
+  "default_qty": 1.0,
+  "paper_slippage_bps": 2.0,
+  "live_guard": {
+    "require_readiness_file": true,
+    "readiness_file": "outputs/live_readiness_approved.flag",
+    "fills_file": "outputs/live_fills.jsonl",
+    "test_order": true
+  }
+}

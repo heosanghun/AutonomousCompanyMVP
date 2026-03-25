@@ -1,0 +1,11 @@
+{
+  "require_human_approval_when": [
+    "live_trading_first_enable",
+    "notional_limit_increase",
+    "loss_limit_relaxation",
+    "disabling_kill_switch_or_risk_checks"
+  ],
+  "notional_increase_requires_approval_above_usd": 1000,
+  "loss_limit_relaxation_requires_approval": true,
+  "notes": "Enforcement hooks belong in ops scripts and runbooks; this file is the policy source of truth."
+}
