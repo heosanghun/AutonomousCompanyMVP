@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Rejected Detail - AUTONOMOUS_ENGINE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#849396",
+                        "on-primary-container": "#00626e",
+                        "surface-container-highest": "#353534",
+                        "inverse-on-surface": "#313030",
+                        "tertiary-fixed-dim": "#48ddbc",
+                        "on-tertiary": "#00382d",
+                        "surface-tint": "#00daf3",
+                        "secondary-container": "#454749",
+                        "surface-container": "#201f1f",
+                        "surface-bright": "#3a3939",
+                        "primary": "#c3f5ff",
+                        "tertiary-fixed": "#6bfad8",
+                        "secondary-fixed-dim": "#c6c6c9",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed": "#9cf0ff",
+                        "on-tertiary-fixed-variant": "#005142",
+                        "on-primary-fixed": "#001f24",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-primary": "#006875",
+                        "outline-variant": "#3b494c",
+                        "on-tertiary-container": "#006553",
+                        "on-primary": "#00363d",
+                        "on-error": "#690005",
+                        "secondary-fixed": "#e2e2e5",
+                        "on-secondary": "#2f3133",
+                        "primary-fixed-dim": "#00daf3",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#002019",
+                        "on-surface-variant": "#bac9cc",
+                        "inverse-surface": "#e5e2e1",
+                        "on-primary-fixed-variant": "#004f58",
+                        "primary-container": "#00e5ff",
+                        "on-secondary-fixed-variant": "#454749",
+                        "background": "#131313",
+                        "tertiary-container": "#55e7c6",
+                        "surface-dim": "#131313",
+                        "surface": "#131313",
+                        "surface-container-lowest": "#0e0e0e",
+                        "error": "#ffb4ab",
+                        "surface-variant": "#353534",
+                        "tertiary": "#9cffe4",
+                        "on-secondary-container": "#b4b5b7",
+                        "surface-container-low": "#1c1b1b",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-fixed": "#1a1c1e",
+                        "secondary": "#c6c6c9"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0", "lg": "0", "xl": "0", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0e0e0e; }
+        ::-webkit-scrollbar-thumb { background: #3b494c; }
+        .glass-panel {
+            background: rgba(147, 0, 10, 0.05);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-hidden">
+<!-- Top Navigation Anchor (Shared Component) -->
+<header class="bg-[#131313] text-[#c3f5ff] font-['Space_Grotesk'] tracking-tighter uppercase fixed top-0 w-full z-50 shadow-[0_0_40px_rgba(0,229,255,0.04)]">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-none">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#c3f5ff]">terminal</span>
+<span class="text-xl font-bold text-[#c3f5ff] tracking-[0.2em]">AUTONOMOUS_ENGINE</span>
+</div>
+<div class="flex items-center gap-2 text-sm">
+<span class="opacity-50">SYNC_04:21:00</span>
+<div class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-16 pb-16 md:pb-0 min-h-screen flex flex-col md:flex-row">
+<!-- Background Simulated Dashboard -->
+<section class="flex-1 p-8 opacity-20 pointer-events-none hidden md:block">
+<div class="grid grid-cols-3 gap-8">
+<div class="h-64 bg-surface-container"></div>
+<div class="h-64 bg-surface-container"></div>
+<div class="h-64 bg-surface-container"></div>
+<div class="col-span-2 h-96 bg-surface-container"></div>
+<div class="h-96 bg-surface-container"></div>
+</div>
+</section>
+<!-- Sidebar Detailed Overlay (The Requested Panel) -->
+<aside class="fixed right-0 top-0 h-full w-full md:w-[480px] bg-surface-container-lowest z-[60] shadow-2xl flex flex-col border-l border-outline-variant/15">
+<!-- Panel Header -->
+<div class="p-6 bg-surface-container-low flex justify-between items-start">
+<div class="flex flex-col">
+<div class="flex items-center gap-2 mb-1">
+<span class="text-error font-headline font-bold tracking-widest text-xs">CRITICAL_EXCEPTION</span>
+<span class="w-1 h-1 rounded-full bg-error"></span>
+<span class="text-on-surface-variant text-[10px] font-mono">CODE: RG-EXP-092</span>
+</div>
+<h2 class="text-2xl font-headline font-bold text-primary tracking-tight">#ORD-7742-X</h2>
+</div>
+<button class="p-2 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-6 space-y-8">
+<!-- Core Order Specs -->
+<div class="grid grid-cols-2 gap-px bg-outline-variant/10">
+<div class="bg-surface-container p-4">
+<span class="text-[10px] font-headline text-on-surface-variant tracking-widest uppercase block mb-1">SYMBOL</span>
+<span class="text-xl font-bold font-headline text-primary">NVDA</span>
+</div>
+<div class="bg-surface-container p-4">
+<span class="text-[10px] font-headline text-on-surface-variant tracking-widest uppercase block mb-1">ACTION</span>
+<span class="text-xl font-bold font-headline text-error">SELL</span>
+</div>
+<div class="bg-surface-container p-4">
+<span class="text-[10px] font-headline text-on-surface-variant tracking-widest uppercase block mb-1">SIZE</span>
+<span class="text-xl font-bold font-mono text-on-surface">500</span>
+</div>
+<div class="bg-surface-container p-4">
+<span class="text-[10px] font-headline text-on-surface-variant tracking-widest uppercase block mb-1">TYPE</span>
+<span class="text-xl font-bold font-headline text-on-surface">MARKET</span>
+</div>
+</div>
+<!-- Rejection Logic Alert -->
+<div class="bg-error-container/10 border-l-4 border-error p-5 relative overflow-hidden">
+<div class="relative z-10">
+<span class="text-[10px] font-bold text-error font-headline tracking-widest uppercase block mb-2">REJECTION_REASON</span>
+<p class="text-on-surface text-sm leading-relaxed font-medium">
+                            'RiskGuard Gate: Maximum Notional Exposure for NVDA reached (Limit: $500k, Attempted: $512k)'
+                        </p>
+</div>
+<span class="material-symbols-outlined absolute -right-4 -bottom-4 text-8xl text-error opacity-5 pointer-events-none">gavel</span>
+</div>
+<!-- Rejection Distribution (Stacked Bar Chart) -->
+<div class="space-y-4">
+<h3 class="text-[11px] font-headline text-on-surface-variant tracking-widest uppercase border-b border-outline-variant/10 pb-2">SYSTEM_REJECTION_FREQUENCY</h3>
+<div class="space-y-3">
+<!-- Bar 1 -->
+<div class="space-y-1">
+<div class="flex justify-between text-[10px] font-mono">
+<span class="text-on-surface-variant">RISK LIMIT</span>
+<span class="text-primary">62%</span>
+</div>
+<div class="h-1 bg-surface-container-highest w-full">
+<div class="h-full bg-primary" style="width: 62%"></div>
+</div>
+</div>
+<!-- Bar 2 -->
+<div class="space-y-1">
+<div class="flex justify-between text-[10px] font-mono">
+<span class="text-on-surface-variant">PRICE DRIFT</span>
+<span class="text-on-surface-variant">24%</span>
+</div>
+<div class="h-1 bg-surface-container-highest w-full">
+<div class="h-full bg-outline-variant" style="width: 24%"></div>
+</div>
+</div>
+<!-- Bar 3 -->
+<div class="space-y-1">
+<div class="flex justify-between text-[10px] font-mono">
+<span class="text-on-surface-variant">EXCHANGE DOWN</span>
+<span class="text-on-surface-variant">14%</span>
+</div>
+<div class="h-1 bg-surface-container-highest w-full">
+<div class="h-full bg-outline-variant" style="width: 14%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Slippage Distribution Visual -->
+<div class="space-y-4">
+<h3 class="text-[11px] font-headline text-on-surface-variant tracking-widest uppercase border-b border-outline-variant/10 pb-2">NVDA SLIPPAGE DISTRIBUTION</h3>
+<div class="h-32 flex items-end gap-1 px-2">
+<!-- Simulated Histogram Bars -->
+<div class="flex-1 bg-outline-variant/20 h-[20%]"></div>
+<div class="flex-1 bg-outline-variant/20 h-[35%]"></div>
+<div class="flex-1 bg-outline-variant/30 h-[50%]"></div>
+<div class="flex-1 bg-primary/40 h-[75%]"></div>
+<div class="flex-1 bg-primary h-[100%]"></div>
+<div class="flex-1 bg-primary/40 h-[65%]"></div>
+<div class="flex-1 bg-outline-variant/30 h-[40%]"></div>
+<div class="flex-1 bg-outline-variant/20 h-[25%]"></div>
+<div class="flex-1 bg-outline-variant/10 h-[10%]"></div>
+</div>
+<div class="flex justify-between text-[9px] font-mono text-on-surface-variant px-1">
+<span>-0.05%</span>
+<span>0.00%</span>
+<span>+0.05%</span>
+</div>
+</div>
+<!-- Audit Log Snippet -->
+<div class="bg-surface-container-lowest border border-outline-variant/15 p-4 font-mono text-[11px]">
+<div class="flex justify-between border-b border-outline-variant/10 pb-2 mb-2">
+<span class="text-primary">AUDIT_LOG_SNAPSHOT</span>
+<span class="text-on-surface-variant">UTC 14:02:11.004</span>
+</div>
+<div class="space-y-1">
+<div class="flex gap-4">
+<span class="text-on-surface-variant w-24">decision_id:</span>
+<span class="text-on-surface">592k-aa92-f011-x99</span>
+</div>
+<div class="flex gap-4">
+<span class="text-on-surface-variant w-24">reason_code:</span>
+<span class="text-error">EXPOSURE_THRESHOLD_EXCEEDED</span>
+</div>
+<div class="flex gap-4">
+<span class="text-on-surface-variant w-24">node_id:</span>
+<span class="text-on-surface">SYSTEM_NODE_01</span>
+</div>
+<div class="flex gap-4">
+<span class="text-on-surface-variant w-24">compliance:</span>
+<span class="text-tertiary">RULE_SET_V4.2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Panel Footer Actions -->
+<div class="p-6 bg-surface-container-low border-t border-outline-variant/10 flex gap-4">
+<button class="flex-1 bg-surface-container-highest text-on-surface py-3 font-headline text-xs font-bold tracking-widest uppercase hover:bg-surface-bright transition-all">
+                    DISMISS
+                </button>
+<button class="flex-1 bg-gradient-to-r from-primary to-primary-container text-on-primary py-3 font-headline text-xs font-bold tracking-widest uppercase shadow-[0_0_20px_rgba(0,229,255,0.2)] hover:scale-[1.02] transition-all">
+                    EDIT_ORDER
+                </button>
+</div>
+</aside>
+</main>
+<!-- Navigation Drawer (Shared Component - Hidden on mobile) -->
+<nav class="hidden md:flex flex-col py-8 gap-4 h-full w-64 fixed left-0 top-0 bg-[#0e0e0e] z-40 transition-all duration-300">
+<div class="px-6 mb-8">
+<span class="text-[#00e5ff] font-black font-['Space_Grotesk'] text-sm uppercase tracking-widest">SYSTEM_NODE_01</span>
+</div>
+<div class="flex flex-col gap-1">
+<a class="text-[#c3f5ff] bg-[#201f1f] border-l-4 border-[#00e5ff] flex items-center px-6 py-3 gap-3 font-['Space_Grotesk'] text-sm uppercase tracking-widest" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+                DASHBOARD
+            </a>
+<a class="text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] flex items-center px-6 py-3 gap-3 font-['Space_Grotesk'] text-sm uppercase tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined">psychology</span>
+                STRATEGY
+            </a>
+<a class="text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] flex items-center px-6 py-3 gap-3 font-['Space_Grotesk'] text-sm uppercase tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined">shield</span>
+                EXPOSURE
+            </a>
+<a class="text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] flex items-center px-6 py-3 gap-3 font-['Space_Grotesk'] text-sm uppercase tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+                COMPLIANCE
+            </a>
+<a class="text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] flex items-center px-6 py-3 gap-3 font-['Space_Grotesk'] text-sm uppercase tracking-widest transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+                OPERATIONS
+            </a>
+</div>
+</nav>
+<!-- Bottom Nav Bar (Shared Component - Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-16 bg-[#131313]/90 backdrop-blur-xl shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+<button class="text-[#bac9cc] hover:text-[#c3f5ff] active:scale-90 transition-transform">
+<span class="material-symbols-outlined">analytics</span>
+</button>
+<button class="text-[#bac9cc] hover:text-[#c3f5ff] active:scale-90 transition-transform">
+<span class="material-symbols-outlined">query_stats</span>
+</button>
+<button class="text-[#00e5ff] scale-110 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">security</span>
+</button>
+<button class="text-[#bac9cc] hover:text-[#c3f5ff] active:scale-90 transition-transform">
+<span class="material-symbols-outlined">gavel</span>
+</button>
+<button class="text-[#bac9cc] hover:text-[#c3f5ff] active:scale-90 transition-transform">
+<span class="material-symbols-outlined">settings_input_component</span>
+</button>
+</nav>
+<!-- Footer (Shared Component) -->
+<footer class="w-full py-6 mt-auto bg-[#0e0e0e] border-t border-[#3b494c]/15 flex flex-col md:flex-row justify-between items-center px-8 z-30">
+<div class="text-[#bac9cc] font-medium font-['Inter'] text-[11px] uppercase tracking-tighter mb-4 md:mb-0">
+            © 2024 AUTONOMOUS_COMPANY | V2.4.0-STABLE
+        </div>
+<div class="flex gap-6">
+<a class="text-[#bac9cc] font-['Inter'] text-[11px] uppercase tracking-tighter hover:text-[#c3f5ff] transition-opacity" href="#">PROD_ENV</a>
+<a class="text-[#bac9cc] font-['Inter'] text-[11px] uppercase tracking-tighter hover:text-[#c3f5ff] transition-opacity" href="#">RISK_DISCLOSURE</a>
+<a class="text-[#bac9cc] font-['Inter'] text-[11px] uppercase tracking-tighter hover:text-[#c3f5ff] transition-opacity" href="#">AUDIT_LOG</a>
+</div>
+</footer>
+</body></html>

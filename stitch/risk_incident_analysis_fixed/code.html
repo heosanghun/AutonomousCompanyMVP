@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RISK_INCIDENT_ANALYSIS_NODE_01 | AUTONOMOUS_ENGINE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#2f3133",
+                        "surface-variant": "#353534",
+                        "on-tertiary-fixed": "#002019",
+                        "on-error": "#690005",
+                        "secondary-fixed": "#e2e2e5",
+                        "tertiary": "#9cffe4",
+                        "outline-variant": "#3b494c",
+                        "on-primary-fixed-variant": "#004f58",
+                        "surface-tint": "#00daf3",
+                        "on-tertiary-fixed-variant": "#005142",
+                        "inverse-primary": "#006875",
+                        "primary-container": "#00e5ff",
+                        "outline": "#849396",
+                        "primary-fixed-dim": "#00daf3",
+                        "surface-container": "#201f1f",
+                        "primary": "#c3f5ff",
+                        "primary-fixed": "#9cf0ff",
+                        "tertiary-fixed-dim": "#48ddbc",
+                        "secondary-fixed-dim": "#c6c6c9",
+                        "on-error-container": "#ffdad6",
+                        "surface": "#131313",
+                        "on-secondary-container": "#b4b5b7",
+                        "on-surface-variant": "#bac9cc",
+                        "error": "#ffb4ab",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary-fixed": "#6bfad8",
+                        "surface-container-highest": "#353534",
+                        "on-primary-container": "#00626e",
+                        "tertiary-container": "#55e7c6",
+                        "on-secondary-fixed": "#1a1c1e",
+                        "inverse-on-surface": "#313030",
+                        "error-container": "#93000a",
+                        "on-primary": "#00363d",
+                        "surface-dim": "#131313",
+                        "on-tertiary": "#00382d",
+                        "surface-container-low": "#1c1b1b",
+                        "on-surface": "#e5e2e1",
+                        "surface-bright": "#3a3939",
+                        "secondary-container": "#454749",
+                        "on-primary-fixed": "#001f24",
+                        "surface-container-high": "#2a2a2a",
+                        "background": "#0e0e0e",
+                        "on-background": "#e5e2e1",
+                        "on-tertiary-container": "#006553",
+                        "secondary": "#c6c6c9",
+                        "on-secondary-fixed-variant": "#454749",
+                        "inverse-surface": "#e5e2e1"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: { "DEFAULT": "0rem", "lg": "0rem", "xl": "0rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+            vertical-align: middle;
+        }
+        .bg-noise {
+            background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCzyKk1CbQUuy7ZyS0FgFksUetE26TPyzq3rkZddqkv2MCHRxOpUZaSzzvvcZO2Rhq6Ycc4J0YT2mPcZTNHowEQhYi0dPdA2SIQ-ULRN023ozTuzPUc5rbzYetf4vRq5_UispzuwziXzecm19TxhP_35lw8MJW58AvV_5w2SBu-20JVuESwFU8kXCA1fttsvJ8hWY7JRPTpJUu0fXdNzsbBIsFximBEnZXpkcSksK66D1PZ0FPv5tlOEI4JyJ_Gs7BkrYxzGnZ5qcSK);
+            opacity: 0.03;
+        }
+        .glass-panel {
+            background: rgba(19, 19, 19, 0.7);
+            backdrop-filter: blur(24px);
+        }
+        .critical-glow {
+            box-shadow: 0 0 20px rgba(147, 0, 10, 0.4);
+        }
+        .scanline {
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 229, 255, 0.05) 50%);
+            background-size: 100% 4px;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0e0e0e; }
+        ::-webkit-scrollbar-thumb { background: #3b494c; }
+    </style>
+</head>
+<body class="bg-[#0e0e0e] text-[#e5e2e1] font-body min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+<div class="fixed inset-0 bg-noise pointer-events-none z-50"></div>
+<div class="fixed inset-0 scanline pointer-events-none z-40 opacity-20"></div>
+<!-- Navigation Drawer (Left Sidebar) -->
+<aside class="h-full w-64 fixed left-0 top-0 bg-[#0e0e0e] border-r border-[#3b494c]/20 z-30 flex flex-col py-8 gap-4 font-headline uppercase tracking-widest text-sm">
+<div class="px-8 mb-8">
+<h2 class="text-[#00e5ff] font-black text-xl">SYSTEM_NODE_01</h2>
+</div>
+<nav class="flex-1">
+<ul class="space-y-1">
+<li class="px-4">
+<a class="flex items-center gap-4 py-3 px-4 text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span>OVERVIEW</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-4 py-3 px-4 text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">show_chart</span>
+<span>TRADING</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-4 py-3 px-4 text-[#c3f5ff] bg-[#201f1f] border-l-4 border-[#00e5ff] transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-[#00e5ff]">shield</span>
+<span>RISK CONTROL</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-4 py-3 px-4 text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span>STRATEGY INTELLIGENCE</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-4 py-3 px-4 text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span>COMPLIANCE</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-4 py-3 px-4 text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">history</span>
+<span>OPERATIONS</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-4 py-3 px-4 text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">assessment</span>
+<span>REPORTS</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-4 py-3 px-4 text-[#bac9cc] opacity-60 hover:opacity-100 hover:bg-[#201f1f] transition-all duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>SETTINGS</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="px-8 mt-auto pt-4 border-t border-[#3b494c]/15 text-[10px] text-[#bac9cc]/50">
+            SECURE_CONNECTION: ACTIVE
+        </div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex flex-col min-h-screen">
+<!-- Top App Bar -->
+<header class="flex items-center justify-between px-8 h-16 w-full bg-[#131313] shadow-[0_0_40px_rgba(0,229,255,0.04)] sticky top-0 z-20">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#c3f5ff]">terminal</span>
+<h1 class="font-headline text-xl font-bold text-[#c3f5ff] tracking-[0.2em] uppercase">AUTONOMOUS_ENGINE</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-[#bac9cc] font-headline tracking-widest uppercase">NODE_STATUS</span>
+<span class="text-xs text-error font-medium flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-pulse"></span>
+                        CRITICAL_BREACH
+                    </span>
+</div>
+<div class="h-8 w-px bg-[#3b494c]/20"></div>
+<span class="font-headline text-[#c3f5ff] text-sm tracking-tighter uppercase">SYNC_04:21:00</span>
+</div>
+</header>
+<!-- Critical Status Banner -->
+<div class="bg-[#93000a] text-white px-8 py-4 flex items-center justify-between border-b border-black/20 critical-glow relative overflow-hidden">
+<div class="absolute inset-0 bg-white/5 pointer-events-none animate-pulse"></div>
+<div class="flex items-center gap-4 relative z-10">
+<span class="material-symbols-outlined text-3xl">error</span>
+<div>
+<h2 class="font-headline font-black text-lg tracking-tighter">CRITICAL_SYSTEM_DIVERGENCE_DETECTED</h2>
+<p class="text-xs font-headline opacity-80 uppercase tracking-widest">INCIDENT_ID: 8842-AX-01 // LEVEL_RED_PROTOCOL</p>
+</div>
+</div>
+<div class="flex items-center gap-4 relative z-10">
+<div class="bg-black/20 px-4 py-2 border border-white/20">
+<span class="font-headline text-sm tracking-widest uppercase">RISK_EXPOSURE: $14.2M</span>
+</div>
+<div class="bg-black/20 px-4 py-2 border border-white/20">
+<span class="font-headline text-sm tracking-widest uppercase">TIME_TO_EXHAUSTION: 18m 42s</span>
+</div>
+</div>
+</div>
+<div class="p-8 flex-1">
+<div class="flex justify-between items-end mb-8 border-b border-[#3b494c]/20 pb-4">
+<h3 class="font-headline text-4xl font-black tracking-tighter text-[#e5e2e1]">RISK_INCIDENT_ANALYSIS_NODE_01</h3>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-[#201f1f] border border-[#3b494c]/40 text-[10px] font-headline tracking-widest uppercase text-[#bac9cc]">LOC: LDN-04</span>
+<span class="px-3 py-1 bg-[#201f1f] border border-[#3b494c]/40 text-[10px] font-headline tracking-widest uppercase text-[#bac9cc]">VER: 2.4.0-STABLE</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column: Context & Timeline -->
+<div class="col-span-4 space-y-8">
+<!-- Systemic Divergence Metric -->
+<section class="bg-[#1c1b1b] border border-[#3b494c]/15 p-6">
+<div class="flex justify-between items-start mb-6">
+<h4 class="font-headline text-xs tracking-widest text-[#bac9cc] uppercase">Systemic Divergence</h4>
+<span class="text-error material-symbols-outlined">trending_up</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-6xl font-headline font-black text-[#00e5ff] tracking-tighter">14.2%</span>
+<span class="text-xs font-headline text-error uppercase tracking-widest">Above Limit</span>
+</div>
+<div class="mt-4 w-full bg-[#0e0e0e] h-1.5">
+<div class="bg-error h-full" style="width: 84%"></div>
+</div>
+<p class="mt-4 text-[11px] text-[#bac9cc] font-body leading-relaxed opacity-60">
+                            Current algorithmic divergence exceeds safety thresholds. Strategy execution has deviated from the backtested variance model by 4.2 standard deviations.
+                        </p>
+</section>
+<!-- Strategy Context -->
+<section class="bg-[#1c1b1b] border border-[#3b494c]/15 p-6 border-l-4 border-l-[#00e5ff]">
+<h4 class="font-headline text-xs tracking-widest text-[#bac9cc] uppercase mb-4">Strategy ID: VOL-ARB-A1</h4>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-[11px]">
+<span class="opacity-50 uppercase tracking-widest">Asset Class</span>
+<span class="font-headline text-[#c3f5ff]">DIGITAL_EQUITY_SWAPS</span>
+</div>
+<div class="flex justify-between items-center text-[11px]">
+<span class="opacity-50 uppercase tracking-widest">Leverage Factor</span>
+<span class="font-headline text-[#c3f5ff]">14.5x (CAP 15x)</span>
+</div>
+<div class="flex justify-between items-center text-[11px]">
+<span class="opacity-50 uppercase tracking-widest">Risk Model</span>
+<span class="font-headline text-[#c3f5ff]">MONTE_CARLO_D3</span>
+</div>
+</div>
+</section>
+<!-- Incident Timeline -->
+<section class="bg-[#1c1b1b] border border-[#3b494c]/15 p-6">
+<h4 class="font-headline text-xs tracking-widest text-[#bac9cc] uppercase mb-6">Incident Timeline</h4>
+<div class="space-y-6 relative before:content-[''] before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-px before:bg-[#3b494c]/30">
+<div class="relative pl-8">
+<span class="absolute left-0 top-1 w-5 h-5 bg-error rounded-full flex items-center justify-center border-4 border-[#1c1b1b]"></span>
+<div class="text-[10px] font-headline text-[#bac9cc] tracking-widest mb-1">04:18:22</div>
+<div class="text-xs font-bold text-[#e5e2e1] uppercase">Signal Divergence Triggered</div>
+</div>
+<div class="relative pl-8">
+<span class="absolute left-0 top-1 w-5 h-5 bg-[#00e5ff] rounded-full flex items-center justify-center border-4 border-[#1c1b1b]"></span>
+<div class="text-[10px] font-headline text-[#bac9cc] tracking-widest mb-1">04:19:05</div>
+<div class="text-xs font-bold text-[#e5e2e1] uppercase">Automatic Hedging Failure</div>
+</div>
+<div class="relative pl-8">
+<span class="absolute left-0 top-1 w-5 h-5 bg-error/50 rounded-full flex items-center justify-center border-4 border-[#1c1b1b]"></span>
+<div class="text-[10px] font-headline text-[#bac9cc] tracking-widest mb-1">04:20:44</div>
+<div class="text-xs font-bold text-[#e5e2e1] uppercase">Risk Barrier Breach</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Center/Right: Impact Analysis -->
+<div class="col-span-8 space-y-8">
+<!-- Loss Projection Chart -->
+<div class="bg-[#1c1b1b] border border-[#3b494c]/15 p-8 relative overflow-hidden h-[340px]">
+<div class="flex justify-between items-start mb-8 relative z-10">
+<div>
+<h4 class="font-headline text-xs tracking-widest text-[#bac9cc] uppercase mb-1">Loss Projection Matrix</h4>
+<p class="text-[10px] font-body opacity-50">STRESS_TEST: -20% VOL_SHOCK</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-[#00e5ff]"></span>
+<span class="text-[10px] font-headline uppercase opacity-60">Expected</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-error"></span>
+<span class="text-[10px] font-headline uppercase opacity-60">Projected</span>
+</div>
+</div>
+</div>
+<!-- Mock Chart Visualization -->
+<div class="absolute inset-x-8 bottom-12 top-24 flex items-end gap-1">
+<div class="flex-1 bg-[#3b494c]/10 hover:bg-[#3b494c]/20 transition-colors h-[40%] group relative">
+<div class="absolute bottom-0 inset-x-0 bg-[#00e5ff] h-1/2"></div>
+</div>
+<div class="flex-1 bg-[#3b494c]/10 hover:bg-[#3b494c]/20 transition-colors h-[45%] group relative">
+<div class="absolute bottom-0 inset-x-0 bg-[#00e5ff] h-3/5"></div>
+</div>
+<div class="flex-1 bg-[#3b494c]/10 hover:bg-[#3b494c]/20 transition-colors h-[55%] group relative">
+<div class="absolute bottom-0 inset-x-0 bg-[#00e5ff] h-4/5"></div>
+</div>
+<div class="flex-1 bg-[#3b494c]/10 hover:bg-[#3b494c]/20 transition-colors h-[75%] group relative">
+<div class="absolute bottom-0 inset-x-0 bg-error h-[90%] shadow-[0_0_15px_rgba(255,180,171,0.3)]"></div>
+</div>
+<div class="flex-1 bg-[#3b494c]/10 hover:bg-[#3b494c]/20 transition-colors h-[90%] group relative">
+<div class="absolute bottom-0 inset-x-0 bg-error h-[100%] shadow-[0_0_15px_rgba(255,180,171,0.3)] animate-pulse"></div>
+</div>
+</div>
+</div>
+<!-- Exposure Heatmap and Details -->
+<div class="grid grid-cols-2 gap-8">
+<section class="bg-[#1c1b1b] border border-[#3b494c]/15 p-6">
+<h4 class="font-headline text-xs tracking-widest text-[#bac9cc] uppercase mb-4">Liquidity Exposure Heatmap</h4>
+<div class="aspect-square grid grid-cols-5 grid-rows-5 gap-1">
+<!-- Mock Heatmap Grid -->
+<div class="bg-error shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]"></div>
+<div class="bg-error opacity-80"></div>
+<div class="bg-error opacity-60"></div>
+<div class="bg-[#3b494c]/30"></div>
+<div class="bg-[#3b494c]/10"></div>
+<div class="bg-error opacity-90 animate-pulse"></div>
+<div class="bg-error opacity-70"></div>
+<div class="bg-error opacity-40"></div>
+<div class="bg-[#3b494c]/20"></div>
+<div class="bg-[#3b494c]/10"></div>
+<div class="bg-error"></div>
+<div class="bg-error opacity-50"></div>
+<div class="bg-[#3b494c]/30"></div>
+<div class="bg-[#3b494c]/10"></div>
+<div class="bg-[#3b494c]/5"></div>
+<div class="bg-error opacity-60"></div>
+<div class="bg-error opacity-40"></div>
+<div class="bg-[#3b494c]/20"></div>
+<div class="bg-[#3b494c]/10"></div>
+<div class="bg-[#3b494c]/5"></div>
+<div class="bg-error opacity-30"></div>
+<div class="bg-[#3b494c]/20"></div>
+<div class="bg-[#3b494c]/10"></div>
+<div class="bg-[#3b494c]/5"></div>
+<div class="bg-[#3b494c]/5"></div>
+</div>
+</section>
+<section class="bg-[#1c1b1b] border border-[#3b494c]/15 p-6 space-y-6">
+<h4 class="font-headline text-xs tracking-widest text-[#bac9cc] uppercase mb-4">Regional Impact Distribution</h4>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-[10px] font-headline uppercase tracking-wider mb-2">
+<span>APAC_MARKETS</span>
+<span class="text-error">+6.2M</span>
+</div>
+<div class="w-full bg-[#0e0e0e] h-1">
+<div class="bg-error h-full" style="width: 75%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[10px] font-headline uppercase tracking-wider mb-2">
+<span>EMEA_MARKETS</span>
+<span class="text-[#00e5ff]">-1.4M</span>
+</div>
+<div class="w-full bg-[#0e0e0e] h-1">
+<div class="bg-[#00e5ff] h-full" style="width: 25%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[10px] font-headline uppercase tracking-wider mb-2">
+<span>AMER_MARKETS</span>
+<span class="text-error">+9.4M</span>
+</div>
+<div class="w-full bg-[#0e0e0e] h-1">
+<div class="bg-error h-full" style="width: 95%"></div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-[#3b494c]/15">
+<div class="flex items-center gap-2 text-xs font-headline text-error animate-pulse">
+<span class="material-symbols-outlined text-sm">warning</span>
+<span>CONTAGION_RISK: HIGH</span>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<!-- Emergency Action Buttons -->
+<div class="mt-12 pt-8 border-t border-[#3b494c]/20 flex gap-6">
+<button class="flex-1 bg-transparent border-2 border-error text-error font-headline font-bold py-6 px-8 flex items-center justify-between group hover:bg-error hover:text-white transition-all duration-300">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-3xl">trending_down</span>
+<div class="text-left">
+<span class="block text-sm tracking-widest uppercase">FORCE_DELEVERAGE</span>
+<span class="block text-[10px] font-normal opacity-70">REDUCE EXPOSURE BY 50% IMMEDIATELY</span>
+</div>
+</div>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<button class="flex-1 bg-error text-white font-headline font-bold py-6 px-8 flex items-center justify-between group critical-glow hover:scale-[1.02] transition-all duration-300">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-3xl">power_settings_new</span>
+<div class="text-left">
+<span class="block text-sm tracking-widest uppercase">EXECUTE_KILL_SWITCH</span>
+<span class="block text-[10px] font-normal opacity-70">HALT ALL TRADING OPERATIONS ON NODE_01</span>
+</div>
+</div>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">bolt</span>
+</button>
+</div>
+</div>
+<!-- Footer -->
+<footer class="flex flex-col md:flex-row justify-between items-center px-8 w-full border-t border-[#3b494c]/15 bg-[#0e0e0e] py-6 mt-auto">
+<div class="text-[#bac9cc] font-medium font-body text-[11px] uppercase tracking-tighter">
+                © 2024 AUTONOMOUS_COMPANY | V2.4.0-STABLE
+            </div>
+<div class="flex gap-8 text-[11px] font-body text-[#bac9cc] uppercase tracking-tighter">
+<a class="hover:text-[#c3f5ff] transition-colors" href="#">PROD_ENV</a>
+<a class="hover:text-[#c3f5ff] transition-colors" href="#">RISK_DISCLOSURE</a>
+<a class="hover:text-[#c3f5ff] transition-colors" href="#">AUDIT_LOG</a>
+</div>
+</footer>
+</main>
+</body></html>

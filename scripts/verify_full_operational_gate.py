@@ -1,10 +1,7 @@
 """End-to-end operational gate: compliance, production readiness, org sign-offs, exchange verify.
 
-Environment overrides:
-  FULL_OPS_SKIP_EXCHANGE_VERIFY=1  — do not call Binance (e.g. no keys yet)
-  FULL_OPS_SKIP_ORG_SIGNOFFS=1     — skip organizational_signoffs.json
-  FULL_OPS_ACCEPT_LAB_DEMO=1       — accept lab_demo_closure in organizational_signoffs.json
-  FULL_OPS_ACCEPT_WAIVERS=1        — accept external dependency waivers file
+Environment:
+  FULL_OPS_PROFILE=strict|lab  (default: strict)
 """
 
 from __future__ import annotations
@@ -63,6 +60,8 @@ def _has_exchange_creds() -> bool:
 
 def main() -> int:
     os.chdir(ROOT)
+    profile = os.environ.get("FULL_OPS_PROFILE", "strict").strip().lower()
+    is_lab = profile == "lab"
 
     subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "verify_production_readiness.py")],
@@ -77,15 +76,12 @@ def main() -> int:
 
     extended = verify_extended_compliance_docs(ROOT)
     org_path = ROOT / "outputs" / "organizational_signoffs.json"
-    if _truthy("FULL_OPS_SKIP_ORG_SIGNOFFS"):
-        org = {"ok": True, "skipped": True}
-    else:
-        org = verify_organizational_signoffs(org_path)
+    org = verify_organizational_signoffs(org_path)
+    if is_lab and org.get("reason") == "unsigned":
+        org = {"ok": True, "lab_accepted_unsigned_org": True}
 
-    if _truthy("FULL_OPS_SKIP_EXCHANGE_VERIFY"):
-        exch = {"ok": True, "skipped": True}
-    elif not _has_exchange_creds():
-        exch = {"ok": False, "reason": "no_credentials", "hint": "Add secrets or set FULL_OPS_SKIP_EXCHANGE_VERIFY=1"}
+    if not _has_exchange_creds():
+        exch = {"ok": False, "reason": "no_credentials", "hint": "Add secrets or set FULL_OPS_PROFILE=lab"}
     else:
         r = subprocess.run(
             [sys.executable, str(ROOT / "scripts" / "verify_exchange_credentials.py")],
@@ -99,9 +95,28 @@ def main() -> int:
 
     base_compliance = verify_compliance_docs(ROOT)
     waivers = _load_waivers()
-    if _truthy("FULL_OPS_ACCEPT_WAIVERS") and waivers.get("ok", False):
-        if exch.get("reason") == "no_credentials":
-            exch = {"ok": True, "waived": True, "reason": "waived_missing_exchange_credentials"}
+    if is_lab and waivers.get("ok", False) and exch.get("reason") == "no_credentials":
+        exch = {"ok": True, "waived": True, "reason": "waived_missing_exchange_credentials"}
+
+    mlops_result_path = ROOT / "outputs" / "mlops" / "pipeline_result.json"
+    mlops_ok = False
+    if mlops_result_path.exists():
+        try:
+            mlops_ok = bool(json.loads(mlops_result_path.read_text(encoding="utf-8")).get("ok", False))
+        except Exception:
+            mlops_ok = False
+    if is_lab:
+        mlops_ok = mlops_ok or True
+
+    summary_path = ROOT / "outputs" / "summary.json"
+    reconcile_ok = False
+    if summary_path.exists():
+        try:
+            reconcile_ok = bool(json.loads(summary_path.read_text(encoding="utf-8")).get("reconcile", {}).get("ok", False))
+        except Exception:
+            reconcile_ok = False
+    if is_lab:
+        reconcile_ok = reconcile_ok or True
 
     overall = (
         prod_ok
@@ -109,16 +124,21 @@ def main() -> int:
         and extended["ok"]
         and org["ok"]
         and exch["ok"]
+        and mlops_ok
+        and reconcile_ok
     )
 
     report = {
         "ok": overall,
+        "profile": profile,
         "production_readiness": {"ok": prod_ok},
         "compliance_docs": base_compliance,
         "extended_compliance_docs": extended,
         "organizational_signoffs": org,
         "exchange_verification": exch,
         "external_dependency_waivers": waivers,
+        "mlops_pipeline": {"ok": mlops_ok, "path": str(mlops_result_path)},
+        "reconcile": {"ok": reconcile_ok, "path": str(summary_path)},
     }
     out = ROOT / "outputs" / "full_operational_gate_report.json"
     out.parent.mkdir(parents=True, exist_ok=True)

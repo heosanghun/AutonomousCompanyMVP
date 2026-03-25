@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sovereign Intelligence | Autonomous Trading Command</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Roboto+Mono:wght@300;400;500&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-fixed-variant": "#0d4e57",
+                        "surface-tint": "#00daf3",
+                        "background": "#131313",
+                        "tertiary-fixed-dim": "#f3bf26",
+                        "surface-container-low": "#1c1b1b",
+                        "inverse-primary": "#006875",
+                        "primary-container": "#00e5ff",
+                        "on-tertiary-container": "#6f5500",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary": "#00363d",
+                        "surface-bright": "#3a3939",
+                        "primary-fixed-dim": "#00daf3",
+                        "surface-container": "#201f1f",
+                        "surface-container-high": "#2a2a2a",
+                        "error-container": "#93000a",
+                        "outline": "#849396",
+                        "on-background": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "surface-container-highest": "#353534",
+                        "on-primary-container": "#00626e",
+                        "on-tertiary-fixed-variant": "#594400",
+                        "on-primary-fixed-variant": "#004f58",
+                        "primary": "#c3f5ff",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdf96",
+                        "on-tertiary": "#3e2e00",
+                        "tertiary-container": "#fec931",
+                        "primary-fixed": "#9cf0ff",
+                        "on-secondary-fixed": "#001f24",
+                        "secondary-fixed": "#b3ecf7",
+                        "secondary-fixed-dim": "#98d0da",
+                        "on-surface-variant": "#bac9cc",
+                        "inverse-on-surface": "#313030",
+                        "error": "#ffb4ab",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary": "#ffeac0",
+                        "on-tertiary-fixed": "#251a00",
+                        "on-secondary-container": "#8ac1cc",
+                        "secondary": "#98d0da",
+                        "on-primary": "#00363d",
+                        "outline-variant": "#3b494c",
+                        "surface": "#131313",
+                        "secondary-container": "#11505a",
+                        "surface-variant": "#353534",
+                        "on-primary-fixed": "#001f24"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["Roboto Mono"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(42, 42, 42, 0.6);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+        }
+        .ghost-border {
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+        .shimmer-text {
+            background: linear-gradient(90deg, #c3f5ff, #00daf3, #c3f5ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-neutral-950/60 backdrop-blur-[40px] border-b-[0.5px] border-white/10 shadow-[0_8px_32px_rgba(0,229,255,0.08)] flex justify-between items-center px-8 h-16">
+<div class="flex items-center space-x-6">
+<span class="text-2xl font-bold tracking-tighter text-cyan-400 font-headline">Sovereign Intelligence</span>
+<nav class="hidden md:flex space-x-8">
+<a class="text-cyan-400 border-b-2 border-cyan-400 pb-1 font-['Space_Grotesk'] tracking-tight text-sm uppercase transition-all duration-300" href="#">Broker Sync</a>
+<a class="text-neutral-400 hover:text-neutral-200 font-['Space_Grotesk'] tracking-tight text-sm uppercase transition-all duration-300 hover:bg-white/5" href="#">System Drift</a>
+<a class="text-neutral-400 hover:text-neutral-200 font-['Space_Grotesk'] tracking-tight text-sm uppercase transition-all duration-300 hover:bg-white/5" href="#">Oracle AI</a>
+</nav>
+</div>
+<div class="flex items-center space-x-4">
+<div class="relative">
+<span class="material-symbols-outlined text-cyan-400 cursor-pointer p-2 hover:bg-white/5 rounded-full transition-all">account_tree</span>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined text-cyan-400 cursor-pointer p-2 hover:bg-white/5 rounded-full transition-all">notifications_active</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+</div>
+<span class="material-symbols-outlined text-cyan-400 cursor-pointer p-2 hover:bg-white/5 rounded-full transition-all">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden ghost-border">
+<img alt="User Intelligence Profile" class="w-full h-full object-cover" data-alt="Professional headshot of a futuristic data analyst in a sleek dark uniform with soft cyan ambient studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCPM72Qo2ZA6EvYn_2HzCkMj72fLxkKXcz-THB6Hu15YRVrrpZmAcqUGWmPifK1Pj9ihDM0HyGM_vhZIEG3JMgBqhfQFYgLb4unwRL3HJSN7oDIepSfC4eKG6GHfcCEtOR2uPDw-4zaUw2knsuW5CY0wZfqEY7Cn2X7kDM5o4WBZZerP8QH6xXZuLIo8QxhMEfxonVFA1z4SZjJnUljZn5oXuBqmwjRp52NDEpJNELxrgk9wGV5DAjf8vsTj-5lLp1Aerw63oLVAMi"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-[72px] z-40 bg-neutral-950 border-r-[0.5px] border-white/10 flex flex-col items-center pt-20 pb-8 space-y-6">
+<div class="group relative flex flex-col items-center py-4 bg-cyan-400/10 text-cyan-400 border-r-2 border-cyan-400 cursor-pointer w-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<span class="font-['Roboto_Mono'] text-[10px] tracking-widest uppercase mt-1">Terminal</span>
+</div>
+<div class="group relative flex flex-col items-center py-4 text-neutral-500 hover:text-cyan-300 hover:bg-white/5 transition-colors cursor-pointer w-full">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-['Roboto_Mono'] text-[10px] tracking-widest uppercase mt-1">Strategies</span>
+</div>
+<div class="group relative flex flex-col items-center py-4 text-neutral-500 hover:text-cyan-300 hover:bg-white/5 transition-colors cursor-pointer w-full">
+<span class="material-symbols-outlined">lan</span>
+<span class="font-['Roboto_Mono'] text-[10px] tracking-widest uppercase mt-1">Nodes</span>
+</div>
+<div class="group relative flex flex-col items-center py-4 text-neutral-500 hover:text-cyan-300 hover:bg-white/5 transition-colors cursor-pointer w-full">
+<span class="material-symbols-outlined">history</span>
+<span class="font-['Roboto_Mono'] text-[10px] tracking-widest uppercase mt-1">History</span>
+</div>
+<div class="group relative flex flex-col items-center py-4 text-neutral-500 hover:text-cyan-300 hover:bg-white/5 transition-colors cursor-pointer w-full">
+<span class="material-symbols-outlined">security</span>
+<span class="font-['Roboto_Mono'] text-[10px] tracking-widest uppercase mt-1">Vault</span>
+</div>
+<div class="mt-auto space-y-6 w-full flex flex-col items-center">
+<div class="text-neutral-600 hover:text-neutral-300 transition-colors flex flex-col items-center cursor-pointer">
+<span class="material-symbols-outlined">help_center</span>
+</div>
+<div class="text-neutral-600 hover:text-neutral-300 transition-colors flex flex-col items-center cursor-pointer">
+<span class="material-symbols-outlined">description</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pl-[72px] pt-16 pb-8 min-h-screen">
+<div class="max-w-[1600px] mx-auto p-8 space-y-8">
+<!-- 1. KPI Hero Strip -->
+<section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+<!-- Sharpe Ratio -->
+<div class="glass-panel ghost-border rounded-xl p-6 flex flex-col justify-between group hover:shadow-[0_0_20px_rgba(0,229,255,0.15)] transition-all">
+<div class="flex justify-between items-start">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Sharpe Ratio</span>
+<span class="text-primary text-[10px] font-mono">+0.14</span>
+</div>
+<div class="mt-4 flex items-baseline space-x-2">
+<span class="text-3xl font-headline font-bold text-on-surface">3.82</span>
+</div>
+<div class="h-8 mt-4 w-full opacity-40 group-hover:opacity-100 transition-opacity">
+<svg class="w-full h-full overflow-visible" viewbox="0 0 100 30">
+<path class="text-primary shadow-[0_0_8px_rgba(0,229,255,0.8)]" d="M0 20 Q 20 5, 40 25 T 80 10 T 100 15" fill="none" stroke="currentColor" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Max Drawdown -->
+<div class="glass-panel ghost-border rounded-xl p-6 flex flex-col justify-between group transition-all">
+<div class="flex justify-between items-start">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Max Drawdown</span>
+<span class="text-error text-[10px] font-mono">-0.02%</span>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-headline font-bold text-on-surface">-2.14%</span>
+</div>
+<div class="h-8 mt-4 w-full opacity-40">
+<svg class="w-full h-full" viewbox="0 0 100 30">
+<path class="text-error" d="M0 5 L 20 15 L 40 10 L 60 25 L 100 28" fill="none" stroke="currentColor" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Win Rate -->
+<div class="glass-panel ghost-border rounded-xl p-6 flex flex-col justify-between group transition-all">
+<div class="flex justify-between items-start">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Win Rate</span>
+<div class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-headline font-bold text-on-surface">68.4%</span>
+</div>
+<div class="h-8 mt-4 w-full bg-white/5 rounded-full overflow-hidden relative">
+<div class="absolute inset-y-0 left-0 bg-primary/40 w-[68.4%] shadow-[0_0_10px_rgba(0,229,255,0.4)]"></div>
+</div>
+</div>
+<!-- Cumulative Return -->
+<div class="glass-panel ghost-border rounded-xl p-6 flex flex-col justify-between group transition-all">
+<div class="flex justify-between items-start">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Cum. Return</span>
+<span class="text-primary text-[10px] font-mono">YTD</span>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-headline font-bold text-primary">+124.9%</span>
+</div>
+<div class="h-8 mt-4 w-full opacity-40 group-hover:opacity-100 transition-opacity">
+<svg class="w-full h-full overflow-visible" viewbox="0 0 100 30">
+<path class="text-primary" d="M0 30 L 10 25 L 30 20 L 50 10 L 70 5 L 100 0" fill="none" stroke="currentColor" stroke-width="3"></path>
+</svg>
+</div>
+</div>
+<!-- Latency -->
+<div class="glass-panel ghost-border rounded-xl p-6 flex flex-col justify-between group transition-all">
+<div class="flex justify-between items-start">
+<span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Latency</span>
+<span class="text-on-surface-variant text-[10px] font-mono">NOMINAL</span>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-headline font-bold text-on-surface">12.4<span class="text-sm font-light text-on-surface-variant">ms</span></span>
+</div>
+<div class="flex space-x-1 mt-4">
+<div class="h-4 w-1 bg-primary/80"></div>
+<div class="h-6 w-1 bg-primary/80"></div>
+<div class="h-3 w-1 bg-primary/80"></div>
+<div class="h-5 w-1 bg-primary/80"></div>
+<div class="h-4 w-1 bg-primary/80"></div>
+<div class="h-2 w-1 bg-white/10"></div>
+</div>
+</div>
+<!-- Current PnL -->
+<div class="glass-panel ghost-border rounded-xl p-6 flex flex-col justify-between bg-primary/5 border-primary/20">
+<div class="flex justify-between items-start">
+<span class="font-label text-[10px] uppercase tracking-widest text-primary">Live PnL</span>
+<div class="flex space-x-1">
+<div class="w-1 h-1 bg-primary rounded-full"></div>
+<div class="w-1 h-1 bg-primary rounded-full opacity-50"></div>
+<div class="w-1 h-1 bg-primary rounded-full opacity-20"></div>
+</div>
+</div>
+<div class="mt-4">
+<span class="text-3xl font-headline font-bold text-primary-container">+$42.1K</span>
+</div>
+<div class="mt-4 text-[9px] font-mono text-primary/60 tracking-widest">
+                        SESSION_DURATION: 04:22:12
+                    </div>
+</div>
+</section>
+<!-- 2. Performance Panel & 3. Risk Matrix -->
+<section class="grid grid-cols-12 gap-8">
+<!-- Performance Panel (8 Cols) -->
+<div class="col-span-12 lg:col-span-8 glass-panel ghost-border rounded-xl p-8 relative overflow-hidden">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h2 class="text-xl font-headline font-bold tracking-tight">Equity Dynamics</h2>
+<p class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mt-1">Multi-strategy vs. Global Benchmark</p>
+</div>
+<div class="flex space-x-4">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 bg-primary rounded-full"></div>
+<span class="text-[10px] font-label uppercase">Sovereign Alpha</span>
+</div>
+<div class="flex items-center space-x-2">
+<div class="w-3 h-0.5 border-t border-dashed border-on-surface-variant"></div>
+<span class="text-[10px] font-label uppercase">S&amp;P 500</span>
+</div>
+</div>
+</div>
+<div class="h-80 w-full relative">
+<!-- Chart Mockup -->
+<div class="absolute inset-0 flex items-end justify-between px-2">
+<div class="w-[5%] h-[20%] bg-primary/10 border-t border-primary/40"></div>
+<div class="w-[5%] h-[25%] bg-primary/10 border-t border-primary/40"></div>
+<div class="w-[5%] h-[40%] bg-primary/10 border-t border-primary/40"></div>
+<div class="w-[5%] h-[35%] bg-primary/10 border-t border-primary/40"></div>
+<div class="w-[5%] h-[55%] bg-primary/10 border-t border-primary/40"></div>
+<div class="w-[5%] h-[70%] bg-primary/10 border-t border-primary/50"></div>
+<div class="w-[5%] h-[65%] bg-primary/10 border-t border-primary/50"></div>
+<div class="w-[5%] h-[80%] bg-primary/10 border-t border-primary/60"></div>
+<div class="w-[5%] h-[75%] bg-primary/20 border-t-2 border-primary/80"></div>
+<div class="w-[5%] h-[90%] bg-primary/30 border-t-2 border-primary"></div>
+</div>
+<!-- Dotted Benchmark -->
+<svg class="absolute inset-0 w-full h-full" preserveaspectratio="none">
+<path d="M0 250 L 1600 180" fill="none" stroke="#849396" stroke-dasharray="4 4" stroke-width="1"></path>
+</svg>
+</div>
+<!-- Overlay Grid Lines -->
+<div class="absolute inset-0 pointer-events-none grid grid-cols-4 grid-rows-4 opacity-[0.03]">
+<div class="border-r border-b border-white"></div><div class="border-r border-b border-white"></div><div class="border-r border-b border-white"></div><div class="border-b border-white"></div>
+<div class="border-r border-b border-white"></div><div class="border-r border-b border-white"></div><div class="border-r border-b border-white"></div><div class="border-b border-white"></div>
+<div class="border-r border-b border-white"></div><div class="border-r border-b border-white"></div><div class="border-r border-b border-white"></div><div class="border-b border-white"></div>
+<div class="border-r border-white"></div><div class="border-r border-white"></div><div class="border-r border-white"></div><div></div>
+</div>
+</div>
+<!-- Risk Matrix (4 Cols) -->
+<div class="col-span-12 lg:col-span-4 glass-panel ghost-border rounded-xl p-8">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-headline font-bold tracking-tight">Volatility Nodes</h2>
+<span class="material-symbols-outlined text-primary text-sm">filter_center_focus</span>
+</div>
+<div class="grid grid-cols-5 gap-3">
+<!-- Heatmap Grid -->
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.1</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.4</div>
+<div class="aspect-square rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center text-[9px] font-mono shadow-[0_0_10px_rgba(0,229,255,0.2)]">1.2</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.2</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.1</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.3</div>
+<div class="aspect-square rounded-lg bg-primary/40 border border-primary flex items-center justify-center text-[9px] font-mono shadow-[0_0_15px_rgba(0,229,255,0.3)]">2.8</div>
+<div class="aspect-square rounded-lg bg-primary border border-primary flex items-center justify-center text-[9px] font-mono text-on-primary shadow-[0_0_20px_rgba(0,229,255,0.4)]">4.5</div>
+<div class="aspect-square rounded-lg bg-primary/30 border border-primary/50 flex items-center justify-center text-[9px] font-mono shadow-[0_0_12px_rgba(0,229,255,0.2)]">1.9</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.2</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.4</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.6</div>
+<div class="aspect-square rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-[9px] font-mono">0.9</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.3</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.1</div>
+<div class="aspect-square rounded-lg bg-error/20 border border-error/40 flex items-center justify-center text-[9px] font-mono text-error">X.4</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.5</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.2</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.1</div>
+<div class="aspect-square rounded-lg bg-surface-container-highest flex items-center justify-center border border-white/5 text-[9px] font-mono">0.0</div>
+</div>
+<div class="mt-8 p-4 rounded-xl bg-white/5 border border-white/10">
+<div class="flex justify-between items-center text-[10px] font-mono text-on-surface-variant uppercase mb-2">
+<span>System Load</span>
+<span>42%</span>
+</div>
+<div class="w-full h-1 bg-white/10 rounded-full">
+<div class="w-[42%] h-full bg-primary-container"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Execution Monitor -->
+<section class="glass-panel ghost-border rounded-xl overflow-hidden">
+<div class="p-6 flex justify-between items-center border-b border-white/10">
+<h2 class="text-xl font-headline font-bold tracking-tight flex items-center">
+<span class="w-2 h-2 rounded-full bg-primary mr-3 animate-pulse"></span>
+                        Real-time Execution
+                    </h2>
+<div class="flex space-x-2">
+<button class="px-4 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-[10px] font-mono uppercase tracking-widest transition-all">Export Logs</button>
+<button class="px-4 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 text-[10px] font-mono uppercase tracking-widest transition-all">Live Feed</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-white/5 text-[10px] font-mono uppercase tracking-[0.2em] text-on-surface-variant">
+<tr>
+<th class="py-4 px-6 font-medium">Timestamp</th>
+<th class="py-4 px-6 font-medium">Asset</th>
+<th class="py-4 px-6 font-medium">Type</th>
+<th class="py-4 px-6 font-medium">Size</th>
+<th class="py-4 px-6 font-medium">Price</th>
+<th class="py-4 px-6 font-medium">Slippage</th>
+<th class="py-4 px-6 font-medium text-right">Status</th>
+</tr>
+</thead>
+<tbody class="text-xs font-mono">
+<tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+<td class="py-4 px-6 opacity-60">12:44:02.12</td>
+<td class="py-4 px-6 font-bold text-on-surface">BTC-USDT.P</td>
+<td class="py-4 px-6"><span class="text-primary-container">BUY</span></td>
+<td class="py-4 px-6">2.420</td>
+<td class="py-4 px-6">$64,122.50</td>
+<td class="py-4 px-6 text-primary">-0.002%</td>
+<td class="py-4 px-6 text-right"><span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px]">EXECUTED</span></td>
+</tr>
+<tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+<td class="py-4 px-6 opacity-60">12:44:01.88</td>
+<td class="py-4 px-6 font-bold text-on-surface">ETH-USD.P</td>
+<td class="py-4 px-6"><span class="text-error">SELL</span></td>
+<td class="py-4 px-6">14.800</td>
+<td class="py-4 px-6">$3,421.10</td>
+<td class="py-4 px-6 text-on-surface-variant">0.000%</td>
+<td class="py-4 px-6 text-right"><span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px]">EXECUTED</span></td>
+</tr>
+<tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+<td class="py-4 px-6 opacity-60">12:43:59.05</td>
+<td class="py-4 px-6 font-bold text-on-surface">SOL-USDT.P</td>
+<td class="py-4 px-6"><span class="text-primary-container">BUY</span></td>
+<td class="py-4 px-6">150.000</td>
+<td class="py-4 px-6">$142.92</td>
+<td class="py-4 px-6 text-error">+0.014%</td>
+<td class="py-4 px-6 text-right"><span class="px-2 py-1 rounded bg-white/10 text-on-surface-variant text-[10px]">PENDING</span></td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="py-4 px-6 opacity-60">12:43:58.21</td>
+<td class="py-4 px-6 font-bold text-on-surface">XAU-USD</td>
+<td class="py-4 px-6"><span class="text-error">SELL</span></td>
+<td class="py-4 px-6">1.000</td>
+<td class="py-4 px-6">$2,341.50</td>
+<td class="py-4 px-6 text-primary">-0.001%</td>
+<td class="py-4 px-6 text-right"><span class="px-2 py-1 rounded bg-primary/10 text-primary text-[10px]">EXECUTED</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- 5. Kill-Switch -->
+<section class="flex justify-center pt-8">
+<div class="relative group cursor-pointer">
+<!-- Red Glow Pulse -->
+<div class="absolute -inset-1 bg-error rounded-xl blur opacity-25 group-hover:opacity-60 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+<button class="relative px-12 py-8 bg-neutral-950/80 backdrop-blur-xl border border-error/50 rounded-xl flex items-center space-x-6 hover:bg-error/10 transition-all active:scale-95">
+<div class="w-16 h-16 rounded-full bg-error/20 flex items-center justify-center border border-error/40 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-error text-3xl" style="font-variation-settings: 'FILL' 1;">emergency_home</span>
+</div>
+<div class="text-left">
+<span class="block text-error font-headline font-bold text-2xl tracking-tight">TERMINATE ALL CYCLES</span>
+<span class="block text-on-surface-variant text-[10px] font-mono uppercase tracking-[0.3em] mt-1">Double-Click for Protocol Zero</span>
+</div>
+</button>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full z-50 bg-neutral-950/80 backdrop-blur-md border-t-[0.5px] border-white/10 flex justify-between items-center px-10 h-8">
+<div class="font-['Roboto_Mono'] text-[8px] tracking-[0.2em] uppercase font-light text-neutral-600">
+            SOVEREIGN_INTEL_v4.2.0
+        </div>
+<div class="flex space-x-8">
+<span class="font-['Roboto_Mono'] text-[8px] tracking-[0.2em] uppercase font-light text-cyan-400">LATENCY: 12MS</span>
+<span class="font-['Roboto_Mono'] text-[8px] tracking-[0.2em] uppercase font-light text-neutral-600 hover:text-neutral-300 cursor-pointer transition-colors">AUDIT: 0x7F4A...B2</span>
+<div class="flex items-center space-x-2">
+<span class="w-1 h-1 rounded-full bg-primary shadow-[0_0_4px_#00e5ff]"></span>
+<span class="font-['Roboto_Mono'] text-[8px] tracking-[0.2em] uppercase font-light text-cyan-500">SYSTEM_HEALTH: NOMINAL</span>
+</div>
+</div>
+</footer>
+</body></html>

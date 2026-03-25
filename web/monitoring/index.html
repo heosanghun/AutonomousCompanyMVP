@@ -2,264 +2,615 @@
 <html class="dark" lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0e0e0e" />
   <title>Sovereign Ops | AutonomousCompanyMVP</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
   <script>
     tailwind.config = {
-      darkMode: 'class',
+      darkMode: "class",
       theme: {
         extend: {
           colors: {
-            background: '#0e0e0e',
-            surface: '#131313',
-            'surface-high': '#1f1f1f',
-            'on-surface': '#e8e6e3',
-            'on-muted': '#9ca3af',
-            primary: '#00e5ff',
-            'primary-dim': '#00b8d4',
-            error: '#ff6b6b',
-            ok: '#5eead4',
+            bg0: "#0e0e0e",
+            bg1: "#131313",
+            bg2: "#1d1d1d",
+            line: "#2a2a2a",
+            mute: "#a3a3a3",
+            text: "#f2f2f2",
+            cyan: "#81ecff",
+            cyanDim: "#00d4ec",
+            good: "#69f6b8",
+            bad: "#ff7076"
           },
           fontFamily: {
-            headline: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
-            body: ['"DM Sans"', 'system-ui', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
-          },
-          boxShadow: {
-            glow: '0 0 24px rgba(0, 229, 255, 0.12)',
-            'glow-sm': '0 0 12px rgba(0, 229, 255, 0.08)',
-          },
-        },
-      },
+            headline: ["Space Grotesk", "sans-serif"],
+            body: ["Inter", "sans-serif"],
+            mono: ["Roboto Mono", "monospace"]
+          }
+        }
+      }
     };
   </script>
   <style>
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-    .glass-panel {
-      background: rgba(31, 31, 31, 0.55);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
+    body {
+      background:
+        radial-gradient(1000px 500px at 10% -20%, rgba(129,236,255,0.12), transparent 45%),
+        radial-gradient(900px 420px at 110% 0%, rgba(105,246,184,0.06), transparent 45%),
+        #0e0e0e;
     }
-    .ghost-border { border: 0.5px solid rgba(255, 255, 255, 0.08); }
-    .mesh-bg {
-      background-color: #0e0e0e;
-      background-image:
-        radial-gradient(ellipse 120% 80% at 20% -20%, rgba(0, 229, 255, 0.14), transparent 50%),
-        radial-gradient(ellipse 80% 60% at 100% 10%, rgba(94, 234, 212, 0.06), transparent 45%),
-        radial-gradient(ellipse 60% 40% at 50% 100%, rgba(0, 184, 212, 0.05), transparent 40%);
+    .mat { font-variation-settings: "FILL" 0, "wght" 350, "GRAD" 0, "opsz" 24; }
+    .glass {
+      background: rgba(28, 28, 28, 0.52);
+      backdrop-filter: blur(34px);
+      -webkit-backdrop-filter: blur(34px);
+      box-shadow: inset 0 0 0 .5px rgba(255,255,255,.09);
     }
-    .shimmer-title {
-      background: linear-gradient(105deg, #e8e6e3 0%, #00e5ff 45%, #5eead4 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .accent-glow { box-shadow: 0 0 44px rgba(0,212,236,.12); }
+    .kpi-card { min-height: 126px; }
+    .focus-ring:focus-visible { outline: 2px solid #81ecff; outline-offset: 2px; }
+    .status-dot { display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:6px; }
+    .status-ok { background:#69f6b8; box-shadow:0 0 12px rgba(105,246,184,.45); }
+    .status-bad { background:#ff7076; box-shadow:0 0 12px rgba(255,112,118,.45); }
+    .status-warn { background:#81ecff; box-shadow:0 0 12px rgba(129,236,255,.45); }
+    .soft-divider { border-top: 1px solid rgba(255,255,255,.06); }
+    .pill {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-family: "Roboto Mono", monospace;
+      color: #cfcfcf;
+      background: rgba(255,255,255,.03);
     }
-    @keyframes fade-up {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .sticky-head { position: sticky; top: 0; background: rgba(18,18,18,.94); backdrop-filter: blur(10px); }
+    @media (max-width: 900px) {
+      aside { display: none; }
+      main { margin-left: 0 !important; padding-left: 14px !important; padding-right: 14px !important; }
+      .mobile-hidden { display: none !important; }
     }
-    .animate-in { animation: fade-up 0.5s ease forwards; }
+    .safe-pb { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
+    @media (min-width: 901px) {
+      .safe-pb { padding-bottom: 2.5rem; }
+    }
+    .mobile-bottom-nav {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      background: rgba(10,10,10,.92);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .tap-target { min-height: 44px; min-width: 44px; }
+    .chat-scroll::-webkit-scrollbar { width: 6px; }
+    .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 999px; }
+    .chat-msg-user { background: linear-gradient(135deg, rgba(0,212,236,.28), rgba(0,212,236,.12)); }
+    .chat-msg-assistant { background: rgba(255,255,255,.04); }
+    .chat-card-title { font-size: 12px; color: #9ec7cf; font-family: "Roboto Mono", monospace; margin-bottom: 8px; }
+    .chat-card-subtitle { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+    .chat-kv { font-size: 14px; line-height: 1.55; }
+    .chat-kv b { color: #eaf9fc; font-weight: 600; }
+    .quick-chip {
+      border: 1px solid rgba(129,236,255,.28);
+      color: #b3ebf5;
+      background: rgba(16, 42, 48, .45);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      line-height: 1;
+      transition: all .15s ease;
+    }
+    .quick-chip:hover { color: #fff; border-color: rgba(129,236,255,.5); background: rgba(16, 42, 48, .68); }
+    .quick-chip.active { color: #fff; border-color: rgba(129,236,255,.72); background: rgba(20, 64, 74, .88); }
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #9ca3af;
+      display: inline-block;
+      animation: typingBounce 1s infinite ease-in-out;
+      opacity: .7;
+    }
+    .typing-dot:nth-child(2) { animation-delay: .12s; }
+    .typing-dot:nth-child(3) { animation-delay: .24s; }
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: .5; }
+      40% { transform: translateY(-3px); opacity: 1; }
+    }
   </style>
 </head>
-<body class="mesh-bg text-on-surface font-body min-h-screen selection:bg-primary/25">
-  <!-- Top bar (ref: stitch/sovereign_intelligence_dashboard_gold) -->
-  <header class="fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-between px-6 md:px-8 border-b ghost-border bg-neutral-950/70 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,229,255,0.06)]">
-    <div class="flex items-center gap-4 md:gap-8">
-      <div class="flex items-center gap-3">
-        <span class="material-symbols-outlined text-primary text-2xl">hub</span>
-        <div>
-          <p class="font-headline font-bold text-lg tracking-tight shimmer-title leading-none">Sovereign Ops</p>
-          <p class="text-[10px] font-mono uppercase tracking-[0.2em] text-on-muted mt-0.5">AutonomousCompany MVP</p>
+<body id="top" class="text-text font-body min-h-screen overflow-x-hidden">
+  <header class="fixed top-0 left-0 right-0 z-50 h-14 sm:h-16 px-4 sm:px-5 md:px-8 flex items-center justify-between bg-black/35 backdrop-blur-3xl border-b border-white/5 pt-[env(safe-area-inset-top,0px)]">
+    <div class="flex items-center gap-2 sm:gap-3 md:gap-8 min-w-0">
+      <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
+        <span class="material-symbols-outlined mat text-cyan text-xl sm:text-2xl shrink-0">hub</span>
+        <div class="min-w-0">
+          <p class="font-headline font-bold tracking-tight text-cyan text-base sm:text-lg leading-none truncate">SOVEREIGN OPS</p>
+          <p class="hidden sm:block font-mono text-[9px] sm:text-[10px] text-mute tracking-[0.15em] uppercase truncate">AutonomousCompany MVP</p>
         </div>
       </div>
-      <nav class="hidden lg:flex items-center gap-6 text-[11px] font-headline uppercase tracking-widest text-on-muted">
-        <span class="text-primary border-b-2 border-primary pb-1">Overview</span>
-        <a class="hover:text-on-surface transition-colors" href="/api/status" target="_blank" rel="noopener">API JSON</a>
-        <a class="hover:text-on-surface transition-colors" href="/metrics" target="_blank" rel="noopener">Prometheus</a>
+      <nav class="hidden lg:flex items-center gap-6 text-[11px] uppercase tracking-widest font-headline text-mute">
+        <span class="text-cyan border-b-2 border-cyan pb-0.5">Overview</span>
+        <a href="/api/status" target="_blank" rel="noopener" class="hover:text-white">API JSON</a>
+        <a href="/metrics" target="_blank" rel="noopener" class="hover:text-white">Prometheus</a>
       </nav>
     </div>
-    <div class="flex items-center gap-3">
-      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel ghost-border">
-        <span class="w-2 h-2 rounded-full bg-primary animate-pulse shadow-glow-sm"></span>
-        <span id="livePulse" class="text-[10px] font-mono text-on-muted uppercase tracking-wider">Live sync</span>
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass">
+        <span class="h-2 w-2 rounded-full bg-cyan animate-pulse"></span>
+        <span id="livePulse" class="font-mono text-[10px] uppercase text-mute">Live Sync</span>
       </div>
-      <button type="button" onclick="loadStatus()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-headline uppercase tracking-wider hover:bg-primary/20 transition-all">
-        <span class="material-symbols-outlined text-base">sync</span>
-        Refresh
+      <button type="button" onclick="loadStatus()" aria-label="Refresh status" class="tap-target focus-ring glass rounded-full px-3 sm:px-4 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
+        <span class="material-symbols-outlined mat text-xl sm:text-base">refresh</span><span class="hidden sm:inline">Refresh</span>
       </button>
     </div>
   </header>
 
-  <!-- Slim rail -->
-  <aside class="fixed left-0 top-0 z-40 w-[72px] h-full pt-20 pb-8 flex flex-col items-center border-r ghost-border bg-neutral-950/80 backdrop-blur-xl">
-    <div class="flex flex-col items-center gap-6 py-4 w-full text-primary bg-primary/10 border-r-2 border-primary">
-      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitoring</span>
-      <span class="font-mono text-[9px] uppercase tracking-widest text-center leading-tight">Ops</span>
+  <aside class="hidden md:flex md:flex-col fixed left-0 top-16 bottom-0 w-[76px] bg-black/30 backdrop-blur-2xl border-r border-white/5 items-center pt-5">
+    <div class="w-full py-4 text-cyan bg-cyan/10 border-r-2 border-cyan flex flex-col items-center gap-2">
+      <span class="material-symbols-outlined mat">monitoring</span>
+      <span class="font-mono text-[9px] uppercase tracking-widest">Ops</span>
     </div>
-    <div class="mt-6 flex flex-col items-center gap-4 text-on-muted hover:text-primary/80 transition-colors cursor-default py-2 w-full">
-      <span class="material-symbols-outlined text-xl">security</span>
-    </div>
-    <div class="mt-auto mb-4 text-on-muted">
-      <span class="material-symbols-outlined text-xl">description</span>
-    </div>
+    <span class="material-symbols-outlined mat text-mute mt-6">security</span>
+    <span class="material-symbols-outlined mat text-mute mt-auto mb-4">description</span>
   </aside>
 
-  <main class="pl-[72px] pt-20 pb-12 px-4 md:px-8 max-w-[1600px] mx-auto">
-    <p id="generatedAt" class="text-xs font-mono text-on-muted mb-6 animate-in">Loading status…</p>
+  <main class="ml-0 md:ml-[88px] pt-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:pt-20 safe-pb px-4 sm:px-5 md:px-8">
+    <section id="errorBanner" class="hidden mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"></section>
 
-    <!-- KPI strip -->
-    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 mb-10">
-      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] group hover:shadow-glow transition-shadow animate-in">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Sharpe</span>
-          <span class="material-symbols-outlined text-primary/60 text-lg">trending_up</span>
+    <section class="glass rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 accent-glow">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="min-w-0">
+          <h1 class="font-headline text-xl sm:text-2xl md:text-3xl font-bold tracking-tight leading-tight">Oracle-Grade Runtime Control</h1>
+          <p class="text-xs sm:text-sm text-mute mt-1">실시간 전략·리스크·게이트 상태를 한 화면에서 운영</p>
         </div>
-        <p id="kpiSharpe" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
-      </div>
-      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] hover:shadow-glow transition-shadow animate-in">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">MDD</span>
-          <span class="material-symbols-outlined text-error/80 text-lg">trending_down</span>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="glass rounded-xl px-3 py-2"><span class="text-mute">Mode</span><p id="heroMode" class="font-mono mt-1">—</p></div>
+          <div class="glass rounded-xl px-3 py-2"><span class="text-mute">Kill-switch</span><p id="heroKill" class="font-mono mt-1">—</p></div>
         </div>
-        <p id="kpiMdd" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
       </div>
-      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] hover:shadow-glow transition-shadow animate-in">
-        <div class="flex justify-between items-start">
-          <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Win rate</span>
-          <span class="w-1.5 h-1.5 rounded-full bg-primary shadow-glow-sm animate-pulse"></span>
-        </div>
-        <p id="kpiWin" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
-      </div>
-      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] hover:shadow-glow transition-shadow animate-in">
-        <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Cum. return</span>
-        <p id="kpiCum" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
-      </div>
-      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] hover:shadow-glow transition-shadow animate-in">
-        <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Latency p99</span>
-        <p id="kpiLat" class="text-2xl font-mono font-medium mt-2"><span id="kpiLatVal">—</span> <span class="text-sm text-on-muted">ms</span></p>
-      </div>
-      <div class="glass-panel ghost-border rounded-2xl p-5 flex flex-col justify-between min-h-[120px] border-primary/20 hover:shadow-glow transition-shadow animate-in">
-        <span class="text-[10px] font-headline uppercase tracking-widest text-on-muted">Fills</span>
-        <p id="kpiFills" class="text-3xl font-headline font-bold tracking-tight mt-2">—</p>
-        <p id="runIdLine" class="text-[10px] font-mono text-on-muted truncate mt-1" title="">run_id —</p>
+      <p id="generatedAt" class="font-mono text-[11px] text-mute mt-4">Loading status…</p>
+      <div class="soft-divider mt-3 pt-3 flex flex-wrap gap-2">
+        <span id="badgePipeline" class="pill">pipeline: —</span>
+        <span id="badgeReconcile" class="pill">reconcile: —</span>
+        <span id="badgeGate" class="pill">gate: —</span>
+        <span id="badgeDrift" class="pill">drift: —</span>
       </div>
     </section>
 
-    <div class="grid lg:grid-cols-2 gap-6 mb-8">
-      <section class="glass-panel ghost-border rounded-2xl overflow-hidden">
+    <section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6">
+      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
+        <div class="flex justify-between"><p class="text-[10px] uppercase tracking-widest text-mute font-headline">Sharpe</p><span class="material-symbols-outlined mat text-cyan text-base">query_stats</span></div>
+        <p id="kpiSharpe" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
+      </article>
+      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
+        <div class="flex justify-between"><p class="text-[10px] uppercase tracking-widest text-mute font-headline">MDD</p><span class="material-symbols-outlined mat text-bad text-base">trending_down</span></div>
+        <p id="kpiMdd" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
+      </article>
+      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
+        <div class="flex justify-between"><p class="text-[10px] uppercase tracking-widest text-mute font-headline">Win Rate</p><span class="h-1.5 w-1.5 rounded-full bg-good mt-1"></span></div>
+        <p id="kpiWin" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
+      </article>
+      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
+        <p class="text-[10px] uppercase tracking-widest text-mute font-headline">Cumulative Return</p>
+        <p id="kpiCum" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
+      </article>
+      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
+        <p class="text-[10px] uppercase tracking-widest text-mute font-headline">Latency p99</p>
+        <p id="kpiLat" class="font-mono text-2xl sm:text-3xl font-semibold mt-2 sm:mt-4 tabular-nums"><span id="kpiLatVal">—</span><span class="text-xs sm:text-sm text-mute ml-1">ms</span></p>
+      </article>
+      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card border border-cyan/30">
+        <p class="text-[10px] uppercase tracking-widest text-mute font-headline">Fills</p>
+        <p id="kpiFills" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
+        <p id="runIdLine" class="font-mono text-[11px] text-mute truncate mt-1">run_id —</p>
+      </article>
+    </section>
+
+    <section class="grid xl:grid-cols-2 gap-4">
+      <article class="glass rounded-2xl overflow-hidden">
         <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-          <h2 class="font-headline font-semibold text-sm uppercase tracking-widest text-on-surface">Gate status</h2>
-          <span class="material-symbols-outlined text-on-muted text-lg">verified_user</span>
+          <h2 class="font-headline text-sm uppercase tracking-widest">Gate Status</h2>
+          <span class="material-symbols-outlined mat text-mute">verified_user</span>
         </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left text-on-muted text-xs uppercase tracking-wider border-b border-white/5">
-                <th class="px-5 py-3 font-medium">Check</th>
-                <th class="px-5 py-3 font-medium">State</th>
-              </tr>
-            </thead>
+        <div class="px-5 py-3 text-xs text-mute flex items-center gap-3">
+          <span><span class="status-dot status-ok"></span><span id="gatePassCount">0</span> PASS</span>
+          <span><span class="status-dot status-bad"></span><span id="gateFailCount">0</span> FAIL</span>
+        </div>
+        <div id="gateCardsMobile" class="md:hidden px-4 pb-4 space-y-2"></div>
+        <div class="hidden md:block overflow-x-auto">
+          <table class="w-full">
+            <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left">Check</th><th class="px-5 py-3 text-left">State</th></tr></thead>
             <tbody id="gateRows"></tbody>
           </table>
         </div>
-      </section>
-
-      <section class="glass-panel ghost-border rounded-2xl overflow-hidden">
+      </article>
+      <article class="glass rounded-2xl overflow-hidden">
         <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-          <h2 class="font-headline font-semibold text-sm uppercase tracking-widest text-on-surface">Artifacts</h2>
-          <span class="material-symbols-outlined text-on-muted text-lg">folder_open</span>
+          <h2 class="font-headline text-sm uppercase tracking-widest">Artifacts</h2>
+          <span class="material-symbols-outlined mat text-mute">folder_open</span>
         </div>
-        <div class="overflow-x-auto max-h-[280px] overflow-y-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left text-on-muted text-xs uppercase tracking-wider border-b border-white/5 sticky top-0 bg-surface-high/90 backdrop-blur">
-                <th class="px-5 py-3 font-medium">Key</th>
-                <th class="px-5 py-3 font-medium">Path</th>
-              </tr>
-            </thead>
+        <div class="px-4 sm:px-5 py-3 border-b border-white/5">
+          <input id="artifactSearch" type="search" enterkeyhint="search" autocomplete="off" class="focus-ring w-full rounded-lg bg-black/25 border border-white/10 px-3 py-3 sm:py-2 text-sm sm:text-xs font-mono text-white placeholder:text-mute min-h-[44px] sm:min-h-0" placeholder="Search artifact key/path..." />
+        </div>
+        <div id="pathCardsMobile" class="md:hidden px-4 pb-4 space-y-2 max-h-[min(50vh,420px)] overflow-y-auto"></div>
+        <div class="hidden md:block overflow-auto max-h-[320px]">
+          <table class="w-full">
+            <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left">Key</th><th class="px-5 py-3 text-left">Path</th></tr></thead>
             <tbody id="pathRows"></tbody>
           </table>
         </div>
-      </section>
-    </div>
+      </article>
+    </section>
 
-    <details class="glass-panel ghost-border rounded-2xl overflow-hidden group">
-      <summary class="px-5 py-4 cursor-pointer font-headline text-sm uppercase tracking-widest text-on-muted hover:text-on-surface transition-colors list-none flex items-center justify-between">
-        Raw payload
-        <span class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
-      </summary>
-      <pre id="raw" class="text-xs font-mono text-primary/90 bg-black/40 p-5 overflow-auto max-h-[360px] border-t border-white/5 leading-relaxed"></pre>
+    <section class="glass rounded-2xl mt-4 overflow-hidden">
+      <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+        <h2 class="font-headline text-sm uppercase tracking-widest">Ops Assistant</h2>
+        <span class="material-symbols-outlined mat text-mute">chat</span>
+      </div>
+      <div class="px-4 sm:px-5 py-3 text-xs text-mute font-mono border-b border-white/5">
+        자유롭게 질문하세요. 현재 운영 상태를 기반으로 요약/가이드 답변을 제공합니다.
+      </div>
+      <div class="px-4 sm:px-5 py-3 border-b border-white/5 flex flex-wrap gap-2">
+        <button type="button" class="quick-chip" data-quick-q="지금 가장 위험한 이슈 3개와 우선순위를 알려줘">위험요약</button>
+        <button type="button" class="quick-chip" data-quick-q="실패 게이트별 즉시 조치 체크리스트를 알려줘">조치체크리스트</button>
+        <button type="button" class="quick-chip" data-quick-q="다음 30분 운영계획을 제안해줘">30분 운영계획</button>
+      </div>
+      <div class="px-4 sm:px-5 py-3 border-b border-white/5 space-y-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-[11px] font-mono text-mute mr-1">톤</span>
+          <button type="button" class="quick-chip active" data-tone="friendly">친근</button>
+          <button type="button" class="quick-chip" data-tone="professional">전문</button>
+          <button type="button" class="quick-chip" data-tone="concise">간결</button>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-[11px] font-mono text-mute mr-1">라우팅</span>
+          <button type="button" class="quick-chip active" data-route="auto">자동분리</button>
+          <button type="button" class="quick-chip" data-route="ops">운영상태기반</button>
+          <button type="button" class="quick-chip" data-route="general">일반잡담</button>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-[11px] font-mono text-mute mr-1">응답길이</span>
+          <button type="button" class="quick-chip" data-length="one_line">한 줄</button>
+          <button type="button" class="quick-chip active" data-length="three_lines">3줄</button>
+          <button type="button" class="quick-chip" data-length="detailed">상세</button>
+          <span class="text-[11px] font-mono text-mute ml-2">메모리</span>
+          <select id="memoryTurns" class="focus-ring rounded-xl bg-black/30 border border-white/10 px-3 py-1.5 text-xs font-mono">
+            <option value="0">OFF</option>
+            <option value="2">2턴</option>
+            <option value="4" selected>4턴</option>
+            <option value="8">8턴</option>
+          </select>
+        </div>
+      </div>
+      <div id="chatThread" class="chat-scroll max-h-[360px] overflow-y-auto px-4 sm:px-5 py-4 space-y-3">
+        <div class="chat-msg-assistant rounded-2xl px-4 py-3 border border-white/10">
+          <p class="text-xs text-mute mb-1 font-mono">Assistant</p>
+          <p class="text-sm leading-relaxed">안녕하세요. 운영 상태 요약, 실패 게이트 조치, 우선순위 액션 플랜을 도와드릴게요.</p>
+        </div>
+      </div>
+      <div class="px-4 sm:px-5 py-3 border-t border-white/5 bg-black/20">
+        <div class="flex items-end gap-2">
+          <textarea id="chatInput" rows="1" placeholder="예) 지금 가장 위험한 이슈 3개와 즉시 조치 순서를 알려줘"
+            class="focus-ring flex-1 resize-none rounded-2xl bg-black/30 border border-white/10 px-4 py-3 text-sm text-white placeholder:text-mute min-h-[48px] max-h-40"></textarea>
+          <button id="chatSendBtn" type="button" class="tap-target focus-ring glass rounded-2xl px-4 py-3 text-cyan hover:text-white">
+            <span class="material-symbols-outlined mat">send</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <details class="glass rounded-xl sm:rounded-2xl mt-4 overflow-hidden">
+      <summary class="px-4 sm:px-5 py-4 cursor-pointer font-headline text-sm uppercase tracking-widest text-mute min-h-[48px] flex items-center">Raw Payload</summary>
+      <pre id="raw" class="p-4 sm:p-5 border-t border-white/5 text-[11px] sm:text-xs font-mono text-cyan overflow-auto max-h-[min(45vh,360px)] sm:max-h-[360px]"></pre>
     </details>
   </main>
 
+  <nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch justify-around gap-1 px-2" aria-label="Mobile quick actions">
+    <a href="#top" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan">
+      <span class="material-symbols-outlined mat text-xl">home</span>
+      Home
+    </a>
+    <button type="button" onclick="loadStatus()" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-cyan">
+      <span class="material-symbols-outlined mat text-xl">sync</span>
+      Sync
+    </button>
+    <a href="/api/status" target="_blank" rel="noopener" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan">
+      <span class="material-symbols-outlined mat text-xl">code</span>
+      API
+    </a>
+    <a href="/metrics" target="_blank" rel="noopener" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan">
+      <span class="material-symbols-outlined mat text-xl">monitoring</span>
+      Metrics
+    </a>
+  </nav>
+
   <script>
+    let latestPaths = {};
+    let latestStatus = {};
+    const chatHistory = [];
+    const chatSettings = {
+      tone: "friendly",
+      route_mode: "auto",
+      length: "three_lines",
+      memory_turns: 4,
+    };
     function fmt(v) {
-      if (v === null || v === undefined) return '—';
-      if (typeof v === 'number' && Number.isFinite(v)) {
+      if (v === null || v === undefined) return "—";
+      if (typeof v === "number" && Number.isFinite(v)) {
         if (Math.abs(v) < 0.01 && v !== 0) return v.toExponential(2);
         return v.toLocaleString(undefined, { maximumFractionDigits: 4 });
       }
       return String(v);
     }
-
     function badge(ok) {
-      if (ok) {
-        return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 text-ok text-xs font-mono font-medium border border-emerald-500/30">PASS</span>';
-      }
-      return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/15 text-error text-xs font-mono font-medium border border-red-500/30">FAIL</span>';
+      if (ok) return '<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-good bg-green-500/10 border border-green-500/25">PASS</span>';
+      return '<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-bad bg-red-500/10 border border-red-500/25">FAIL</span>';
     }
-
     async function loadStatus() {
-      const pulse = document.getElementById('livePulse');
-      pulse.textContent = 'Fetching…';
+      const pulse = document.getElementById("livePulse");
+      pulse.textContent = "Fetching…";
+      document.getElementById("errorBanner").classList.add("hidden");
       try {
-        const r = await fetch('/api/status', { cache: 'no-store' });
+        const r = await fetch("/api/status", { cache: "no-store" });
+        if (!r.ok) throw new Error(`status_http_${r.status}`);
         const d = await r.json();
-        document.getElementById('generatedAt').textContent = `Generated (UTC): ${d.generated_at_utc || '—'}`;
-        pulse.textContent = 'Live sync';
-
+        latestStatus = d || {};
         const m = d.metrics || {};
-        document.getElementById('kpiSharpe').textContent = fmt(m.sharpe);
-        document.getElementById('kpiMdd').textContent = fmt(m.mdd);
-        document.getElementById('kpiWin').textContent = fmt(m.win_rate);
-        document.getElementById('kpiCum').textContent = fmt(m.cum_return);
-        document.getElementById('kpiLatVal').textContent = fmt(m.latency_p99_ms);
-
         const s = d.summary || {};
-        document.getElementById('kpiFills').textContent = s.n_fills != null ? fmt(s.n_fills) : '—';
-        const rid = s.run_id || '';
-        const ridEl = document.getElementById('runIdLine');
-        ridEl.textContent = rid ? `run ${rid.slice(0, 8)}…` : 'run_id —';
-        ridEl.title = rid || '';
+        document.getElementById("generatedAt").textContent = `Generated (UTC): ${d.generated_at_utc || "—"}`;
+        document.getElementById("kpiSharpe").textContent = fmt(m.sharpe);
+        document.getElementById("kpiMdd").textContent = fmt(m.mdd);
+        document.getElementById("kpiWin").textContent = fmt(m.win_rate);
+        document.getElementById("kpiCum").textContent = fmt(m.cum_return);
+        document.getElementById("kpiLatVal").textContent = fmt(m.latency_p99_ms);
+        document.getElementById("kpiFills").textContent = s.n_fills != null ? fmt(s.n_fills) : "—";
+        const rid = s.run_id || "";
+        document.getElementById("runIdLine").textContent = rid ? `run ${rid.slice(0, 8)}…` : "run_id —";
+        document.getElementById("heroMode").textContent = s.execution_mode || "—";
+        document.getElementById("heroKill").textContent = s.kill_switch ? "ON" : "OFF";
+        document.getElementById("badgePipeline").textContent = `pipeline: ${(d.gates||{}).mlops_pipeline_ok ? "ok" : "fail"}`;
+        document.getElementById("badgeReconcile").textContent = `reconcile: ${(d.gates||{}).reconcile_ok ? "ok" : "fail"}`;
+        document.getElementById("badgeGate").textContent = `gate: ${(d.gates||{}).full_operational_ok ? "ok" : "fail"}`;
+        document.getElementById("badgeDrift").textContent = `drift: ${((s.drift||{}).drift_detected ? "detected" : "normal")}`;
 
         const gates = d.gates || {};
-        document.getElementById('gateRows').innerHTML = Object.entries(gates).map(([k, v]) => `
-          <tr class="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
-            <td class="px-5 py-3 font-mono text-xs text-on-muted">${k}</td>
-            <td class="px-5 py-3">${badge(Boolean(v))}</td>
-          </tr>
-        `).join('');
-
-        const paths = d.paths || {};
-        document.getElementById('pathRows').innerHTML = Object.entries(paths).map(([k, v]) => `
-          <tr class="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
-            <td class="px-5 py-3 font-mono text-xs text-primary/90">${k}</td>
-            <td class="px-5 py-3 font-mono text-[11px] text-on-muted break-all">${v}</td>
-          </tr>
-        `).join('');
-
-        document.getElementById('raw').textContent = JSON.stringify(d, null, 2);
+        let passCount = 0;
+        let failCount = 0;
+        Object.values(gates).forEach((v) => (v ? passCount++ : failCount++));
+        document.getElementById("gatePassCount").textContent = String(passCount);
+        document.getElementById("gateFailCount").textContent = String(failCount);
+        const gateEntries = Object.entries(gates);
+        document.getElementById("gateRows").innerHTML = gateEntries.map(([k, v]) =>
+          `<tr class="border-t border-white/5"><td class="px-5 py-3 font-mono text-xs text-mute">${k}</td><td class="px-5 py-3">${badge(Boolean(v))}</td></tr>`
+        ).join("");
+        document.getElementById("gateCardsMobile").innerHTML = gateEntries.map(([k, v]) =>
+          `<div class="glass rounded-xl px-4 py-3 flex items-center justify-between gap-3 border border-white/5">
+            <span class="font-mono text-[11px] text-mute break-all flex-1 min-w-0">${k}</span>
+            <span class="shrink-0">${badge(Boolean(v))}</span>
+          </div>`
+        ).join("") || `<p class="text-xs text-mute font-mono px-1">No gate data.</p>`;
+        latestPaths = d.paths || {};
+        renderPathRows();
+        document.getElementById("raw").textContent = JSON.stringify(d, null, 2);
+        pulse.textContent = "Live Sync";
       } catch (e) {
-        pulse.textContent = 'Error';
-        document.getElementById('generatedAt').textContent = `Error: ${e.message || e} — start server: python scripts/monitoring_server.py`;
+        pulse.textContent = "Error";
+        const msg = `데이터 로딩 실패: ${e.message || e}`;
+        document.getElementById("generatedAt").textContent = msg;
+        const b = document.getElementById("errorBanner");
+        b.textContent = `${msg} (server: python scripts/monitoring_server.py --port 8787)`;
+        b.classList.remove("hidden");
       }
     }
+    function appendChatMessage(role, text) {
+      const thread = document.getElementById("chatThread");
+      const isUser = role === "user";
+      const wrap = document.createElement("div");
+      wrap.className = `${isUser ? "chat-msg-user ml-auto" : "chat-msg-assistant"} rounded-2xl px-4 py-3 border border-white/10 max-w-[92%]`;
+      wrap.innerHTML = `<p class="text-xs text-mute mb-1 font-mono">${isUser ? "You" : "Assistant"}</p><p class="text-sm leading-relaxed whitespace-pre-wrap"></p>`;
+      wrap.querySelector("p:last-child").textContent = text;
+      thread.appendChild(wrap);
+      thread.scrollTop = thread.scrollHeight;
+    }
+    function appendAssistantCard(model) {
+      const thread = document.getElementById("chatThread");
+      const wrap = document.createElement("div");
+      wrap.className = "chat-msg-assistant rounded-2xl px-4 py-3 border border-white/10 max-w-[92%]";
+      const risksHtml = (model.risks || []).map((r) => `<li>${r}</li>`).join("");
+      const actionsHtml = (model.actions || []).map((a, i) => `<li>${i + 1}. ${a}</li>`).join("");
+      wrap.innerHTML = `
+        <p class="text-xs text-mute mb-1 font-mono">Assistant</p>
+        <div class="chat-card-title">${model.title}</div>
+        <div class="chat-kv"><b>실행 모드</b>: ${model.mode} &nbsp;|&nbsp; <b>킬스위치</b>: ${model.kill}</div>
+        <div class="chat-kv"><b>샤프</b>: ${model.sharpe} &nbsp;|&nbsp; <b>지연 p99</b>: ${model.latency} ms</div>
+        <div class="chat-kv"><b>드리프트</b>: ${model.drift}</div>
+        <div class="chat-card-subtitle" style="margin-top:10px;">핵심 리스크</div>
+        <ul class="chat-kv list-disc pl-5 space-y-1">${risksHtml || "<li>특이 리스크 없음</li>"}</ul>
+        <div class="chat-card-subtitle" style="margin-top:10px;">권장 다음 조치</div>
+        <ul class="chat-kv list-none pl-0 space-y-1">${actionsHtml}</ul>
+      `;
+      thread.appendChild(wrap);
+      thread.scrollTop = thread.scrollHeight;
+    }
+    function appendLoadingBubble() {
+      const thread = document.getElementById("chatThread");
+      const wrap = document.createElement("div");
+      wrap.id = "assistantLoadingBubble";
+      wrap.className = "chat-msg-assistant rounded-2xl px-4 py-3 border border-white/10 max-w-[92%]";
+      wrap.innerHTML = `
+        <p class="text-xs text-mute mb-1 font-mono">Assistant</p>
+        <div class="flex items-center gap-1.5" aria-label="assistant typing">
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="text-xs text-mute font-mono ml-2">thinking...</span>
+        </div>
+      `;
+      thread.appendChild(wrap);
+      thread.scrollTop = thread.scrollHeight;
+      return wrap;
+    }
+    function removeLoadingBubble(node) {
+      if (node && node.parentNode) node.parentNode.removeChild(node);
+      const stale = document.getElementById("assistantLoadingBubble");
+      if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+    }
+    function buildAssistantReply(userText) {
+      const text = (userText || "").toLowerCase();
+      const gates = (latestStatus.gates || {});
+      const failed = Object.entries(gates).filter(([, v]) => !v).map(([k]) => k);
+      const m = latestStatus.metrics || {};
+      const s = latestStatus.summary || {};
+      const drift = (s.drift || {}).drift_detected ? "감지됨" : "정상";
+      const formatNum = (v, d = 4) => (typeof v === "number" && Number.isFinite(v) ? v.toFixed(d) : "-");
+      const model = {
+        title: "운영 상태 분석 결과",
+        mode: s.execution_mode || "-",
+        kill: s.kill_switch ? "ON" : "OFF",
+        drift,
+        sharpe: formatNum(m.sharpe, 4),
+        latency: formatNum(m.latency_p99_ms, 4),
+        risks: [],
+        actions: [],
+      };
+      if (failed.length) model.risks.push(`실패 게이트 ${failed.length}개: ${failed.join(", ")}`);
+      if ((s.drift || {}).drift_detected) model.risks.push("드리프트 감지: 보수 운용 필요");
+      if ((m.latency_p99_ms || 0) > 5.0) model.risks.push("지연시간 임계 초과");
+      if (!model.risks.length) model.risks.push("치명적 리스크는 현재 보이지 않음");
 
+      if (text.includes("위험") || text.includes("리스크") || text.includes("이슈")) {
+        model.actions = [
+          "실패 게이트부터 복구 후 전체 검증 재실행",
+          "drift/latency 수치를 10분 간격으로 추적",
+          "reconcile 상태를 마지막으로 확인",
+        ];
+      } else if (text.includes("게이트") || text.includes("통과")) {
+        model.actions = [
+          "FAIL 게이트 항목별 담당/기한 지정",
+          "증빙 JSON 갱신 후 verify 스크립트 재실행",
+          "PASS/FAIL 변화 로그를 운영 노트에 기록",
+        ];
+      } else if (text.includes("조치") || text.includes("다음") || text.includes("계획")) {
+        model.actions = [
+          "production/full gate 리포트 최신화",
+          "실패 항목 증빙 경로 업데이트",
+          "strict 기준으로 최종 재검증",
+        ];
+      } else {
+        model.actions = [
+          "우선 실패 게이트 복구 여부 확인",
+          "latency/drift 추세 확인",
+          "필요 시 '위험요약' 또는 '조치체크리스트' 질문",
+        ];
+      }
+      return model;
+    }
+    function autoResizeTextarea(el) {
+      el.style.height = "auto";
+      el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+    }
+    async function askGemini(message) {
+      const turns = Number(chatSettings.memory_turns) || 0;
+      const keep = Math.max(0, turns * 2);
+      const history = keep > 0 ? chatHistory.slice(-keep) : [];
+      const r = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, history, settings: chatSettings }),
+      });
+      const data = await r.json();
+      if (!r.ok || !data.ok) {
+        throw new Error(data.error || `chat_http_${r.status}`);
+      }
+      return String(data.reply || "").trim();
+    }
+    function pushHistory(role, text) {
+      chatHistory.push({ role, text });
+      if (chatHistory.length > 40) chatHistory.splice(0, chatHistory.length - 40);
+    }
+    async function sendChat() {
+      const input = document.getElementById("chatInput");
+      const btn = document.getElementById("chatSendBtn");
+      const val = (input.value || "").trim();
+      if (!val) return;
+      appendChatMessage("user", val);
+      pushHistory("user", val);
+      input.value = "";
+      autoResizeTextarea(input);
+      btn.disabled = true;
+      btn.classList.add("opacity-60", "cursor-not-allowed");
+      const loadingNode = appendLoadingBubble();
+      try {
+        const text = await askGemini(val);
+        removeLoadingBubble(loadingNode);
+        appendChatMessage("assistant", text);
+        pushHistory("assistant", text);
+      } catch (_) {
+        removeLoadingBubble(loadingNode);
+        const fallback = buildAssistantReply(val);
+        appendAssistantCard(fallback);
+        pushHistory("assistant", "운영 상태 분석 카드 기반 응답");
+      } finally {
+        removeLoadingBubble(loadingNode);
+        btn.disabled = false;
+        btn.classList.remove("opacity-60", "cursor-not-allowed");
+      }
+    }
+    function bindSingleChoice(selector, key) {
+      document.querySelectorAll(selector).forEach((el) => {
+        el.addEventListener("click", () => {
+          document.querySelectorAll(selector).forEach((x) => x.classList.remove("active"));
+          el.classList.add("active");
+          const next = el.getAttribute(`data-${key}`) || "";
+          if (key === "route") chatSettings.route_mode = next;
+          else chatSettings[key] = next;
+        });
+      });
+    }
+    function renderPathRows() {
+      const q = (document.getElementById("artifactSearch").value || "").toLowerCase().trim();
+      const rows = Object.entries(latestPaths).filter(([k, v]) => {
+        if (!q) return true;
+        return k.toLowerCase().includes(q) || String(v).toLowerCase().includes(q);
+      });
+      const emptyMsg = `<tr><td colspan="2" class="px-5 py-6 text-xs text-mute font-mono">No artifacts match search.</td></tr>`;
+      document.getElementById("pathRows").innerHTML = rows.map(([k, v]) =>
+        `<tr class="border-t border-white/5"><td class="px-5 py-3 font-mono text-xs text-cyan">${k}</td><td class="px-5 py-3 font-mono text-xs text-mute break-all">${v}</td></tr>`
+      ).join("") || emptyMsg;
+      const mobileEmpty = `<p class="text-xs text-mute font-mono py-4 text-center">No artifacts match search.</p>`;
+      document.getElementById("pathCardsMobile").innerHTML = rows.map(([k, v]) =>
+        `<div class="glass rounded-xl p-4 border border-white/5 space-y-2">
+          <p class="font-mono text-xs text-cyan font-semibold break-all">${k}</p>
+          <p class="font-mono text-[11px] text-mute break-all leading-relaxed">${v}</p>
+        </div>`
+      ).join("") || mobileEmpty;
+    }
+    document.getElementById("artifactSearch").addEventListener("input", renderPathRows);
+    const chatInput = document.getElementById("chatInput");
+    const chatSendBtn = document.getElementById("chatSendBtn");
+    chatSendBtn.addEventListener("click", sendChat);
+    document.querySelectorAll("[data-quick-q]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        chatInput.value = btn.getAttribute("data-quick-q") || "";
+        autoResizeTextarea(chatInput);
+        sendChat();
+      });
+    });
+    bindSingleChoice("[data-tone]", "tone");
+    bindSingleChoice("[data-route]", "route");
+    bindSingleChoice("[data-length]", "length");
+    document.getElementById("memoryTurns").addEventListener("change", (e) => {
+      chatSettings.memory_turns = Number(e.target.value || "0");
+    });
+    chatInput.addEventListener("input", () => autoResizeTextarea(chatInput));
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendChat();
+      }
+    });
     loadStatus();
     setInterval(loadStatus, 10000);
   </script>

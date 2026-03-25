@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from src.agentic.propose_agent import propose_next_actions
 from src.main import run
 
 
@@ -33,11 +34,26 @@ def validate(summary: dict) -> tuple[bool, list[str]]:
     drift = summary.get("drift", {})
     if bool(drift.get("drift_detected", False)):
         errors.append("drift detected: runtime should remain in guarded mode")
+    if not bool(summary.get("reconcile", {}).get("ok", False)):
+        errors.append("reconcile check failed")
+    mlops_artifact = Path("outputs/mlops/pipeline_result.json")
+    if not mlops_artifact.exists():
+        errors.append("mlops pipeline artifact missing: outputs/mlops/pipeline_result.json")
+    else:
+        try:
+            mlops_ok = bool(json.loads(mlops_artifact.read_text(encoding="utf-8")).get("ok", False))
+            if not mlops_ok:
+                errors.append("mlops pipeline artifact indicates failure")
+        except Exception:
+            errors.append("mlops pipeline artifact unreadable")
 
     return len(errors) == 0, errors
 
 
 def main() -> int:
+    from scripts.run_mlops_data_pipeline import main as run_mlops_main
+
+    run_mlops_main()
     out_dir = "outputs/validation_run"
     summary = run(output_dir=out_dir)
     ok, errors = validate(summary)
@@ -46,6 +62,7 @@ def main() -> int:
         "errors": errors,
         "summary_path": str(Path(out_dir) / "summary.json"),
         "audit_path": str(Path(out_dir) / "audit.log"),
+        "proposal_copilot": propose_next_actions({"errors": errors, "gates": summary.get("reconcile", {})}),
     }
     report_path = Path("outputs/validation_report.json")
     report_path.parent.mkdir(parents=True, exist_ok=True)

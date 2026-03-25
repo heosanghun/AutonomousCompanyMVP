@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORACLE AI | Mobile Command Center v3</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#00363d",
+              "on-secondary": "#313030",
+              "error": "#ffb4ab",
+              "primary-fixed": "#9cf0ff",
+              "inverse-on-surface": "#313030",
+              "background": "#131313",
+              "on-error-container": "#ffdad6",
+              "on-primary-fixed": "#001f24",
+              "tertiary-container": "#fec931",
+              "surface-tint": "#00daf3",
+              "on-tertiary-container": "#6f5500",
+              "tertiary-fixed-dim": "#f3bf26",
+              "on-tertiary": "#3e2e00",
+              "surface-dim": "#131313",
+              "primary-fixed-dim": "#00daf3",
+              "surface-container-lowest": "#0e0e0e",
+              "on-error": "#690005",
+              "inverse-surface": "#e5e2e1",
+              "primary": "#c3f5ff",
+              "surface-variant": "#353534",
+              "surface-container-high": "#2a2a2a",
+              "primary-container": "#00e5ff",
+              "on-primary-container": "#00626e",
+              "on-secondary-fixed-variant": "#474646",
+              "surface-container-low": "#1c1b1b",
+              "surface": "#131313",
+              "surface-container-highest": "#353534",
+              "secondary-container": "#474646",
+              "on-secondary-container": "#b7b4b4",
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#bac9cc",
+              "secondary-fixed": "#e5e2e1",
+              "on-primary-fixed-variant": "#004f58",
+              "surface-container": "#201f1f",
+              "error-container": "#93000a",
+              "surface-bright": "#3a3939",
+              "outline": "#849396",
+              "inverse-primary": "#006875",
+              "on-tertiary-fixed": "#251a00",
+              "tertiary": "#ffeac0",
+              "secondary": "#c9c6c5",
+              "outline-variant": "#3b494c",
+              "on-secondary-fixed": "#1c1b1b",
+              "tertiary-fixed": "#ffdf96",
+              "on-tertiary-fixed-variant": "#594400",
+              "on-background": "#e5e2e1",
+              "secondary-fixed-dim": "#c9c6c5"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Space Grotesk"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(28, 27, 27, 0.6);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+        }
+        .plasma-glow {
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .arc-gauge {
+            stroke-dasharray: 100 100;
+            stroke-dashoffset: 25;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container min-h-screen overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="bg-[#131314]/80 dark:bg-[#131314]/80 backdrop-blur-[30px] border-b border-white/5 shadow-[0_24px_48px_rgba(0,229,255,0.06)] docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-6 pt-8 pb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-white/10">
+<img alt="Institutional User Profile" class="w-full h-full object-cover" data-alt="Professional portrait of a high-level executive in a dark suit against a minimalist charcoal gray background, high-end photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP8TuO2Dk-ekpe1ZUN7krIS0xvP5fXM9XxF786rWeR-aLlsdH6j8aeJSNQD-vLFiTqVSiG9Y9D8FsxE-8o6jNKPjXBDljFEVZ_zq3cu5s4Iu9YhHOx-Mj5XCQ_u04bMB742FSbhiY5AVG0xVmk_W9Y0oyF8HjhoLQgc8yrG3Ob8pFLzDGjyZL6y6QRxWUCvnPVRdnWAzSg7RKlnuQ94Fk_77EZl2Kalye0WavAeHUjm488YBaL23a4QpwYkHBYEhCILnAOj8aAHAbx"/>
+</div>
+<span class="text-xl font-black tracking-tighter text-cyan-50 dark:text-cyan-100 font-['Space_Grotesk'] uppercase">ORACLE AI</span>
+</div>
+<button class="text-cyan-400 dark:text-cyan-400 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-2xl" data-icon="sensors">sensors</span>
+</button>
+</header>
+<main class="px-6 py-8 space-y-10 pb-32">
+<!-- High-Precision KPI Header -->
+<section class="space-y-4">
+<div class="flex items-end justify-between px-2">
+<h2 class="font-headline text-xs font-bold tracking-[0.2em] text-on-surface-variant uppercase">Global Pulse</h2>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary-container animate-pulse shadow-[0_0_8px_#00e5ff]"></div>
+<span class="text-[10px] font-mono text-primary-fixed-dim">LIVE_DATA_STREAM</span>
+</div>
+</div>
+<div class="flex gap-4 overflow-x-auto no-scrollbar py-2 -mx-2 px-2">
+<div class="flex-shrink-0 w-40 p-5 rounded-xl bg-surface-container-low border border-white/5 space-y-1">
+<p class="text-[10px] font-headline text-on-surface-variant uppercase tracking-widest">Alpha Net</p>
+<p class="text-2xl font-headline font-bold text-primary-container">84.2<span class="text-xs ml-1">%</span></p>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden mt-2">
+<div class="w-4/5 h-full bg-primary-container"></div>
+</div>
+</div>
+<div class="flex-shrink-0 w-40 p-5 rounded-xl bg-surface-container-low border border-white/5 space-y-1">
+<p class="text-[10px] font-headline text-on-surface-variant uppercase tracking-widest">Volatility</p>
+<p class="text-2xl font-headline font-bold text-tertiary-fixed-dim">0.14<span class="text-xs ml-1">σ</span></p>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden mt-2">
+<div class="w-1/4 h-full bg-tertiary-fixed-dim"></div>
+</div>
+</div>
+<div class="flex-shrink-0 w-40 p-5 rounded-xl bg-surface-container-low border border-white/5 space-y-1">
+<p class="text-[10px] font-headline text-on-surface-variant uppercase tracking-widest">Latency</p>
+<p class="text-2xl font-headline font-bold text-on-surface">12<span class="text-xs ml-1">ms</span></p>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden mt-2">
+<div class="w-1/6 h-full bg-outline"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Systemic Divergence Risk Gauge -->
+<section class="relative bg-surface-container-low rounded-xl p-8 border border-white/5 overflow-hidden">
+<div class="absolute top-0 right-0 p-4">
+<span class="material-symbols-outlined text-outline/30" data-icon="troubleshoot">troubleshoot</span>
+</div>
+<div class="text-center space-y-2 mb-6">
+<h3 class="font-headline text-sm font-bold tracking-widest text-on-surface uppercase">Systemic Divergence</h3>
+<p class="text-[10px] text-on-surface-variant font-mono">MODEL_CONFIDENCE_VARIANCE</p>
+</div>
+<div class="relative flex justify-center items-center h-40">
+<svg class="w-56 h-56 transform -rotate-180" viewbox="0 0 100 100">
+<circle class="text-surface-container-highest" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-dasharray="141 282" stroke-linecap="round" stroke-width="8"></circle>
+<circle class="arc-gauge" cx="50" cy="50" fill="none" r="45" stroke="url(#plasmaGradient)" stroke-dasharray="85 282" stroke-linecap="round" stroke-width="8"></circle>
+<defs>
+<lineargradient id="plasmaGradient" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" style="stop-color:#00daf3"></stop>
+<stop offset="100%" style="stop-color:#00e5ff"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="absolute flex flex-col items-center justify-center pt-8">
+<span class="text-4xl font-headline font-black text-on-surface">0.28</span>
+<span class="text-[10px] font-bold text-primary-container tracking-tighter">OPTIMAL RANGE</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-4">
+<div class="p-3 bg-surface-container-lowest rounded-lg border border-white/5">
+<p class="text-[9px] text-on-surface-variant font-bold uppercase tracking-widest">Upper Bound</p>
+<p class="text-sm font-headline font-medium">0.45</p>
+</div>
+<div class="p-3 bg-surface-container-lowest rounded-lg border border-white/5">
+<p class="text-[9px] text-on-surface-variant font-bold uppercase tracking-widest">Drift Ratio</p>
+<p class="text-sm font-headline font-medium text-primary-container">-0.02%</p>
+</div>
+</div>
+</section>
+<!-- Kill-Switch Command Area -->
+<section class="space-y-6">
+<div class="text-center px-8">
+<h3 class="font-headline text-lg font-bold text-on-surface tracking-tight">Override Protocol</h3>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">Emergency liquidation and node disconnection. Requires sustained authentication.</p>
+</div>
+<div class="relative h-20 bg-surface-container-lowest rounded-full p-2 border border-white/10 shadow-inner flex items-center">
+<!-- Slide Track Background Text -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<span class="text-[10px] font-headline font-bold text-outline/20 tracking-[0.4em] uppercase">Slide to initiate kill-switch</span>
+</div>
+<!-- Slide Handle -->
+<div class="h-16 w-16 rounded-full bg-gradient-to-br from-error to-error-container flex items-center justify-center shadow-xl z-10 cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-on-error text-3xl" data-icon="power_settings_new">power_settings_new</span>
+</div>
+<!-- Visual Feedback Track -->
+<div class="absolute left-2 top-2 bottom-2 bg-error/10 rounded-full w-16"></div>
+</div>
+<div class="flex justify-center">
+<button class="text-[10px] font-bold text-outline uppercase tracking-widest flex items-center gap-2 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="info">info</span>
+                    Protocol Documentation
+                </button>
+</div>
+</section>
+<!-- Strategy Status Feed -->
+<section class="space-y-4">
+<h2 class="font-headline text-xs font-bold tracking-[0.2em] text-on-surface-variant uppercase px-2">Active Strategies</h2>
+<div class="space-y-3">
+<!-- Card 1 -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-fixed-dim" data-icon="token">token</span>
+</div>
+<div>
+<p class="text-sm font-headline font-bold text-on-surface uppercase tracking-tight">Arbitrage_V4</p>
+<p class="text-[10px] text-on-surface-variant font-mono">POS_LONG_0.5ETH</p>
+</div>
+</div>
+<div class="text-right">
+<div class="flex items-center gap-1 justify-end">
+<span class="text-xs font-headline font-bold text-primary-container">98%</span>
+<span class="material-symbols-outlined text-[10px] text-primary-container" data-icon="trending_up">trending_up</span>
+</div>
+<p class="text-[9px] text-on-surface-variant font-mono uppercase">Confidence</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" data-icon="currency_exchange">currency_exchange</span>
+</div>
+<div>
+<p class="text-sm font-headline font-bold text-on-surface uppercase tracking-tight">Liquidity_Pool_A</p>
+<p class="text-[10px] text-on-surface-variant font-mono">HEALTH_NOMINAL</p>
+</div>
+</div>
+<div class="text-right">
+<div class="flex items-center gap-1 justify-end">
+<span class="text-xs font-headline font-bold text-tertiary-fixed-dim">74%</span>
+</div>
+<p class="text-[9px] text-on-surface-variant font-mono uppercase">Confidence</p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-white/5 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-outline" data-icon="shield">shield</span>
+</div>
+<div>
+<p class="text-sm font-headline font-bold text-on-surface uppercase tracking-tight">Hedge_Engine_01</p>
+<p class="text-[10px] text-on-surface-variant font-mono">STANDBY_REDUNDANT</p>
+</div>
+</div>
+<div class="text-right">
+<div class="flex items-center gap-1 justify-end">
+<span class="text-xs font-headline font-bold text-on-surface-variant">--</span>
+</div>
+<p class="text-[9px] text-on-surface-variant font-mono uppercase">Confidence</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-center items-center pb-10">
+<div class="bg-[#1C1B1C]/60 dark:bg-[#1C1B1C]/60 backdrop-blur-[40px] fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] rounded-full border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex justify-between items-center px-4 py-2">
+<!-- Terminal Tab (Active) -->
+<a class="flex flex-col items-center justify-center bg-cyan-500/10 text-cyan-400 rounded-full py-2 px-5 shadow-[0_0_20px_rgba(0,229,255,0.15)] transition-all cubic-bezier(0.4,0,0.2,1)" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-medium tracking-widest uppercase mt-1">Terminal</span>
+</a>
+<!-- Vault Tab -->
+<a class="flex flex-col items-center justify-center text-zinc-500 py-2 px-5 hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-medium tracking-widest uppercase mt-1">Vault</span>
+</a>
+<!-- Strategy Tab -->
+<a class="flex flex-col items-center justify-center text-zinc-500 py-2 px-5 hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-medium tracking-widest uppercase mt-1">Strategy</span>
+</a>
+<!-- Intel Tab -->
+<a class="flex flex-col items-center justify-center text-zinc-500 py-2 px-5 hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-['Space_Grotesk'] text-[10px] font-medium tracking-widest uppercase mt-1">Intel</span>
+</a>
+</div>
+</nav>
+<!-- Background Decorative Gradients -->
+<div class="fixed top-0 right-0 w-[300px] h-[300px] bg-primary-container/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+<div class="fixed bottom-0 left-0 w-[400px] h-[400px] bg-tertiary-container/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+</body></html>

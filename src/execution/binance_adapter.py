@@ -94,6 +94,11 @@ class BinanceLiveAdapter:
                 status="rejected",
                 venue="binance_live",
                 note="missing_exchange_credentials",
+                decision_id=order.decision_id,
+                strategy_id=order.strategy_id,
+                model_version=order.model_version,
+                feature_version=order.feature_version,
+                policy_version=order.policy_version,
             )
         side = "BUY" if order.side == "buy" else "SELL"
         endpoint = "/api/v3/order/test" if self.config.test_order else "/api/v3/order"
@@ -113,6 +118,11 @@ class BinanceLiveAdapter:
                 status="rejected",
                 venue="binance_live",
                 note="normalized_qty_is_zero",
+                decision_id=order.decision_id,
+                strategy_id=order.strategy_id,
+                model_version=order.model_version,
+                feature_version=order.feature_version,
+                policy_version=order.policy_version,
             )
         params = {
             "symbol": order.symbol,
@@ -137,6 +147,11 @@ class BinanceLiveAdapter:
                         status="filled",
                         venue="binance_test_order",
                         note="accepted_by_binance_test_endpoint",
+                        decision_id=order.decision_id,
+                        strategy_id=order.strategy_id,
+                        model_version=order.model_version,
+                        feature_version=order.feature_version,
+                        policy_version=order.policy_version,
                     )
                 fill_price = order.price_hint
                 fills = data.get("fills") if isinstance(data, dict) else None
@@ -155,6 +170,11 @@ class BinanceLiveAdapter:
                     status="filled",
                     venue="binance_live",
                     note="live_order_submitted",
+                    decision_id=order.decision_id,
+                    strategy_id=order.strategy_id,
+                    model_version=order.model_version,
+                    feature_version=order.feature_version,
+                    policy_version=order.policy_version,
                 )
             except HTTPError as e:
                 body = ""
@@ -175,6 +195,11 @@ class BinanceLiveAdapter:
                     status="rejected",
                     venue="binance_live",
                     note=f"http_error:{e.code}:{body[:120]}",
+                    decision_id=order.decision_id,
+                    strategy_id=order.strategy_id,
+                    model_version=order.model_version,
+                    feature_version=order.feature_version,
+                    policy_version=order.policy_version,
                 )
             except URLError:
                 if attempt < self.config.max_retries:
@@ -190,6 +215,11 @@ class BinanceLiveAdapter:
                     status="rejected",
                     venue="binance_live",
                     note="network_error_after_retries",
+                    decision_id=order.decision_id,
+                    strategy_id=order.strategy_id,
+                    model_version=order.model_version,
+                    feature_version=order.feature_version,
+                    policy_version=order.policy_version,
                 )
             except Exception as e:
                 return FillEvent(
@@ -202,6 +232,11 @@ class BinanceLiveAdapter:
                     status="rejected",
                     venue="binance_live",
                     note=f"submit_error:{type(e).__name__}",
+                    decision_id=order.decision_id,
+                    strategy_id=order.strategy_id,
+                    model_version=order.model_version,
+                    feature_version=order.feature_version,
+                    policy_version=order.policy_version,
                 )
         return FillEvent(
             order_id=order.order_id,
@@ -213,4 +248,9 @@ class BinanceLiveAdapter:
             status="rejected",
             venue="binance_live",
             note="submit_exhausted_without_result",
+            decision_id=order.decision_id,
+            strategy_id=order.strategy_id,
+            model_version=order.model_version,
+            feature_version=order.feature_version,
+            policy_version=order.policy_version,
         )

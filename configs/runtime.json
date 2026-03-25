@@ -3,10 +3,20 @@
   "symbol": "BTCUSDT",
   "default_qty": 1.0,
   "paper_slippage_bps": 2.0,
+  "data_source": "mock",
+  "ws_price_samples": 1000,
+  "ws_per_message_timeout_sec": 15.0,
+  "mock_ticks": 1000,
+  "mock_seed": 0,
+  "fresh_fills_per_run": true,
+  "klines_interval": "1m",
+  "klines_limit": 1000,
+  "binance_rest_base": "https://api.binance.com",
   "live_guard": {
     "require_readiness_file": true,
     "readiness_file": "outputs/live_readiness_approved.flag",
     "fills_file": "outputs/live_fills.jsonl",
+    "per_run_fills": true,
     "test_order": true
   }
 }

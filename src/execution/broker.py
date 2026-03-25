@@ -6,7 +6,7 @@ import json
 import os
 import random
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import replace
 from pathlib import Path
 
 from src.execution.binance_adapter import BinanceConfig, BinanceLiveAdapter
@@ -22,9 +22,10 @@ class Broker(ABC):
 class PaperBroker(Broker):
     """Simple paper broker with configurable pseudo slippage."""
 
-    def __init__(self, fills_path: str | Path, slippage_bps: float = 2.0) -> None:
+    def __init__(self, fills_path: str | Path, slippage_bps: float = 2.0, run_id: str = "") -> None:
         self.fills_path = Path(fills_path)
         self.slippage_bps = slippage_bps
+        self.run_id = run_id
         self.fills_path.parent.mkdir(parents=True, exist_ok=True)
 
     def submit(self, order: OrderRequest) -> FillEvent:
@@ -41,6 +42,12 @@ class PaperBroker(Broker):
             status="filled",
             venue="paper",
             note=f"paper_fill_with_{self.slippage_bps}bps_base_slippage",
+            decision_id=order.decision_id,
+            strategy_id=order.strategy_id,
+            model_version=order.model_version,
+            feature_version=order.feature_version,
+            policy_version=order.policy_version,
+            run_id=self.run_id,
         )
         with self.fills_path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(fill.as_dict(), ensure_ascii=True) + "\n")
@@ -61,6 +68,11 @@ class LiveBrokerStub(Broker):
             status="rejected",
             venue="live_stub",
             note="live_broker_not_implemented",
+            decision_id=order.decision_id,
+            strategy_id=order.strategy_id,
+            model_version=order.model_version,
+            feature_version=order.feature_version,
+            policy_version=order.policy_version,
         )
 
 
@@ -77,15 +89,20 @@ class LiveBrokerEnvGuard(Broker):
         readiness_flag_path: str | Path,
         fills_path: str | Path = "outputs/live_fills.jsonl",
         test_order: bool = True,
+        run_id: str = "",
     ) -> None:
         self.readiness_flag_path = Path(readiness_flag_path)
         self.fills_path = Path(fills_path)
+        self.run_id = run_id
         self.fills_path.parent.mkdir(parents=True, exist_ok=True)
         self.adapter = BinanceLiveAdapter(BinanceConfig(test_order=test_order))
 
     def _write_fill(self, fill: FillEvent) -> None:
+        rec = fill.as_dict()
+        if self.run_id:
+            rec["run_id"] = self.run_id
         with self.fills_path.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(fill.as_dict(), ensure_ascii=True) + "\n")
+            f.write(json.dumps(rec, ensure_ascii=True) + "\n")
 
     def _ready(self) -> tuple[bool, str]:
         api_key = os.environ.get("EXCHANGE_API_KEY", "").strip()
@@ -109,9 +126,15 @@ class LiveBrokerEnvGuard(Broker):
                 status="rejected",
                 venue="live_guard",
                 note=reason,
+                decision_id=order.decision_id,
+                strategy_id=order.strategy_id,
+                model_version=order.model_version,
+                feature_version=order.feature_version,
+                policy_version=order.policy_version,
+                run_id=self.run_id,
             )
             self._write_fill(fill)
             return fill
-        fill = self.adapter.submit(order)
+        fill = replace(self.adapter.submit(order), run_id=self.run_id)
         self._write_fill(fill)
         return fill

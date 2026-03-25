@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "description": "Pilot allowlist for open-closed-loop execution agent (sandbox only).",
+  "actions": [
+    {
+      "id": "refresh_status",
+      "description": "Collect latest dashboard status payload",
+      "command": "\"{python}\" scripts/monitoring_server.py --check",
+      "timeout_sec": 45
+    },
+    {
+      "id": "validate_gates",
+      "description": "Run gate validation in strict profile",
+      "command": "\"{python}\" scripts/validate_gates.py",
+      "timeout_sec": 120
+    },
+    {
+      "id": "verify_readiness",
+      "description": "Check production readiness report",
+      "command": "\"{python}\" scripts/verify_production_readiness.py",
+      "timeout_sec": 120
+    },
+    {
+      "id": "run_mlops_allowlist",
+      "description": "Run low-risk MLOps allowlisted task",
+      "command": "\"{python}\" scripts/run_agentic_mlops_allowlist.py --max-runs 1 --timeout-sec 180",
+      "timeout_sec": 240
+    },
+    {
+      "id": "limited_execution_dryrun",
+      "description": "Run limited execution agent dry-run only",
+      "command": "\"{python}\" scripts/agentic_limited_execution.py --mode paper --dry-run",
+      "timeout_sec": 90
+    }
+  ]
+}

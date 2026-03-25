@@ -82,10 +82,13 @@ Artifacts:
 ## Production Readiness
 
 ```bash
+python scripts/create_human_live_approval_template.py
+python scripts/approve_human_live_approval.py --by "your_name"
 python scripts/bootstrap_compliance_bundle.py
 python scripts/finalize_live_readiness.py
 python scripts/verify_production_readiness.py
 python scripts/run_limited_live_validation.py
+python scripts/run_mlops_data_pipeline.py
 ```
 
 Live mode guard:
@@ -128,18 +131,22 @@ python scripts/verify_exchange_credentials.py
 End-to-end gate (writes `outputs/full_operational_gate_report.json`):
 
 ```bash
-# Without exchange keys yet (explicit skip):
-# CMD:  set FULL_OPS_SKIP_EXCHANGE_VERIFY=1
-# PowerShell:  $env:FULL_OPS_SKIP_EXCHANGE_VERIFY="1"
+# Strict production profile (default):
+set FULL_OPS_PROFILE=strict
 python scripts/verify_full_operational_gate.py
 ```
 
-With real keys, omit the skip so the gate calls Binance account info.
-
-Optional: accept lab demo closure flag in sign-offs file:
+Lab profile (sandbox only):
 
 ```bash
-set FULL_OPS_ACCEPT_LAB_DEMO=1
+set FULL_OPS_PROFILE=lab
+python scripts/verify_full_operational_gate.py
+```
+
+Strict profile (recommended production baseline):
+
+```bash
+set FULL_OPS_PROFILE=strict
 python scripts/verify_full_operational_gate.py
 ```
 
@@ -158,6 +165,48 @@ Close remaining items in autonomous lab mode (writes waiver + matrix):
 
 ```bash
 python scripts/close_remaining_items.py
+```
+
+Full architecture and operations manual:
+
+- [docs/AutonomousCompany_Complete_Manual.md](docs/AutonomousCompany_Complete_Manual.md)
+
+## Emergency & AIOps
+
+- External kill switch:
+
+```bash
+python scripts/trigger_external_kill_switch.py
+```
+
+- Optional webhook alerts:
+  - set `OPS_ALERT_WEBHOOK_URL` in environment
+
+## Open-Closed-Loop Pilot Agent (sandbox)
+
+Safety constraints are enforced in three layers:
+
+- `sandbox required`: command fails without `--sandbox`
+- `human approval gate`: required when `--require-approval` and non-dry-run
+- `allowlist only`: executes action IDs from `configs/openclo_pilot_allowlist.json`
+
+Create approval artifact:
+
+```bash
+python scripts/create_human_openclo_approval_template.py
+python scripts/approve_human_openclo.py --by "your_name"
+```
+
+Pilot dry-run:
+
+```bash
+python scripts/run_openclo_pilot.py --sandbox --dry-run --goal "게이트 실패 진단"
+```
+
+Pilot execution (sandbox + approval gate):
+
+```bash
+python scripts/run_openclo_pilot.py --sandbox --require-approval --goal "현재 운영 리스크 보완"
 ```
 
 ## Personal Solo Mode (self-funding)

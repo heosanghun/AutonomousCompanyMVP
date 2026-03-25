@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sovereign Intelligence | Mobile Command</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Roboto+Mono:wght@300;400;500&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#e5e2e1",
+              "on-secondary-fixed-variant": "#0d4e57",
+              "surface-tint": "#00daf3",
+              "background": "#131313",
+              "tertiary-fixed-dim": "#f3bf26",
+              "surface-container-low": "#1c1b1b",
+              "inverse-primary": "#006875",
+              "primary-container": "#00e5ff",
+              "on-tertiary-container": "#6f5500",
+              "surface-container-lowest": "#0e0e0e",
+              "on-secondary": "#00363d",
+              "surface-bright": "#3a3939",
+              "primary-fixed-dim": "#00daf3",
+              "surface-container": "#201f1f",
+              "surface-container-high": "#2a2a2a",
+              "error-container": "#93000a",
+              "outline": "#849396",
+              "on-background": "#e5e2e1",
+              "surface-dim": "#131313",
+              "surface-container-highest": "#353534",
+              "on-primary-container": "#00626e",
+              "on-tertiary-fixed-variant": "#594400",
+              "on-primary-fixed-variant": "#004f58",
+              "primary": "#c3f5ff",
+              "on-error-container": "#ffdad6",
+              "tertiary-fixed": "#ffdf96",
+              "on-tertiary": "#3e2e00",
+              "tertiary-container": "#fec931",
+              "primary-fixed": "#9cf0ff",
+              "on-secondary-fixed": "#001f24",
+              "secondary-fixed": "#b3ecf7",
+              "secondary-fixed-dim": "#98d0da",
+              "on-surface-variant": "#bac9cc",
+              "inverse-on-surface": "#313030",
+              "error": "#ffb4ab",
+              "on-error": "#690005",
+              "inverse-surface": "#e5e2e1",
+              "tertiary": "#ffeac0",
+              "on-tertiary-fixed": "#251a00",
+              "on-secondary-container": "#8ac1cc",
+              "secondary": "#98d0da",
+              "on-primary": "#00363d",
+              "outline-variant": "#3b494c",
+              "surface": "#131313",
+              "secondary-container": "#11505a",
+              "surface-variant": "#353534",
+              "on-primary-fixed": "#001f24"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Space Grotesk"],
+              "mono": ["Roboto Mono"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .glass-panel {
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .inner-stroke {
+        box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-lowest text-on-surface font-body selection:bg-primary/30">
+<!-- TopAppBar -->
+<header class="bg-neutral-950/60 backdrop-blur-[40px] fixed top-0 w-full z-50 border-b-[0.5px] border-white/10 shadow-[0_8px_32px_rgba(0,229,255,0.08)]">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-screen-xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-cyan-400 text-2xl" style="font-variation-settings: 'FILL' 1;">
+                    account_tree
+                </span>
+<h1 class="text-2xl font-bold tracking-tighter text-cyan-400 font-headline uppercase">
+                    Sovereign Intelligence
+                </h1>
+</div>
+<div class="flex items-center space-x-4">
+<button class="material-symbols-outlined text-neutral-400 hover:bg-white/5 transition-all duration-300 p-2 rounded-full">notifications_active</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-cyan-400/20">
+<img class="w-full h-full object-cover" data-alt="close up of glowing blue circuit board with futuristic light effects reflecting technical excellence" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2RFtGFYxWBan1aXb5Kn1A1JPd92DSs4y7pOZl0QlfefYLZphlylK1hF1SfwytOepJ1_MxGsr8kH2zs-otQug7OZKo3DIdTRCoUrZWt68-TDwK_VOlV8tS_3tvE8mEM8IKfpwZYRcJSnq9J6EzP4O2MaL4qxQo_Mer9ZJwOQKO6hIbewtsuJXh9HbmOLGVsJjBU-BpMUNjvSIMnJL4-cp4l5Gqfm1UTYYytJ7boKsiqJQrGfcg1ahhFkH6g4_4Pba50kJyCY2-WtI1"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-4 max-w-md mx-auto space-y-10">
+<!-- Global Pulse: KPIs -->
+<section class="space-y-4">
+<div class="flex justify-between items-center px-2">
+<h2 class="font-headline text-[10px] tracking-[0.2em] uppercase text-neutral-500 font-medium">Global Pulse</h2>
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00e5ff]"></div>
+<span class="font-mono text-[10px] text-cyan-400">LIVE_CONN</span>
+</div>
+</div>
+<div class="flex overflow-x-auto no-scrollbar gap-4 pb-2">
+<div class="flex-shrink-0 w-36 h-28 bg-surface-container-low rounded-lg inner-stroke p-4 flex flex-col justify-between">
+<span class="font-headline text-[10px] text-neutral-400 uppercase tracking-widest">Alpha</span>
+<div class="space-y-1">
+<div class="font-mono text-xl text-cyan-400">+12.4%</div>
+<div class="h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-cyan-400 w-3/4"></div>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 w-36 h-28 bg-surface-container-low rounded-lg inner-stroke p-4 flex flex-col justify-between">
+<span class="font-headline text-[10px] text-neutral-400 uppercase tracking-widest">Volatility</span>
+<div class="space-y-1">
+<div class="font-mono text-xl text-on-surface">0.14</div>
+<div class="h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container w-1/4"></div>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 w-36 h-28 bg-surface-container-low rounded-lg inner-stroke p-4 flex flex-col justify-between">
+<span class="font-headline text-[10px] text-neutral-400 uppercase tracking-widest">Sharpe</span>
+<div class="space-y-1">
+<div class="font-mono text-xl text-on-surface">3.82</div>
+<div class="h-1 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-cyan-400 w-5/6"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Systemic Divergence Dial -->
+<section class="flex flex-col items-center justify-center py-6">
+<div class="relative w-72 h-72 flex items-center justify-center">
+<!-- Background Glow -->
+<div class="absolute inset-0 bg-cyan-400/5 rounded-full blur-[64px]"></div>
+<!-- The Dial Outer Shell -->
+<div class="absolute inset-0 rounded-full border border-white/5 bg-surface-container-low/40 glass-panel shadow-2xl flex items-center justify-center">
+<!-- Progress Arc (SVG) -->
+<svg class="absolute w-full h-full -rotate-90 p-4">
+<circle class="text-white/5" cx="50%" cy="50%" fill="transparent" r="48%" stroke="currentColor" stroke-width="2"></circle>
+<circle class="text-cyan-400" cx="50%" cy="50%" fill="transparent" r="48%" stroke="currentColor" stroke-dasharray="100 1000" stroke-width="4"></circle>
+</svg>
+<div class="text-center space-y-2 relative z-10">
+<span class="font-headline text-[10px] tracking-[0.3em] uppercase text-neutral-500">Divergence</span>
+<div class="font-mono text-5xl font-light text-cyan-400">0.28</div>
+<div class="px-3 py-1 bg-cyan-400/10 rounded-full inline-block border border-cyan-400/20">
+<span class="font-headline text-[10px] text-cyan-400 tracking-widest uppercase">Optimal</span>
+</div>
+</div>
+</div>
+<!-- Floating Data Points -->
+<div class="absolute -top-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
+<div class="w-[0.5px] h-8 bg-cyan-400/30"></div>
+<span class="font-mono text-[8px] text-cyan-400/60 mt-1">REAL-TIME_DRIFT</span>
+</div>
+</div>
+</section>
+<!-- Active Strategies -->
+<section class="space-y-6">
+<div class="flex justify-between items-end px-2">
+<h2 class="font-headline text-[10px] tracking-[0.2em] uppercase text-neutral-500 font-medium">Active Strategies</h2>
+<span class="font-mono text-[10px] text-neutral-600">COUNT: 04</span>
+</div>
+<div class="space-y-4">
+<!-- Strategy Card 1 -->
+<div class="bg-surface-container-high rounded-lg inner-stroke p-5 space-y-4 transition-all duration-300 hover:bg-surface-container-highest">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<h3 class="font-headline text-sm font-semibold tracking-tight">Arbitrage_v4</h3>
+<p class="font-mono text-[10px] text-neutral-500">BTC/ETH Cross-Chain</p>
+</div>
+<div class="text-right">
+<div class="font-mono text-cyan-400 text-sm">98.2%</div>
+<span class="font-headline text-[9px] text-neutral-500 uppercase">Confidence</span>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<span class="font-headline text-[9px] text-neutral-500 uppercase">Allocation</span>
+<span class="font-mono text-[9px] text-on-surface">$1.2M</span>
+</div>
+<div class="h-1.5 bg-white/5 rounded-full overflow-hidden flex">
+<div class="h-full bg-cyan-400 w-2/3"></div>
+<div class="h-full bg-cyan-400/30 w-1/12"></div>
+</div>
+</div>
+</div>
+<!-- Strategy Card 2 -->
+<div class="bg-surface-container-high rounded-lg inner-stroke p-5 space-y-4">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<h3 class="font-headline text-sm font-semibold tracking-tight">Liquidity_Pool_A</h3>
+<p class="font-mono text-[10px] text-neutral-500">Stable-Delta Neutral</p>
+</div>
+<div class="text-right">
+<div class="font-mono text-tertiary-container text-sm">84.5%</div>
+<span class="font-headline text-[9px] text-neutral-500 uppercase">Confidence</span>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<span class="font-headline text-[9px] text-neutral-500 uppercase">Allocation</span>
+<span class="font-mono text-[9px] text-on-surface">$450K</span>
+</div>
+<div class="h-1.5 bg-white/5 rounded-full overflow-hidden flex">
+<div class="h-full bg-tertiary-container w-1/4"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Override Protocol -->
+<section class="pt-8">
+<div class="bg-error-container/10 border border-error/20 rounded-xl p-6 space-y-6 overflow-hidden relative">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-6xl text-error">warning</span>
+</div>
+<div class="space-y-2">
+<h2 class="font-headline text-xs font-bold tracking-widest text-error uppercase">Override Protocol</h2>
+<p class="text-neutral-400 text-[10px] leading-relaxed max-w-[80%] uppercase font-mono">Total liquidation of all active positions. Irreversible system state.</p>
+</div>
+<div class="relative h-16 bg-error-container/30 rounded-full flex items-center p-1.5 border border-error/10">
+<div class="h-full aspect-square bg-error rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,180,171,0.4)] cursor-pointer">
+<span class="material-symbols-outlined text-on-error" style="font-variation-settings: 'FILL' 1;">power_settings_new</span>
+</div>
+<div class="flex-1 text-center pr-12">
+<span class="font-headline text-[10px] font-bold tracking-[0.2em] text-error animate-pulse">AUTHORIZATION REQUIRED</span>
+</div>
+</div>
+<div class="text-center">
+<span class="font-mono text-[8px] text-error/60 uppercase">System Key: 0x7F...KILL_ACTIVE</span>
+</div>
+</div>
+</section>
+</main>
+<!-- SideNavBar (Hidden on Mobile, but defined for design integrity) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full w-[72px] z-40 bg-neutral-950 border-r-[0.5px] border-white/10 flex flex-col items-center pt-20 pb-8 space-y-6">
+<div class="bg-cyan-400/10 text-cyan-400 border-r-2 border-cyan-400 flex flex-col items-center py-4 w-full">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<span class="font-mono text-[10px] tracking-widest uppercase">Terminal</span>
+</div>
+<div class="text-neutral-500 hover:text-cyan-300 hover:bg-white/5 transition-colors flex flex-col items-center py-4 w-full cursor-pointer">
+<span class="material-symbols-outlined mb-1">account_tree</span>
+<span class="font-mono text-[10px] tracking-widest uppercase">Nodes</span>
+</div>
+<div class="text-neutral-500 hover:text-cyan-300 hover:bg-white/5 transition-colors flex flex-col items-center py-4 w-full cursor-pointer">
+<span class="material-symbols-outlined mb-1">history</span>
+<span class="font-mono text-[10px] tracking-widest uppercase">History</span>
+</div>
+</nav>
+<!-- Footer (Mobile Version) -->
+<footer class="bg-neutral-950/80 backdrop-blur-md fixed bottom-0 w-full z-50 border-t-[0.5px] border-white/10 h-10">
+<div class="flex justify-between items-center px-6 h-full w-full">
+<span class="font-mono text-[8px] tracking-[0.2em] uppercase font-light text-neutral-600">SOVEREIGN_INTEL_v4.2.0</span>
+<div class="flex gap-4">
+<span class="font-mono text-[8px] tracking-[0.2em] uppercase font-light text-cyan-500">LATENCY: 12MS</span>
+<span class="font-mono text-[8px] tracking-[0.2em] uppercase font-light text-neutral-600">AUDIT: 0x7F4A</span>
+</div>
+</div>
+</footer>
+<!-- Mobile Navigation Bar -->
+<div class="fixed bottom-10 left-0 w-full md:hidden flex justify-around items-center bg-surface-container-low/90 backdrop-blur-xl h-16 border-t border-white/5 z-40 px-4">
+<div class="flex flex-col items-center text-cyan-400">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<span class="text-[9px] font-headline tracking-tighter uppercase mt-1">Terminal</span>
+</div>
+<div class="flex flex-col items-center text-neutral-500">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="text-[9px] font-headline tracking-tighter uppercase mt-1">Nodes</span>
+</div>
+<div class="flex flex-col items-center text-neutral-500">
+<span class="material-symbols-outlined">lan</span>
+<span class="text-[9px] font-headline tracking-tighter uppercase mt-1">Network</span>
+</div>
+<div class="flex flex-col items-center text-neutral-500">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[9px] font-headline tracking-tighter uppercase mt-1">Log</span>
+</div>
+<div class="flex flex-col items-center text-neutral-500">
+<span class="material-symbols-outlined">security</span>
+<span class="text-[9px] font-headline tracking-tighter uppercase mt-1">Vault</span>
+</div>
+</div>
+</body></html>

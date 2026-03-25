@@ -1,0 +1,23 @@
+{
+  "profile": "shadow",
+  "shadow": {
+    "description": "Paper + mirrored signals; no live capital.",
+    "execution_mode": "paper",
+    "emit_signals": true
+  },
+  "canary": {
+    "description": "Small notional live slice with automatic comparison to shadow.",
+    "execution_mode": "live",
+    "max_notional_scale": 0.1,
+    "rollback_on_drift": true
+  },
+  "production": {
+    "description": "Full limits from operational_limits.json and human approval files.",
+    "execution_mode": "live",
+    "max_notional_scale": 1.0
+  },
+  "rollback": {
+    "triggers": ["kill_switch", "reconcile_mismatch", "drift_detected", "gate_failure"],
+    "action": "set EXECUTION_MODE=paper and cancel open orders if CANCEL_OPEN_ORDERS_ON_KILL_SWITCH=1"
+  }
+}

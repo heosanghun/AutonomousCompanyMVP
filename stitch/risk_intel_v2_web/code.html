@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ORACLE | Risk Control - Systemic Divergence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;family=Roboto+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #131314;
+            color: #e5e2e3;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(28, 27, 28, 0.8);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .neon-pulse {
+            box-shadow: 0 0 15px rgba(255, 180, 171, 0.2);
+        }
+        .text-glow-red {
+            text-shadow: 0 0 12px rgba(255, 180, 171, 0.5);
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed-variant": "#004f58",
+              "on-primary-container": "#00626e",
+              "surface-container-high": "#2a2a2b",
+              "error": "#ffb4ab",
+              "background": "#131314",
+              "secondary-container": "#00a572",
+              "inverse-on-surface": "#313031",
+              "on-secondary-fixed-variant": "#005236",
+              "on-primary-fixed": "#001f24",
+              "surface-variant": "#353436",
+              "primary-fixed": "#9cf0ff",
+              "on-background": "#e5e2e3",
+              "secondary-fixed": "#6ffbbe",
+              "surface": "#131314",
+              "tertiary-fixed": "#ffdad7",
+              "on-tertiary-container": "#b1121f",
+              "surface-container": "#201f20",
+              "tertiary-fixed-dim": "#ffb3ad",
+              "primary-container": "#00e5ff",
+              "outline": "#849396",
+              "primary": "#c3f5ff",
+              "tertiary-container": "#ffc1bc",
+              "on-tertiary": "#68000a",
+              "on-surface": "#e5e2e3",
+              "on-tertiary-fixed": "#410004",
+              "on-primary": "#00363d",
+              "surface-tint": "#00daf3",
+              "on-secondary": "#003824",
+              "on-secondary-container": "#00311f",
+              "inverse-primary": "#006875",
+              "on-surface-variant": "#bac9cc",
+              "on-tertiary-fixed-variant": "#930013",
+              "surface-bright": "#3a393a",
+              "surface-container-highest": "#353436",
+              "inverse-surface": "#e5e2e3",
+              "on-error": "#690005",
+              "primary-fixed-dim": "#00daf3",
+              "secondary-fixed-dim": "#4edea3",
+              "secondary": "#4edea3",
+              "error-container": "#93000a",
+              "outline-variant": "#3b494c",
+              "tertiary": "#ffe7e5",
+              "on-error-container": "#ffdad6",
+              "surface-container-low": "#1c1b1c",
+              "surface-container-lowest": "#0e0e0f",
+              "surface-dim": "#131314",
+              "on-secondary-fixed": "#002113"
+            },
+            fontFamily: {
+              "headline": ["Space Grotesk"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="overflow-hidden">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col h-screen w-64 border-r border-white/10 bg-[#1C1B1C]/80 backdrop-blur-3xl z-50 shadow-[24px_0_48px_rgba(0,229,255,0.06)] font-['Space_Grotesk'] tracking-tight">
+<div class="p-8">
+<h1 class="text-2xl font-bold tracking-tighter text-[#C3F5FF] drop-shadow-[0_0_8px_rgba(0,229,255,0.4)]">ORACLE</h1>
+<p class="text-[10px] text-white/40 uppercase tracking-[0.2em] mt-1 font-['Roboto_Mono']">Institutional AI</p>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<!-- Active State Logic: Mapping to 'Risk Control' -->
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/50 hover:text-white/80 transition-colors hover:bg-white/5" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/50 hover:text-white/80 transition-colors hover:bg-white/5" href="#">
+<span class="material-symbols-outlined" data-icon="show_chart">show_chart</span>
+<span>Trading</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#00E5FF]/10 text-[#00E5FF] border-r-2 border-[#00E5FF] shadow-[inset_0_0_12px_rgba(0,229,255,0.1)]" href="#">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span>Risk Control</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/50 hover:text-white/80 transition-colors hover:bg-white/5" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span>Strategy Intel</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/50 hover:text-white/80 transition-colors hover:bg-white/5" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span>Compliance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/50 hover:text-white/80 transition-colors hover:bg-white/5" href="#">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+<span>Operations</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/50 hover:text-white/80 transition-colors hover:bg-white/5" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span>Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-white/50 hover:text-white/80 transition-colors hover:bg-white/5" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="p-6 border-t border-white/5 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="Quant_Arch_01" class="w-full h-full object-cover" data-alt="minimalist 3d avatar of a professional quantitative architect with glowing cyan accents and sleek eyewear" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAg0sEZthjN7v2LCC-s4_z1roSdJ0g8_gYF3iGfXgD0S_YZuUVHrGU2XzWtzoLiPPCjDQBFmsE-hZi-cAP9oNccKhoOQPMuKV7Z-nUxg41yagMYvokrrgKovEMWRxG3D5KpNMD5pUm5UWt2HCTs8YYDCyd2hbTL2NLhwCPfSldbhkPlyM7QIv-0OSKyE_f8uDvRRk15xKhmQHOBElNMnIGt5qdLYHRoiOKNebichPWNoEYgWeX3hompGO28nUYpQHivvj2ntH_9Siwp"/>
+</div>
+<div>
+<p class="text-xs font-bold text-white">ARCH_01</p>
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(78,222,147,0.5)]"></span>
+<span class="text-[10px] text-white/40">SYSTEM_ON</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 right-0 left-64 flex justify-between items-center px-8 z-50 w-full h-16 border-b border-white/5 bg-[#131314]/50 backdrop-blur-2xl font-['Roboto_Mono'] text-xs uppercase">
+<div class="flex items-center gap-8">
+<span class="font-['Space_Grotesk'] font-black text-[#00E5FF] text-lg">COMMAND_CENTER</span>
+<div class="flex items-center gap-6">
+<span class="flex items-center gap-2 text-[#C3F5FF] font-bold"><span class="w-2 h-2 rounded-full bg-error animate-pulse"></span> LIVE</span>
+<span class="text-white/40">LATENCY: <span class="text-white">12ms</span></span>
+<span class="text-white/40">SLIPPAGE: <span class="text-white">0.002%</span></span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined text-white/40 hover:text-[#00E5FF] transition-all cursor-pointer" data-icon="notifications">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span class="material-symbols-outlined text-white/40 hover:text-[#00E5FF] transition-all cursor-pointer" data-icon="account_circle">account_circle</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 mt-16 p-8 h-[calc(100vh-4rem)] overflow-y-auto bg-background">
+<!-- Incident Header: Crimson Banner -->
+<section class="mb-8 relative overflow-hidden rounded-lg bg-gradient-to-r from-on-error to-surface-container-lowest border border-error/20 p-8 shadow-[0_24px_48px_rgba(255,180,171,0.08)]">
+<div class="absolute top-0 right-0 w-1/3 h-full bg-error/5 skew-x-12 translate-x-12"></div>
+<div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="px-2 py-0.5 bg-error text-on-error text-[10px] font-bold rounded-sm tracking-widest">P0_CRITICAL</span>
+<span class="text-error font-['Roboto_Mono'] tracking-tighter text-sm">DETECTED AT 14:02:44 UTC</span>
+</div>
+<h2 class="text-4xl font-headline font-bold text-error tracking-tight text-glow-red uppercase leading-none">SYSTEMIC DIVERGENCE DETECTED (ID: INC-992-X)</h2>
+</div>
+<div class="flex gap-12 border-l border-white/10 pl-12 h-full py-2">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/40 font-['Roboto_Mono'] tracking-widest mb-1 uppercase">Risk Exposure</span>
+<span class="text-3xl font-headline font-bold text-white">$14.22M</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-white/40 font-['Roboto_Mono'] tracking-widest mb-1 uppercase">Time to Exhaustion</span>
+<span class="text-3xl font-headline font-bold text-error font-['Roboto_Mono'] tabular-nums">08:14</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Analysis Grid & Timeline -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Analysis Grid (Left Column) -->
+<div class="col-span-8 space-y-8">
+<div class="grid grid-cols-2 gap-8">
+<!-- Loss Projection Matrix -->
+<div class="glass-panel rounded-lg p-6 flex flex-col h-64">
+<div class="flex justify-between items-start mb-6">
+<h3 class="text-xs font-['Roboto_Mono'] text-white/40 tracking-widest uppercase">Loss Projection Matrix</h3>
+<span class="material-symbols-outlined text-white/20 text-sm" data-icon="query_stats">query_stats</span>
+</div>
+<div class="flex-1 flex items-end justify-between gap-4 px-2">
+<div class="w-full flex flex-col items-center group">
+<div class="w-full bg-surface-container-highest h-24 rounded-t-md transition-all group-hover:bg-white/10"></div>
+<span class="text-[9px] mt-2 text-white/30 uppercase">Expected</span>
+</div>
+<div class="w-full flex flex-col items-center group">
+<div class="w-full bg-error/40 h-40 rounded-t-md relative group-hover:bg-error/60 transition-all">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 text-error text-[10px] font-bold">-$8.2M</div>
+</div>
+<span class="text-[9px] mt-2 text-white/30 uppercase">Bear Case</span>
+</div>
+<div class="w-full flex flex-col items-center group">
+<div class="w-full bg-error h-48 rounded-t-md relative shadow-[0_0_20px_rgba(255,180,171,0.25)] group-hover:scale-105 transition-all">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 text-error text-[10px] font-black">-$14.2M</div>
+</div>
+<span class="text-[9px] mt-2 text-error uppercase font-bold tracking-tighter">Current</span>
+</div>
+<div class="w-full flex flex-col items-center group">
+<div class="w-full bg-on-error h-32 rounded-t-md transition-all group-hover:bg-on-error/80"></div>
+<span class="text-[9px] mt-2 text-white/30 uppercase">Recov_01</span>
+</div>
+</div>
+</div>
+<!-- Liquidity Exposure Map -->
+<div class="glass-panel rounded-lg p-6 h-64 flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<h3 class="text-xs font-['Roboto_Mono'] text-white/40 tracking-widest uppercase">Liquidity Exposure Map</h3>
+<span class="text-[10px] text-secondary">STABLE</span>
+</div>
+<div class="flex-1 grid grid-cols-5 grid-rows-5 gap-1.5">
+<!-- Heatmap Nodes -->
+<div class="bg-error rounded-sm opacity-100 shadow-[0_0_8px_rgba(255,180,171,0.3)]"></div>
+<div class="bg-error rounded-sm opacity-90"></div>
+<div class="bg-error rounded-sm opacity-70"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-error rounded-sm opacity-80"></div>
+<div class="bg-error rounded-sm opacity-100 shadow-[0_0_8px_rgba(255,180,171,0.3)]"></div>
+<div class="bg-error rounded-sm opacity-60"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-error rounded-sm opacity-50"></div>
+<div class="bg-error rounded-sm opacity-70"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-secondary rounded-sm opacity-40"></div>
+<div class="bg-secondary rounded-sm opacity-20"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-surface-container-highest rounded-sm"></div>
+<div class="bg-secondary rounded-sm opacity-30"></div>
+<div class="bg-secondary rounded-sm opacity-50"></div>
+<div class="bg-secondary rounded-sm opacity-80 shadow-[0_0_8px_rgba(78,222,147,0.3)]"></div>
+</div>
+</div>
+</div>
+<!-- Global Node Status -->
+<div class="glass-panel rounded-lg p-8">
+<h3 class="text-xs font-['Roboto_Mono'] text-white/40 tracking-widest uppercase mb-8">Regional Distribution of Risk</h3>
+<div class="grid grid-cols-3 gap-12">
+<div class="relative">
+<div class="flex justify-between items-center mb-4">
+<span class="text-lg font-headline font-bold text-white">APAC</span>
+<span class="text-secondary text-[10px] font-['Roboto_Mono'] font-bold uppercase tracking-widest px-2 py-0.5 border border-secondary/20 rounded-full bg-secondary/5">Nominal</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[24%]"></div>
+</div>
+<div class="mt-4 flex justify-between text-[10px] text-white/40 uppercase">
+<span>Utilization: 24.2%</span>
+<span>Nodes: 14/14</span>
+</div>
+</div>
+<div class="relative">
+<div class="flex justify-between items-center mb-4">
+<span class="text-lg font-headline font-bold text-white">EMEA</span>
+<span class="text-error text-[10px] font-['Roboto_Mono'] font-bold uppercase tracking-widest px-2 py-0.5 border border-error/20 rounded-full bg-error/5">Diverged</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-error w-[88%]"></div>
+</div>
+<div class="mt-4 flex justify-between text-[10px] text-white/40 uppercase">
+<span>Utilization: 88.9%</span>
+<span class="text-error">Nodes: 02/16</span>
+</div>
+</div>
+<div class="relative">
+<div class="flex justify-between items-center mb-4">
+<span class="text-lg font-headline font-bold text-white">AMER</span>
+<span class="text-[#FFB300] text-[10px] font-['Roboto_Mono'] font-bold uppercase tracking-widest px-2 py-0.5 border border-[#FFB300]/20 rounded-full bg-[#FFB300]/5">Elevated</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-[#FFB300] w-[62%]"></div>
+</div>
+<div class="mt-4 flex justify-between text-[10px] text-white/40 uppercase">
+<span>Utilization: 62.1%</span>
+<span>Nodes: 09/12</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar Info (Right Column) -->
+<div class="col-span-4 space-y-8">
+<!-- Incident Timeline -->
+<div class="glass-panel rounded-lg p-6 flex flex-col h-fit">
+<h3 class="text-xs font-['Roboto_Mono'] text-white/40 tracking-widest uppercase mb-6">Incident Timeline</h3>
+<div class="space-y-8 relative before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-px before:bg-white/10">
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-error border-4 border-background flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+</div>
+<p class="text-[10px] text-error font-['Roboto_Mono'] font-bold mb-1">14:02:44 UTC</p>
+<h4 class="text-sm font-bold text-white mb-1">Signal Trigger</h4>
+<p class="text-xs text-white/40 leading-relaxed">Systemic divergence flagged in EMEA Liquidity Pool B. Delta exceeds threshold.</p>
+</div>
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-[#FFB300] border-4 border-background flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+</div>
+<p class="text-[10px] text-[#FFB300] font-['Roboto_Mono'] font-bold mb-1">14:04:12 UTC</p>
+<h4 class="text-sm font-bold text-white mb-1">Hedging Failure</h4>
+<p class="text-xs text-white/40 leading-relaxed">Auto-hedge engine rejected at Binance/Kraken nodes due to extreme volatility.</p>
+</div>
+<div class="relative pl-10 opacity-50">
+<div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-surface-container-highest border-4 border-background flex items-center justify-center">
+<span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+</div>
+<p class="text-[10px] text-white/20 font-['Roboto_Mono'] font-bold mb-1">ESTIMATED 14:12:00 UTC</p>
+<h4 class="text-sm font-bold text-white/40 mb-1">Barrier Breach</h4>
+<p class="text-xs text-white/20 leading-relaxed">Anticipated breach of secondary risk barriers across all global nodes.</p>
+</div>
+</div>
+</div>
+<!-- Urgent Manual Overrides -->
+<div class="glass-panel rounded-lg p-6 space-y-4">
+<h3 class="text-xs font-['Roboto_Mono'] text-white/40 tracking-widest uppercase mb-2">Urgent Manual Overrides</h3>
+<button class="w-full py-4 border border-error/40 rounded-lg text-error text-xs font-black tracking-widest hover:bg-error/10 transition-all uppercase flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined text-sm group-hover:-rotate-45 transition-transform" data-icon="energy_savings_leaf">energy_savings_leaf</span>
+                        Force De-leverage (50%)
+                    </button>
+<button class="w-full py-6 bg-error text-on-error rounded-lg font-headline font-black text-lg tracking-tight shadow-[0_0_24px_rgba(255,180,171,0.2)] hover:scale-[0.98] transition-transform flex flex-col items-center justify-center gap-1 group relative overflow-hidden">
+<span class="relative z-10 flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="dangerous">dangerous</span>
+                            EXECUTE KILL-SWITCH (ALL NODES)
+                        </span>
+<span class="relative z-10 text-[9px] font-['Roboto_Mono'] text-on-error/70 tracking-widest uppercase mt-1">Requires L3 Auth Priority Signature</span>
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Shell -->
+<footer class="fixed bottom-0 right-0 left-64 flex justify-between px-8 items-center w-full py-4 border-t border-white/5 bg-[#131314] text-white/30 font-['Roboto_Mono'] text-[10px] uppercase tracking-widest z-50">
+<div>© 2024 Institutional Intelligence. Data Retention: 7 Years.</div>
+<div class="flex gap-8">
+<a class="hover:text-white/60 transition-colors" href="#">STABLE_RC4</a>
+<a class="hover:text-white/60 transition-colors" href="#">Compliance Tag: <span class="text-[#00E5FF]">X-RAY-99</span></a>
+<a class="hover:text-white/60 transition-colors" href="#">Legal Disclaimer</a>
+</div>
+</footer>
+</body></html>

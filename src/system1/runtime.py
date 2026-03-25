@@ -11,6 +11,7 @@ import numpy as np
 from src.execution.models import FillEvent
 from src.execution.order_router import OrderRouter
 from src.interface.policy_buffer import PolicyBuffer
+from src.ops.alerts import send_alert
 from src.risk.guard import RiskGuard
 from src.system1.executor import System1Executor
 
@@ -47,6 +48,8 @@ class FastLoopRuntime:
         fills: List[FillEvent] = []
 
         day_pnl = 0.0
+        week_window = 200
+        kill_alert_sent = False
         for i, row in enumerate(ticks_arr):
             t0 = time.perf_counter()
             gamma, beta = self.policy_buffer.read()
@@ -56,11 +59,14 @@ class FastLoopRuntime:
             self.policy_buffer.tick_interpolate()
 
             volatility = float(abs(row[1])) if row.shape[0] > 1 else 0.0
+            start_w = max(0, i - week_window)
+            week_pnl = float(np.sum(strat[start_w:i])) if i > 0 else 0.0
             safe_action = self.risk_guard.evaluate(
                 action=action,
                 realized_pnl=float(strat[i - 1]) if i > 0 else 0.0,
                 day_pnl=day_pnl,
                 volatility=volatility,
+                week_pnl=week_pnl,
             )
 
             actions[i] = safe_action
@@ -73,9 +79,16 @@ class FastLoopRuntime:
                 decision_id=f"dec_{i:08d}",
                 reason_code="fast_loop_signal",
                 risk_approved=(safe_action == action),
+                feature_row=row.astype(float).tolist(),
             )
             if fill is not None:
                 fills.append(fill)
+            if self.risk_guard.kill_switch and not kill_alert_sent:
+                send_alert(
+                    "risk_kill_switch_triggered",
+                    {"reason": self.risk_guard.last_reason, "tick_index": i, "day_pnl": day_pnl},
+                )
+                kill_alert_sent = True
 
         position_changes = np.diff(actions.astype(np.float32), prepend=actions[0])
         return FastLoopResult(

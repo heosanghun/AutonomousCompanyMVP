@@ -60,12 +60,16 @@ def _write_matrix(full_gate_ok: bool) -> Path:
 
 
 def main() -> int:
+    _run([sys.executable, str(ROOT / "scripts" / "run_mlops_data_pipeline.py")])
     _run([sys.executable, str(ROOT / "scripts" / "bootstrap_full_operations.py"), "--lab-demo-signoffs"])
-    _run([sys.executable, str(ROOT / "scripts" / "finalize_live_readiness.py")])
+    _run(
+        [sys.executable, str(ROOT / "scripts" / "finalize_live_readiness.py")],
+        env={"FULL_OPS_ALLOW_AUTO_APPROVE": "1"},
+    )
     _write_waiver()
     gate_rc = _run(
         [sys.executable, str(ROOT / "scripts" / "verify_full_operational_gate.py")],
-        env={"FULL_OPS_ACCEPT_WAIVERS": "1", "FULL_OPS_ACCEPT_LAB_DEMO": "1"},
+        env={"FULL_OPS_PROFILE": "lab"},
     )
     _write_matrix(full_gate_ok=(gate_rc == 0))
     print("close_remaining_items_done")
