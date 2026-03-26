@@ -256,7 +256,10 @@ This repository supports Cloudflare backend endpoints via Pages Functions:
 - `/api/admin/users` (admin-only role/MFA management)
 - `/api/workflows` and `/api/workflows/:id` (state machine)
 - `/api/policy/enforce`
+- `/api/policy/templates` (template-based compliance checks)
 - `/api/ops/recovery`
+- `/api/ops/playbook` (standardized incident playbook execution)
+- `/api/system/readiness` (weighted readiness score)
 - `/api/audit/events`, `/api/audit/policy-decisions`
 
 Deploy with Functions:

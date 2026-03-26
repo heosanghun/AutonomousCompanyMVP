@@ -378,6 +378,24 @@
             <input id="recoveryRetryInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="simulate_failures (0~3)" />
             <button id="recoveryRunBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Run Recovery</button>
           </div>
+          <div class="grid sm:grid-cols-3 gap-2 mt-3">
+            <select id="playbookIdInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm">
+              <option value="latency_spike">latency_spike</option>
+              <option value="gate_failure">gate_failure</option>
+              <option value="drift_detected">drift_detected</option>
+            </select>
+            <button id="playbookRunBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Run Playbook</button>
+            <button id="readinessBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Readiness</button>
+          </div>
+          <div class="grid sm:grid-cols-3 gap-2 mt-3">
+            <select id="policyTemplateInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm">
+              <option value="trade-high-risk">trade-high-risk</option>
+              <option value="ops-change-medium">ops-change-medium</option>
+              <option value="data-pipeline-deploy">data-pipeline-deploy</option>
+            </select>
+            <input id="policyChecksInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="checks csv" />
+            <button id="policyTemplateEvalBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Eval Template</button>
+          </div>
         </article>
       </div>
       <div class="p-4 sm:p-5 pt-0 grid xl:grid-cols-2 gap-4">
@@ -991,6 +1009,31 @@
       document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
       await loadGovernance();
     }
+    async function runPlaybook() {
+      const playbookId = (document.getElementById("playbookIdInput").value || "latency_spike").trim();
+      const out = await apiFetchJson("/api/ops/playbook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playbook_id: playbookId }),
+      });
+      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
+      await loadGovernance();
+    }
+    async function checkReadiness() {
+      const out = await apiFetchJson("/api/system/readiness");
+      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
+    }
+    async function evalPolicyTemplate() {
+      const templateId = (document.getElementById("policyTemplateInput").value || "").trim();
+      const checksRaw = (document.getElementById("policyChecksInput").value || "").trim();
+      const checks = checksRaw ? checksRaw.split(",").map((x) => x.trim()).filter(Boolean) : [];
+      const out = await apiFetchJson("/api/policy/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ template_id: templateId, checks }),
+      });
+      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
+    }
     function renderServiceHub() {
       const grid = document.getElementById("serviceHubGrid");
       const st = t("implemented");
@@ -1372,6 +1415,9 @@
     document.getElementById("wfCreateBtn").addEventListener("click", createWorkflow);
     document.getElementById("policyCheckBtn").addEventListener("click", runPolicyCheck);
     document.getElementById("recoveryRunBtn").addEventListener("click", runRecovery);
+    document.getElementById("playbookRunBtn").addEventListener("click", runPlaybook);
+    document.getElementById("readinessBtn").addEventListener("click", checkReadiness);
+    document.getElementById("policyTemplateEvalBtn").addEventListener("click", evalPolicyTemplate);
     document.getElementById("adminUsersRefreshBtn").addEventListener("click", loadGovernance);
     applyTheme();
     applyLang();
