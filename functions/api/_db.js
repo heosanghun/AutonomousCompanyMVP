@@ -1,3 +1,5 @@
+import { hashPassword } from "./_crypto.js";
+
 const SCHEMA_SQL = [
   `CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
@@ -5,6 +7,7 @@ const SCHEMA_SQL = [
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'viewer',
     mfa_enabled INTEGER NOT NULL DEFAULT 0,
+    mfa_secret TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   )`,
@@ -75,19 +78,31 @@ async function ensureSchema(env) {
   for (const q of SCHEMA_SQL) {
     await env.DB.prepare(q).run();
   }
+  try {
+    await env.DB.prepare(`ALTER TABLE users ADD COLUMN mfa_secret TEXT`).run();
+  } catch (_) {}
   const now = new Date().toISOString();
+  const demoHash = await hashPassword("demo1234", String(env?.AUTH_PEPPER || ""));
   await env.DB.prepare(
-    `INSERT OR IGNORE INTO users (id, email, password_hash, role, mfa_enabled, created_at, updated_at)
-     VALUES (?1, ?2, ?3, ?4, 0, ?5, ?5)`,
+    `INSERT OR IGNORE INTO users (id, email, password_hash, role, mfa_enabled, mfa_secret, created_at, updated_at)
+     VALUES (?1, ?2, ?3, ?4, 0, NULL, ?5, ?5)`,
   )
-    .bind("u_admin", "admin@acmvp.local", "demo1234", "admin", now)
+    .bind("u_admin", "admin@acmvp.local", demoHash, "admin", now)
     .run();
   await env.DB.prepare(
-    `INSERT OR IGNORE INTO users (id, email, password_hash, role, mfa_enabled, created_at, updated_at)
-     VALUES (?1, ?2, ?3, ?4, 0, ?5, ?5)`,
+    `INSERT OR IGNORE INTO users (id, email, password_hash, role, mfa_enabled, mfa_secret, created_at, updated_at)
+     VALUES (?1, ?2, ?3, ?4, 0, NULL, ?5, ?5)`,
   )
-    .bind("u_operator", "operator@acmvp.local", "demo1234", "operator", now)
+    .bind("u_operator", "operator@acmvp.local", demoHash, "operator", now)
     .run();
+  const oldUsers = await env.DB.prepare(`SELECT id, password_hash FROM users`).all();
+  for (const u of oldUsers.results || []) {
+    const ph = String(u.password_hash || "");
+    if (!ph.startsWith("sha256$")) {
+      const migrated = await hashPassword(ph, String(env?.AUTH_PEPPER || ""));
+      await env.DB.prepare(`UPDATE users SET password_hash = ?2, updated_at = ?3 WHERE id = ?1`).bind(u.id, migrated, now).run();
+    }
+  }
   globalThis.__acmvp_schema_ready__ = true;
   return true;
 }

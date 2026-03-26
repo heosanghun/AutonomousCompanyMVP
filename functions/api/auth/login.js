@@ -1,6 +1,7 @@
 import { JSON_HEADERS, nowIso } from "../_shared.js";
 import { createSessionCookie } from "../_auth.js";
 import { ensureSchema } from "../_db.js";
+import { verifyPassword, verifyTotp } from "../_crypto.js";
 
 export async function onRequestPost(context) {
   try {
@@ -16,14 +17,19 @@ export async function onRequestPost(context) {
     if (!email || !password) {
       return new Response(JSON.stringify({ ok: false, error: "email_password_required" }), { status: 400, headers: JSON_HEADERS });
     }
-    const user = await env.DB.prepare(`SELECT id, email, password_hash, role, mfa_enabled FROM users WHERE lower(email) = ?1`)
+    const user = await env.DB.prepare(`SELECT id, email, password_hash, role, mfa_enabled, mfa_secret FROM users WHERE lower(email) = ?1`)
       .bind(email)
       .first();
-    if (!user || String(user.password_hash) !== password) {
+    const pwOk = user ? await verifyPassword(password, String(user.password_hash || ""), String(env.AUTH_PEPPER || "")) : false;
+    if (!user || !pwOk) {
       return new Response(JSON.stringify({ ok: false, error: "invalid_credentials" }), { status: 401, headers: JSON_HEADERS });
     }
-    if (Number(user.mfa_enabled) === 1 && mfaCode !== "000000") {
-      return new Response(JSON.stringify({ ok: false, error: "mfa_required_or_invalid" }), { status: 401, headers: JSON_HEADERS });
+    if (Number(user.mfa_enabled) === 1) {
+      const secret = String(user.mfa_secret || "").trim();
+      const mfaOk = secret ? await verifyTotp(secret, mfaCode) : mfaCode === "000000";
+      if (!mfaOk) {
+        return new Response(JSON.stringify({ ok: false, error: "mfa_required_or_invalid" }), { status: 401, headers: JSON_HEADERS });
+      }
     }
     const sid = crypto.randomUUID();
     const now = nowIso();

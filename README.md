@@ -250,6 +250,8 @@ This repository supports Cloudflare backend endpoints via Pages Functions:
 - `/api/chat` (Gemini)
 - `/metrics`
 - `/api/auth/login`, `/api/auth/me`, `/api/auth/logout`
+- `/api/auth/password` (change password)
+- `/api/auth/mfa` (begin/enable/disable TOTP)
 - `/api/rbac/check`
 - `/api/admin/users` (admin-only role/MFA management)
 - `/api/workflows` and `/api/workflows/:id` (state machine)
@@ -269,6 +271,7 @@ Set production secrets:
 npx wrangler pages secret put GEMINI_API_KEY --project-name autonomouscompany
 npx wrangler pages secret put GEMINI_MODEL --project-name autonomouscompany
 npx wrangler pages secret put LLM_MAX_PROMPT_CHARS --project-name autonomouscompany
+npx wrangler pages secret put AUTH_PEPPER --project-name autonomouscompany
 ```
 
 Bind Cloudflare D1 database to Pages project:

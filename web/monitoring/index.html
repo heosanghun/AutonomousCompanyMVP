@@ -390,6 +390,27 @@
           <pre id="policyDecisionsPre" class="json-pre">[]</pre>
         </article>
       </div>
+      <div class="p-4 sm:p-5 pt-0">
+        <article class="glass rounded-xl border border-white/10 p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-headline text-xs uppercase tracking-widest text-mute">Admin Users</h3>
+            <button id="adminUsersRefreshBtn" class="focus-ring glass rounded-lg px-3 py-1 text-xs text-cyan">Refresh</button>
+          </div>
+          <div class="overflow-auto max-h-[300px]">
+            <table class="w-full text-xs">
+              <thead class="sticky-head">
+                <tr class="text-mute">
+                  <th class="text-left px-2 py-2">Email</th>
+                  <th class="text-left px-2 py-2">Role</th>
+                  <th class="text-left px-2 py-2">MFA</th>
+                  <th class="text-left px-2 py-2">Update</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersRows"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
     </section>
 
     <section class="glass rounded-2xl mt-4 overflow-hidden">
@@ -886,6 +907,30 @@
       document.getElementById("auditEventsPre").textContent = JSON.stringify(ev.data?.items || [], null, 2);
       const pd = await apiFetchJson("/api/audit/policy-decisions?limit=20");
       document.getElementById("policyDecisionsPre").textContent = JSON.stringify(pd.data?.items || [], null, 2);
+      const usersRes = await apiFetchJson("/api/admin/users");
+      const users = Array.isArray(usersRes.data?.items) ? usersRes.data.items : [];
+      document.getElementById("adminUsersRows").innerHTML = users.map((u) => `
+        <tr class="border-t border-white/5">
+          <td class="px-2 py-2">${u.email || u.id}</td>
+          <td class="px-2 py-2">
+            <select id="admRole_${u.id}" class="focus-ring rounded bg-black/25 border border-white/10 px-2 py-1">
+              <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>viewer</option>
+              <option value="auditor" ${u.role === "auditor" ? "selected" : ""}>auditor</option>
+              <option value="operator" ${u.role === "operator" ? "selected" : ""}>operator</option>
+              <option value="admin" ${u.role === "admin" ? "selected" : ""}>admin</option>
+            </select>
+          </td>
+          <td class="px-2 py-2">
+            <select id="admMfa_${u.id}" class="focus-ring rounded bg-black/25 border border-white/10 px-2 py-1">
+              <option value="0" ${u.mfa_enabled ? "" : "selected"}>off</option>
+              <option value="1" ${u.mfa_enabled ? "selected" : ""}>on</option>
+            </select>
+          </td>
+          <td class="px-2 py-2">
+            <button class="quick-chip" onclick="updateAdminUser('${u.id}')">save</button>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="4" class="px-2 py-3 text-mute">No admin data or insufficient role.</td></tr>`;
       if (!me) {
         document.getElementById("policyResultPre").textContent = JSON.stringify({ note: "login required" }, null, 2);
       }
@@ -911,6 +956,17 @@
       await loadGovernance();
     }
     window.wfAction = wfAction;
+    async function updateAdminUser(id) {
+      const role = (document.getElementById(`admRole_${id}`)?.value || "viewer").trim();
+      const mfaEnabled = Number(document.getElementById(`admMfa_${id}`)?.value || "0") === 1;
+      await apiFetchJson("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, role, mfa_enabled: mfaEnabled }),
+      });
+      await loadGovernance();
+    }
+    window.updateAdminUser = updateAdminUser;
     async function runPolicyCheck() {
       const action = (document.getElementById("policyActionInput").value || "").trim();
       const resource = (document.getElementById("policyResourceInput").value || "").trim();
@@ -1316,6 +1372,7 @@
     document.getElementById("wfCreateBtn").addEventListener("click", createWorkflow);
     document.getElementById("policyCheckBtn").addEventListener("click", runPolicyCheck);
     document.getElementById("recoveryRunBtn").addEventListener("click", runRecovery);
+    document.getElementById("adminUsersRefreshBtn").addEventListener("click", loadGovernance);
     applyTheme();
     applyLang();
     refreshSessionUser();
