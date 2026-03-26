@@ -6,3 +6,4 @@ secrets/exchange_credentials.json
 .env
 .ENV
 doc/
+.wrangler/

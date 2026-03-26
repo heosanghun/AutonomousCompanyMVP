@@ -119,20 +119,75 @@
       0%, 80%, 100% { transform: translateY(0); opacity: .5; }
       40% { transform: translateY(-3px); opacity: 1; }
     }
-    .light body {
+    /* Light theme: soft paper / slate (avoid harsh white) */
+    html.light body,
+    html.light body.text-text {
+      color: #1e293b !important;
       background:
-        radial-gradient(1000px 500px at 10% -20%, rgba(8,145,178,0.12), transparent 45%),
-        radial-gradient(900px 420px at 110% 0%, rgba(34,197,94,0.08), transparent 45%),
-        #f4f7fb;
-      color: #0f172a;
+        radial-gradient(900px 480px at 8% -15%, rgba(14, 165, 233, 0.14), transparent 50%),
+        radial-gradient(800px 400px at 100% 0%, rgba(52, 211, 153, 0.1), transparent 48%),
+        linear-gradient(165deg, #c5d0e0 0%, #d4dce8 38%, #cbd5e1 100%) !important;
     }
-    .light .glass {
-      background: rgba(255, 255, 255, 0.72);
-      box-shadow: inset 0 0 0 .5px rgba(15, 23, 42, .08);
+    html.light .glass {
+      background: rgba(248, 250, 252, 0.78);
+      box-shadow: inset 0 0 0 1px rgba(51, 65, 85, 0.1);
     }
-    .light .text-mute { color: #475569 !important; }
-    .light .chat-msg-assistant { background: rgba(15, 23, 42, .04); }
+    html.light header {
+      background: rgba(226, 232, 240, 0.88) !important;
+      border-bottom-color: rgba(51, 65, 85, 0.12) !important;
+    }
+    html.light aside {
+      background: rgba(203, 213, 225, 0.55) !important;
+      border-right-color: rgba(51, 65, 85, 0.12) !important;
+    }
+    html.light .mobile-bottom-nav {
+      background: rgba(226, 232, 240, 0.95) !important;
+      border-top-color: rgba(51, 65, 85, 0.12) !important;
+    }
+    html.light .sticky-head {
+      background: rgba(241, 245, 249, 0.96) !important;
+    }
+    html.light .text-mute { color: #64748b !important; }
+    html.light .text-text { color: #1e293b !important; }
+    html.light .chat-msg-assistant { background: rgba(51, 65, 85, 0.06); }
+    html.light .chat-msg-user { background: linear-gradient(135deg, rgba(14,165,233,.22), rgba(14,165,233,.1)); }
+    html.light .quick-chip {
+      color: #0e7490;
+      background: rgba(14, 165, 233, 0.1);
+      border-color: rgba(14, 165, 233, 0.35);
+    }
+    html.light .pill {
+      color: #475569;
+      background: rgba(51, 65, 85, 0.06);
+      border-color: rgba(51, 65, 85, 0.15);
+    }
+    html.light input,
+    html.light textarea,
+    html.light select {
+      color: #0f172a !important;
+      background: rgba(255, 255, 255, 0.65) !important;
+      border-color: rgba(51, 65, 85, 0.18) !important;
+    }
+    html.light .chat-footer-bar {
+      background: rgba(241, 245, 249, 0.92) !important;
+      border-top-color: rgba(51, 65, 85, 0.12) !important;
+    }
     .modal-backdrop { background: rgba(2,6,23,.55); backdrop-filter: blur(4px); }
+    .json-pre {
+      max-height: min(60vh, 480px);
+      overflow: auto;
+      font-family: "Roboto Mono", monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #81ecff;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .light .json-pre { color: #0369a1; background: rgba(15,23,42,.06); border-color: rgba(15,23,42,.12); }
   </style>
 </head>
 <body id="top" class="text-text font-body min-h-screen overflow-x-hidden">
@@ -146,27 +201,27 @@
         </div>
       </div>
       <nav class="hidden lg:flex items-center gap-6 text-[11px] uppercase tracking-widest font-headline text-mute">
-        <span class="text-cyan border-b-2 border-cyan pb-0.5">Overview</span>
-        <a href="/api/status" target="_blank" rel="noopener" class="hover:text-white">API JSON</a>
-        <a href="/metrics" target="_blank" rel="noopener" class="hover:text-white">Prometheus</a>
+        <span class="text-cyan border-b-2 border-cyan pb-0.5" data-i18n="navOverview">Overview</span>
+        <button type="button" id="apiStatusViewerBtn" class="hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 p-0 cursor-pointer text-mute" data-i18n="apiJson">API JSON</button>
+        <a href="/metrics" target="_blank" rel="noopener" class="hover:text-white" data-i18n="prometheus">Prometheus</a>
       </nav>
     </div>
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
       <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass">
         <span class="h-2 w-2 rounded-full bg-cyan animate-pulse"></span>
-        <span id="livePulse" class="font-mono text-[10px] uppercase text-mute">Live Sync</span>
+        <span id="livePulse" class="font-mono text-[10px] uppercase text-mute" data-i18n="liveSync">Live Sync</span>
       </div>
       <button id="themeToggleBtn" type="button" class="tap-target focus-ring glass rounded-full px-3 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
         <span class="material-symbols-outlined mat text-xl sm:text-base">contrast</span><span class="hidden sm:inline" data-i18n="theme">Theme</span>
       </button>
       <button id="langToggleBtn" type="button" class="tap-target focus-ring glass rounded-full px-3 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
-        <span class="material-symbols-outlined mat text-xl sm:text-base">translate</span><span class="hidden sm:inline" data-i18n="lang">KO</span>
+        <span class="material-symbols-outlined mat text-xl sm:text-base">translate</span><span class="hidden sm:inline" data-i18n="langBtn">English</span>
       </button>
       <button id="accountBtn" type="button" class="tap-target focus-ring glass rounded-full px-3 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
         <span class="material-symbols-outlined mat text-xl sm:text-base">person</span><span class="hidden sm:inline" data-i18n="login">Login</span>
       </button>
       <button type="button" onclick="loadStatus()" aria-label="Refresh status" class="tap-target focus-ring glass rounded-full px-3 sm:px-4 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
-        <span class="material-symbols-outlined mat text-xl sm:text-base">refresh</span><span class="hidden sm:inline">Refresh</span>
+        <span class="material-symbols-outlined mat text-xl sm:text-base">refresh</span><span class="hidden sm:inline" data-i18n="refresh">Refresh</span>
       </button>
     </div>
   </header>
@@ -186,12 +241,12 @@
     <section class="glass rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 accent-glow">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="min-w-0">
-          <h1 class="font-headline text-xl sm:text-2xl md:text-3xl font-bold tracking-tight leading-tight">Oracle-Grade Runtime Control</h1>
-          <p class="text-xs sm:text-sm text-mute mt-1">실시간 전략·리스크·게이트 상태를 한 화면에서 운영</p>
+          <h1 class="font-headline text-xl sm:text-2xl md:text-3xl font-bold tracking-tight leading-tight" data-i18n="heroTitle">Oracle-Grade Runtime Control</h1>
+          <p class="text-xs sm:text-sm text-mute mt-1" data-i18n="heroSub">실시간 전략·리스크·게이트 상태를 한 화면에서 운영</p>
         </div>
         <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="glass rounded-xl px-3 py-2"><span class="text-mute">Mode</span><p id="heroMode" class="font-mono mt-1">—</p></div>
-          <div class="glass rounded-xl px-3 py-2"><span class="text-mute">Kill-switch</span><p id="heroKill" class="font-mono mt-1">—</p></div>
+          <div class="glass rounded-xl px-3 py-2"><span class="text-mute" data-i18n="labelMode">Mode</span><p id="heroMode" class="font-mono mt-1">—</p></div>
+          <div class="glass rounded-xl px-3 py-2"><span class="text-mute" data-i18n="labelKill">Kill-switch</span><p id="heroKill" class="font-mono mt-1">—</p></div>
         </div>
       </div>
       <p id="generatedAt" class="font-mono text-[11px] text-mute mt-4">Loading status…</p>
@@ -234,33 +289,33 @@
     <section class="grid xl:grid-cols-2 gap-4">
       <article class="glass rounded-2xl overflow-hidden">
         <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-          <h2 class="font-headline text-sm uppercase tracking-widest">Gate Status</h2>
+          <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="gateStatus">Gate Status</h2>
           <span class="material-symbols-outlined mat text-mute">verified_user</span>
         </div>
         <div class="px-5 py-3 text-xs text-mute flex items-center gap-3">
-          <span><span class="status-dot status-ok"></span><span id="gatePassCount">0</span> PASS</span>
-          <span><span class="status-dot status-bad"></span><span id="gateFailCount">0</span> FAIL</span>
+          <span><span class="status-dot status-ok"></span><span id="gatePassCount">0</span> <span data-i18n="passLabel">PASS</span></span>
+          <span><span class="status-dot status-bad"></span><span id="gateFailCount">0</span> <span data-i18n="failLabel">FAIL</span></span>
         </div>
         <div id="gateCardsMobile" class="md:hidden px-4 pb-4 space-y-2"></div>
         <div class="hidden md:block overflow-x-auto">
           <table class="w-full">
-            <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left">Check</th><th class="px-5 py-3 text-left">State</th></tr></thead>
+            <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left" data-i18n="thCheck">Check</th><th class="px-5 py-3 text-left" data-i18n="thState">State</th></tr></thead>
             <tbody id="gateRows"></tbody>
           </table>
         </div>
       </article>
       <article class="glass rounded-2xl overflow-hidden">
         <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-          <h2 class="font-headline text-sm uppercase tracking-widest">Artifacts</h2>
+          <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="artifacts">Artifacts</h2>
           <span class="material-symbols-outlined mat text-mute">folder_open</span>
         </div>
         <div class="px-4 sm:px-5 py-3 border-b border-white/5">
-          <input id="artifactSearch" type="search" enterkeyhint="search" autocomplete="off" class="focus-ring w-full rounded-lg bg-black/25 border border-white/10 px-3 py-3 sm:py-2 text-sm sm:text-xs font-mono text-white placeholder:text-mute min-h-[44px] sm:min-h-0" placeholder="Search artifact key/path..." />
+          <input id="artifactSearch" type="search" enterkeyhint="search" autocomplete="off" class="focus-ring w-full rounded-lg bg-black/25 border border-white/10 px-3 py-3 sm:py-2 text-sm sm:text-xs font-mono text-white placeholder:text-mute min-h-[44px] sm:min-h-0" data-i18n-placeholder="artifactPh" placeholder="Search artifact key/path..." />
         </div>
         <div id="pathCardsMobile" class="md:hidden px-4 pb-4 space-y-2 max-h-[min(50vh,420px)] overflow-y-auto"></div>
         <div class="hidden md:block overflow-auto max-h-[320px]">
           <table class="w-full">
-            <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left">Key</th><th class="px-5 py-3 text-left">Path</th></tr></thead>
+            <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left" data-i18n="thKey">Key</th><th class="px-5 py-3 text-left" data-i18n="thPath">Path</th></tr></thead>
             <tbody id="pathRows"></tbody>
           </table>
         </div>
@@ -277,53 +332,53 @@
 
     <section class="glass rounded-2xl mt-4 overflow-hidden">
       <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-        <h2 class="font-headline text-sm uppercase tracking-widest">Ops Assistant</h2>
+        <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="opsAssistant">Ops Assistant</h2>
         <span class="material-symbols-outlined mat text-mute">chat</span>
       </div>
-      <div class="px-4 sm:px-5 py-3 text-xs text-mute font-mono border-b border-white/5">
+      <div id="chatIntro" class="px-4 sm:px-5 py-3 text-xs text-mute font-mono border-b border-white/5" data-i18n="chatIntro">
         자유롭게 질문하세요. 현재 운영 상태를 기반으로 요약/가이드 답변을 제공합니다.
       </div>
       <div class="px-4 sm:px-5 py-3 border-b border-white/5 flex flex-wrap gap-2">
-        <button type="button" class="quick-chip" data-quick-q="지금 가장 위험한 이슈 3개와 우선순위를 알려줘">위험요약</button>
-        <button type="button" class="quick-chip" data-quick-q="실패 게이트별 즉시 조치 체크리스트를 알려줘">조치체크리스트</button>
-        <button type="button" class="quick-chip" data-quick-q="다음 30분 운영계획을 제안해줘">30분 운영계획</button>
+        <button type="button" class="quick-chip" data-quick-id="risk">위험요약</button>
+        <button type="button" class="quick-chip" data-quick-id="checklist">조치체크리스트</button>
+        <button type="button" class="quick-chip" data-quick-id="plan30">30분 운영계획</button>
       </div>
       <div class="px-4 sm:px-5 py-3 border-b border-white/5 space-y-3">
         <div class="flex flex-wrap items-center gap-2">
-          <span class="text-[11px] font-mono text-mute mr-1">톤</span>
-          <button type="button" class="quick-chip active" data-tone="friendly">친근</button>
-          <button type="button" class="quick-chip" data-tone="professional">전문</button>
-          <button type="button" class="quick-chip" data-tone="concise">간결</button>
+          <span class="text-[11px] font-mono text-mute mr-1" data-i18n="labelTone">톤</span>
+          <button type="button" class="quick-chip active" data-tone="friendly" data-i18n="toneFriendly">친근</button>
+          <button type="button" class="quick-chip" data-tone="professional" data-i18n="tonePro">전문</button>
+          <button type="button" class="quick-chip" data-tone="concise" data-i18n="toneConcise">간결</button>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <span class="text-[11px] font-mono text-mute mr-1">라우팅</span>
-          <button type="button" class="quick-chip active" data-route="auto">자동분리</button>
-          <button type="button" class="quick-chip" data-route="ops">운영상태기반</button>
-          <button type="button" class="quick-chip" data-route="general">일반잡담</button>
+          <span class="text-[11px] font-mono text-mute mr-1" data-i18n="labelRoute">라우팅</span>
+          <button type="button" class="quick-chip active" data-route="auto" data-i18n="routeAuto">자동분리</button>
+          <button type="button" class="quick-chip" data-route="ops" data-i18n="routeOps">운영상태기반</button>
+          <button type="button" class="quick-chip" data-route="general" data-i18n="routeGen">일반잡담</button>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <span class="text-[11px] font-mono text-mute mr-1">응답길이</span>
-          <button type="button" class="quick-chip" data-length="one_line">한 줄</button>
-          <button type="button" class="quick-chip active" data-length="three_lines">3줄</button>
-          <button type="button" class="quick-chip" data-length="detailed">상세</button>
-          <span class="text-[11px] font-mono text-mute ml-2">메모리</span>
+          <span class="text-[11px] font-mono text-mute mr-1" data-i18n="labelLength">응답길이</span>
+          <button type="button" class="quick-chip" data-length="one_line" data-i18n="lenOne">한 줄</button>
+          <button type="button" class="quick-chip active" data-length="three_lines" data-i18n="lenThree">3줄</button>
+          <button type="button" class="quick-chip" data-length="detailed" data-i18n="lenDetail">상세</button>
+          <span class="text-[11px] font-mono text-mute ml-2" data-i18n="labelMemory">메모리</span>
           <select id="memoryTurns" class="focus-ring rounded-xl bg-black/30 border border-white/10 px-3 py-1.5 text-xs font-mono">
-            <option value="0">OFF</option>
-            <option value="2">2턴</option>
-            <option value="4" selected>4턴</option>
-            <option value="8">8턴</option>
+            <option value="0" data-i18n="memOff">OFF</option>
+            <option value="2" data-i18n="mem2">2턴</option>
+            <option value="4" selected data-i18n="mem4">4턴</option>
+            <option value="8" data-i18n="mem8">8턴</option>
           </select>
         </div>
       </div>
       <div id="chatThread" class="chat-scroll max-h-[360px] overflow-y-auto px-4 sm:px-5 py-4 space-y-3">
         <div class="chat-msg-assistant rounded-2xl px-4 py-3 border border-white/10">
-          <p class="text-xs text-mute mb-1 font-mono">Assistant</p>
-          <p class="text-sm leading-relaxed">안녕하세요. 운영 상태 요약, 실패 게이트 조치, 우선순위 액션 플랜을 도와드릴게요.</p>
+          <p class="text-xs text-mute mb-1 font-mono" data-i18n="roleAssistant">Assistant</p>
+          <p id="chatWelcome" class="text-sm leading-relaxed" data-i18n="chatWelcome">안녕하세요. 운영 상태 요약, 실패 게이트 조치, 우선순위 액션 플랜을 도와드릴게요.</p>
         </div>
       </div>
-      <div class="px-4 sm:px-5 py-3 border-t border-white/5 bg-black/20">
+      <div class="chat-footer-bar px-4 sm:px-5 py-3 border-t border-white/5 bg-black/20">
         <div class="flex items-end gap-2">
-          <textarea id="chatInput" rows="1" placeholder="예) 지금 가장 위험한 이슈 3개와 즉시 조치 순서를 알려줘"
+          <textarea id="chatInput" rows="1" data-i18n-placeholder="chatPh" placeholder="예) 지금 가장 위험한 이슈 3개와 즉시 조치 순서를 알려줘"
             class="focus-ring flex-1 resize-none rounded-2xl bg-black/30 border border-white/10 px-4 py-3 text-sm text-white placeholder:text-mute min-h-[48px] max-h-40"></textarea>
           <button id="chatSendBtn" type="button" class="tap-target focus-ring glass rounded-2xl px-4 py-3 text-cyan hover:text-white">
             <span class="material-symbols-outlined mat">send</span>
@@ -333,10 +388,27 @@
     </section>
 
     <details class="glass rounded-xl sm:rounded-2xl mt-4 overflow-hidden">
-      <summary class="px-4 sm:px-5 py-4 cursor-pointer font-headline text-sm uppercase tracking-widest text-mute min-h-[48px] flex items-center">Raw Payload</summary>
+      <summary class="px-4 sm:px-5 py-4 cursor-pointer font-headline text-sm uppercase tracking-widest text-mute min-h-[48px] flex items-center" data-i18n="rawPayload">Raw Payload</summary>
       <pre id="raw" class="p-4 sm:p-5 border-t border-white/5 text-[11px] sm:text-xs font-mono text-cyan overflow-auto max-h-[min(45vh,360px)] sm:max-h-[360px]"></pre>
     </details>
   </main>
+
+  <section id="apiJsonModal" class="hidden fixed inset-0 z-[125] modal-backdrop items-center justify-center p-4">
+    <div class="glass rounded-2xl w-full max-w-3xl p-5 border border-white/10 max-h-[90vh] flex flex-col">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h3 class="font-headline text-lg" data-i18n="apiJsonTitle">상태 API (JSON)</h3>
+        <button id="apiJsonCloseBtn" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
+      </div>
+      <p class="text-xs text-mute mb-2 font-mono">GET /api/status</p>
+      <pre id="apiJsonPre" class="json-pre flex-1 min-h-0">{}</pre>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <button id="apiJsonCopyBtn" type="button" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-cyan" data-i18n="copyJson">복사</button>
+        <button id="apiJsonRefreshBtn" type="button" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-cyan" data-i18n="refreshJson">새로고침</button>
+        <a id="apiJsonRawLink" href="/api/status" target="_blank" rel="noopener" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-mute inline-flex items-center" data-i18n="openRawTab">원문(새 탭)</a>
+      </div>
+      <p class="text-[11px] text-mute mt-3" data-i18n="apiJsonHint">새 탭으로 열면 브라우저 기본 화면(흰 배경)으로 JSON만 보일 수 있습니다.</p>
+    </div>
+  </section>
 
   <section id="authModal" class="hidden fixed inset-0 z-[120] modal-backdrop items-center justify-center p-4">
     <div class="glass rounded-2xl w-full max-w-md p-5 border border-white/10">
@@ -345,11 +417,11 @@
         <button id="authCloseBtn" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
       </div>
       <div class="space-y-3">
-        <input id="loginId" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="ID (demo)" />
-        <input id="loginPw" type="password" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="Password (demo1234)" />
+        <input id="loginId" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="loginIdPh" placeholder="ID (demo)" />
+        <input id="loginPw" type="password" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="loginPwPh" placeholder="Password (demo1234)" />
         <button id="loginSubmitBtn" class="focus-ring glass rounded-xl px-4 py-2 text-cyan hover:text-white w-full" data-i18n="login">Login</button>
       </div>
-      <p class="text-xs text-mute mt-3">Demo: <code>demo / demo1234</code></p>
+      <p class="text-xs text-mute mt-3" data-i18n="loginDemo">Demo: demo / demo1234</p>
     </div>
   </section>
 
@@ -360,37 +432,37 @@
     </div>
     <div class="mt-4 space-y-3 text-sm">
       <div class="glass rounded-xl p-3 border border-white/10">
-        <p class="text-mute text-xs">User</p>
+        <p class="text-mute text-xs" data-i18n="mpUser">User</p>
         <p id="myUserName" class="font-semibold">-</p>
       </div>
       <div class="glass rounded-xl p-3 border border-white/10">
-        <p class="text-mute text-xs">Preferences</p>
+        <p class="text-mute text-xs" data-i18n="mpPrefs">Preferences</p>
         <p id="myPrefs" class="font-mono text-xs">-</p>
       </div>
       <div class="glass rounded-xl p-3 border border-white/10">
-        <p class="text-mute text-xs">Usage</p>
+        <p class="text-mute text-xs" data-i18n="mpUsage">Usage</p>
         <p id="myUsage" class="font-mono text-xs">-</p>
       </div>
-      <button id="logoutBtn" class="focus-ring glass rounded-xl px-4 py-2 text-bad hover:text-white w-full">Logout</button>
+      <button id="logoutBtn" class="focus-ring glass rounded-xl px-4 py-2 text-bad hover:text-white w-full" data-i18n="logout">Logout</button>
     </div>
   </section>
 
   <nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch justify-around gap-1 px-2" aria-label="Mobile quick actions">
     <a href="#top" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan">
       <span class="material-symbols-outlined mat text-xl">home</span>
-      Home
+      <span data-i18n="navHome">Home</span>
     </a>
     <button type="button" onclick="loadStatus()" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-cyan">
       <span class="material-symbols-outlined mat text-xl">sync</span>
-      Sync
+      <span data-i18n="navSync">Sync</span>
     </button>
-    <a href="/api/status" target="_blank" rel="noopener" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan">
+    <button type="button" id="apiStatusViewerBtnMobile" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan bg-transparent border-0">
       <span class="material-symbols-outlined mat text-xl">code</span>
-      API
-    </a>
+      <span data-i18n="apiShort">API</span>
+    </button>
     <a href="/metrics" target="_blank" rel="noopener" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan">
       <span class="material-symbols-outlined mat text-xl">monitoring</span>
-      Metrics
+      <span data-i18n="navMetrics">Metrics</span>
     </a>
   </nav>
 
@@ -405,34 +477,220 @@
       usageChats: Number(localStorage.getItem("ops_usage_chats") || "0"),
       favorites: JSON.parse(localStorage.getItem("ops_favorites") || "[]"),
     };
+    const QUICK_PROMPTS = {
+      risk: {
+        ko: "지금 가장 위험한 이슈 3개와 우선순위를 알려줘",
+        en: "List the top 3 operational risks in priority order with brief actions.",
+      },
+      checklist: {
+        ko: "실패 게이트별 즉시 조치 체크리스트를 알려줘",
+        en: "Give an immediate checklist per failing gate.",
+      },
+      plan30: {
+        ko: "다음 30분 운영계획을 제안해줘",
+        en: "Propose a focused 30-minute operations plan.",
+      },
+    };
     const i18n = {
       ko: {
+        docTitle: "Sovereign Ops | AutonomousCompanyMVP",
         theme: "테마",
-        lang: "KO",
+        langBtn: "English",
         login: "로그인",
         myPage: "마이페이지",
         loginTitle: "로그인",
         serviceHub: "서비스 허브",
+        apiJson: "API JSON",
+        apiShort: "API",
+        apiJsonTitle: "상태 API (JSON)",
+        copyJson: "복사",
+        refreshJson: "새로고침",
+        openRawTab: "원문(새 탭)",
+        apiJsonHint: "새 탭으로 열면 브라우저 기본 화면(흰 배경)으로 JSON만 보일 수 있습니다.",
+        navOverview: "개요",
+        prometheus: "Prometheus",
+        liveSync: "동기화",
+        refresh: "새로고침",
+        navHome: "홈",
+        navSync: "동기화",
+        navMetrics: "메트릭",
+        heroTitle: "오라클급 런타임 컨트롤",
+        heroSub: "실시간 전략·리스크·게이트 상태를 한 화면에서 운영합니다.",
+        labelMode: "모드",
+        labelKill: "킬스위치",
+        fetching: "불러오는 중…",
+        generatedUtc: "생성 시각 (UTC)",
+        gateStatus: "게이트 상태",
+        passLabel: "통과",
+        failLabel: "실패",
+        thCheck: "항목",
+        thState: "상태",
+        artifacts: "아티팩트",
+        artifactPh: "키 또는 경로 검색…",
+        thKey: "키",
+        thPath: "경로",
+        opsAssistant: "운영 어시스턴트",
+        chatIntro: "자유롭게 질문하세요. 현재 운영 상태를 기반으로 요약·가이드 답변을 제공합니다.",
+        chipRisk: "위험 요약",
+        chipChecklist: "조치 체크리스트",
+        chipPlan30: "30분 운영계획",
+        labelTone: "톤",
+        toneFriendly: "친근",
+        tonePro: "전문",
+        toneConcise: "간결",
+        labelRoute: "라우팅",
+        routeAuto: "자동",
+        routeOps: "운영 기반",
+        routeGen: "일반",
+        labelLength: "응답 길이",
+        lenOne: "한 줄",
+        lenThree: "3줄",
+        lenDetail: "상세",
+        labelMemory: "메모리",
+        memOff: "끔",
+        mem2: "2턴",
+        mem4: "4턴",
+        mem8: "8턴",
+        roleAssistant: "어시스턴트",
+        chatWelcome: "안녕하세요. 운영 상태 요약, 실패 게이트 조치, 우선순위 액션 플랜을 도와드릴게요.",
+        chatPh: "예) 지금 가장 위험한 이슈 3개와 즉시 조치 순서를 알려줘",
+        rawPayload: "원시 페이로드",
+        mpUser: "사용자",
+        mpPrefs: "환경 설정",
+        mpUsage: "사용량",
+        logout: "로그아웃",
+        loginIdPh: "아이디 (데모)",
+        loginPwPh: "비밀번호 (demo1234)",
+        loginDemo: "데모: demo / demo1234",
+        noGateData: "게이트 데이터 없음",
+        noArtifactMatch: "검색과 일치하는 아티팩트가 없습니다.",
+        loadFail: "데이터 로딩 실패",
+        serverHint: "서버: python scripts/monitoring_server.py --port 8787",
+        implemented: "구현됨",
+        svcRealtimeName: "실시간 상태 동기화",
+        svcRealtimeDesc: "대시보드 지표·게이트 자동 갱신",
+        svcChatName: "Ops Assistant",
+        svcChatDesc: "Gemini 대화, 메모리·톤·라우팅·길이",
+        svcThemeName: "다크/라이트",
+        svcThemeDesc: "눈에 편한 라이트 팔레트 지원",
+        svcLangName: "국문/영문",
+        svcLangDesc: "주요 UI 문자열 전환",
+        svcAuthName: "로그인·마이페이지",
+        svcAuthDesc: "데모 계정, 프로필·사용량",
+        svcArtifactName: "아티팩트 검색",
+        svcArtifactDesc: "키/경로 필터",
+        svcFavName: "즐겨찾기 프롬프트",
+        svcFavDesc: "퀵칩 더블클릭으로 저장",
+        svcNotifyName: "알림 힌트",
+        svcNotifyDesc: "오류 시 배너 안내",
+        svcExportName: "원시 JSON",
+        svcExportDesc: "Raw 페이로드 확인",
       },
       en: {
+        docTitle: "Sovereign Ops | AutonomousCompanyMVP",
         theme: "Theme",
-        lang: "EN",
+        langBtn: "한국어",
         login: "Login",
         myPage: "My Page",
         loginTitle: "Login",
         serviceHub: "Service Hub",
+        apiJson: "API JSON",
+        apiShort: "API",
+        apiJsonTitle: "Status API (JSON)",
+        copyJson: "Copy",
+        refreshJson: "Refresh",
+        openRawTab: "Raw (new tab)",
+        apiJsonHint: "A new tab shows plain JSON on the browser default white page.",
+        navOverview: "Overview",
+        prometheus: "Prometheus",
+        liveSync: "Live Sync",
+        refresh: "Refresh",
+        navHome: "Home",
+        navSync: "Sync",
+        navMetrics: "Metrics",
+        heroTitle: "Oracle-Grade Runtime Control",
+        heroSub: "Operate strategy, risk, and gates in one live view.",
+        labelMode: "Mode",
+        labelKill: "Kill-switch",
+        fetching: "Fetching…",
+        generatedUtc: "Generated (UTC)",
+        gateStatus: "Gate Status",
+        passLabel: "PASS",
+        failLabel: "FAIL",
+        thCheck: "Check",
+        thState: "State",
+        artifacts: "Artifacts",
+        artifactPh: "Search key or path…",
+        thKey: "Key",
+        thPath: "Path",
+        opsAssistant: "Ops Assistant",
+        chatIntro: "Ask anything. Answers use live ops context when relevant.",
+        chipRisk: "Risk summary",
+        chipChecklist: "Action checklist",
+        chipPlan30: "30-min plan",
+        labelTone: "Tone",
+        toneFriendly: "Friendly",
+        tonePro: "Pro",
+        toneConcise: "Concise",
+        labelRoute: "Routing",
+        routeAuto: "Auto",
+        routeOps: "Ops context",
+        routeGen: "General",
+        labelLength: "Length",
+        lenOne: "One line",
+        lenThree: "3 lines",
+        lenDetail: "Detailed",
+        labelMemory: "Memory",
+        memOff: "Off",
+        mem2: "2 turns",
+        mem4: "4 turns",
+        mem8: "8 turns",
+        roleAssistant: "Assistant",
+        chatWelcome: "Hi. I can summarize ops status, gate failures, and next actions.",
+        chatPh: "e.g. Top 3 risks and the order of immediate actions",
+        rawPayload: "Raw Payload",
+        mpUser: "User",
+        mpPrefs: "Preferences",
+        mpUsage: "Usage",
+        logout: "Logout",
+        loginIdPh: "ID (demo)",
+        loginPwPh: "Password (demo1234)",
+        loginDemo: "Demo: demo / demo1234",
+        noGateData: "No gate data.",
+        noArtifactMatch: "No artifacts match search.",
+        loadFail: "Failed to load data",
+        serverHint: "Server: python scripts/monitoring_server.py --port 8787",
+        implemented: "live",
+        svcRealtimeName: "Live status sync",
+        svcRealtimeDesc: "Auto-refresh KPIs and gates",
+        svcChatName: "Ops Assistant",
+        svcChatDesc: "Gemini chat, memory, tone, routing, length",
+        svcThemeName: "Dark / Light",
+        svcThemeDesc: "Soft paper-toned light mode",
+        svcLangName: "KO / EN",
+        svcLangDesc: "Full UI string toggle",
+        svcAuthName: "Login & profile",
+        svcAuthDesc: "Demo auth, usage counters",
+        svcArtifactName: "Artifact search",
+        svcArtifactDesc: "Filter keys and paths",
+        svcFavName: "Favorite prompts",
+        svcFavDesc: "Double-click a quick chip to save",
+        svcNotifyName: "Alert hints",
+        svcNotifyDesc: "Banner on load errors",
+        svcExportName: "Raw JSON",
+        svcExportDesc: "Inspect payload",
       },
     };
-    const serviceFeatures = [
-      { key: "realtime", name: "실시간 상태 동기화", desc: "대시보드 지표/게이트 자동 업데이트", status: "implemented" },
-      { key: "chat", name: "Ops Assistant", desc: "Gemini 대화 + 메모리/톤/라우팅/길이", status: "implemented" },
-      { key: "theme", name: "다크/라이트 전환", desc: "헤더 토글로 즉시 테마 전환", status: "implemented" },
-      { key: "lang", name: "국문/영문 전환", desc: "핵심 UI 라벨 언어 전환", status: "implemented" },
-      { key: "auth", name: "로그인/마이페이지", desc: "계정 진입/프로필/사용량/로그아웃", status: "implemented" },
-      { key: "artifact", name: "아티팩트 검색", desc: "키/경로 실시간 검색", status: "implemented" },
-      { key: "fav", name: "즐겨찾기 프롬프트", desc: "자주 쓰는 질문 저장/재사용", status: "implemented" },
-      { key: "notify", name: "운영 알림 힌트", desc: "오류/게이트 실패 시 배너 안내", status: "implemented" },
-      { key: "export", name: "원시 데이터 확인", desc: "Raw payload 즉시 확인", status: "implemented" },
+    const serviceCatalog = [
+      { nameKey: "svcRealtimeName", descKey: "svcRealtimeDesc" },
+      { nameKey: "svcChatName", descKey: "svcChatDesc" },
+      { nameKey: "svcThemeName", descKey: "svcThemeDesc" },
+      { nameKey: "svcLangName", descKey: "svcLangDesc" },
+      { nameKey: "svcAuthName", descKey: "svcAuthDesc" },
+      { nameKey: "svcArtifactName", descKey: "svcArtifactDesc" },
+      { nameKey: "svcFavName", descKey: "svcFavDesc" },
+      { nameKey: "svcNotifyName", descKey: "svcNotifyDesc" },
+      { nameKey: "svcExportName", descKey: "svcExportDesc" },
     ];
     const chatSettings = {
       tone: "friendly",
@@ -440,6 +698,16 @@
       length: "three_lines",
       memory_turns: 4,
     };
+    function normalizeLang() {
+      const v = String(appState.lang || "ko").toLowerCase();
+      appState.lang = v === "en" ? "en" : "ko";
+    }
+    function t(key) {
+      const lang = appState.lang === "en" ? "en" : "ko";
+      const pack = i18n[lang] || i18n.ko;
+      const val = pack[key];
+      return val != null ? val : (i18n.ko[key] != null ? i18n.ko[key] : key);
+    }
     function fmt(v) {
       if (v === null || v === undefined) return "—";
       if (typeof v === "number" && Number.isFinite(v)) {
@@ -449,44 +717,96 @@
       return String(v);
     }
     function badge(ok) {
-      if (ok) return '<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-good bg-green-500/10 border border-green-500/25">PASS</span>';
-      return '<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-bad bg-red-500/10 border border-red-500/25">FAIL</span>';
+      const label = ok ? t("passLabel") : t("failLabel");
+      if (ok) {
+        return `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-good bg-green-500/10 border border-green-500/25">${label}</span>`;
+      }
+      return `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-bad bg-red-500/10 border border-red-500/25">${label}</span>`;
     }
     function applyTheme() {
       const root = document.documentElement;
-      if (appState.theme === "light") root.classList.add("light");
-      else root.classList.remove("light");
+      if (appState.theme === "light") {
+        root.classList.add("light");
+        root.classList.remove("dark");
+      } else {
+        root.classList.remove("light");
+        root.classList.add("dark");
+      }
       localStorage.setItem("ops_theme", appState.theme);
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute("content", appState.theme === "light" ? "#cbd5e1" : "#0e0e0e");
+    }
+    function applyQuickChips() {
+      document.querySelectorAll("[data-quick-id]").forEach((btn) => {
+        const id = btn.getAttribute("data-quick-id");
+        const labels = { risk: t("chipRisk"), checklist: t("chipChecklist"), plan30: t("chipPlan30") };
+        btn.textContent = labels[id] || id;
+        const qp = QUICK_PROMPTS[id];
+        if (qp) btn.setAttribute("data-quick-q", qp[appState.lang] || qp.ko);
+      });
     }
     function applyLang() {
+      normalizeLang();
       const pack = i18n[appState.lang] || i18n.ko;
       document.documentElement.lang = appState.lang;
       document.querySelectorAll("[data-i18n]").forEach((el) => {
         const k = el.getAttribute("data-i18n");
-        if (pack[k]) el.textContent = pack[k];
+        if (pack[k] != null) el.textContent = pack[k];
       });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+        const k = el.getAttribute("data-i18n-placeholder");
+        if (pack[k] != null) el.setAttribute("placeholder", pack[k]);
+      });
+      document.title = t("docTitle");
+      applyQuickChips();
+      renderServiceHub();
+      refreshAccountUi();
       localStorage.setItem("ops_lang", appState.lang);
+      loadStatus();
+    }
+    let apiJsonText = "";
+    function openApiJsonModal() {
+      const m = document.getElementById("apiJsonModal");
+      m.classList.remove("hidden");
+      m.classList.add("flex");
+      loadApiJsonIntoModal();
+    }
+    function closeApiJsonModal() {
+      const m = document.getElementById("apiJsonModal");
+      m.classList.add("hidden");
+      m.classList.remove("flex");
+    }
+    async function loadApiJsonIntoModal() {
+      const pre = document.getElementById("apiJsonPre");
+      pre.textContent = "…";
+      try {
+        const r = await fetch("/api/status", { cache: "no-store" });
+        const data = await r.json();
+        apiJsonText = JSON.stringify(data, null, 2);
+        pre.textContent = apiJsonText;
+      } catch (e) {
+        apiJsonText = "";
+        pre.textContent = String(e?.message || e);
+      }
     }
     function renderServiceHub() {
       const grid = document.getElementById("serviceHubGrid");
-      grid.innerHTML = serviceFeatures.map((f) => `
+      const st = t("implemented");
+      grid.innerHTML = serviceCatalog.map((f) => `
         <article class="glass rounded-xl border border-white/10 p-3">
           <div class="flex items-center justify-between">
-            <h4 class="font-semibold text-sm">${f.name}</h4>
-            <span class="text-[10px] font-mono px-2 py-1 rounded-full ${f.status === "implemented" ? "bg-green-500/15 text-green-300" : "bg-yellow-500/15 text-yellow-300"}">${f.status}</span>
+            <h4 class="font-semibold text-sm">${t(f.nameKey)}</h4>
+            <span class="text-[10px] font-mono px-2 py-1 rounded-full bg-green-500/15 text-green-300">${st}</span>
           </div>
-          <p class="text-xs text-mute mt-2">${f.desc}</p>
+          <p class="text-xs text-mute mt-2">${t(f.descKey)}</p>
         </article>
       `).join("");
     }
     function refreshAccountUi() {
       const btn = document.getElementById("accountBtn");
-      const label = btn.querySelector("span:last-child");
-      if (appState.user) {
-        label.textContent = appState.lang === "en" ? "My Page" : "마이페이지";
-      } else {
-        label.textContent = appState.lang === "en" ? "Login" : "로그인";
-      }
+      const label = btn && btn.querySelector("span:last-child");
+      if (!label) return;
+      label.textContent = appState.user ? t("myPage") : t("login");
     }
     function openAuthModal() {
       const m = document.getElementById("authModal");
@@ -510,7 +830,7 @@
     }
     async function loadStatus() {
       const pulse = document.getElementById("livePulse");
-      pulse.textContent = "Fetching…";
+      pulse.textContent = t("fetching");
       document.getElementById("errorBanner").classList.add("hidden");
       try {
         const r = await fetch("/api/status", { cache: "no-store" });
@@ -519,7 +839,7 @@
         latestStatus = d || {};
         const m = d.metrics || {};
         const s = d.summary || {};
-        document.getElementById("generatedAt").textContent = `Generated (UTC): ${d.generated_at_utc || "—"}`;
+        document.getElementById("generatedAt").textContent = `${t("generatedUtc")}: ${d.generated_at_utc || "—"}`;
         document.getElementById("kpiSharpe").textContent = fmt(m.sharpe);
         document.getElementById("kpiMdd").textContent = fmt(m.mdd);
         document.getElementById("kpiWin").textContent = fmt(m.win_rate);
@@ -550,17 +870,17 @@
             <span class="font-mono text-[11px] text-mute break-all flex-1 min-w-0">${k}</span>
             <span class="shrink-0">${badge(Boolean(v))}</span>
           </div>`
-        ).join("") || `<p class="text-xs text-mute font-mono px-1">No gate data.</p>`;
+        ).join("") || `<p class="text-xs text-mute font-mono px-1">${t("noGateData")}</p>`;
         latestPaths = d.paths || {};
         renderPathRows();
         document.getElementById("raw").textContent = JSON.stringify(d, null, 2);
-        pulse.textContent = "Live Sync";
+        pulse.textContent = t("liveSync");
       } catch (e) {
         pulse.textContent = "Error";
-        const msg = `데이터 로딩 실패: ${e.message || e}`;
+        const msg = `${t("loadFail")}: ${e.message || e}`;
         document.getElementById("generatedAt").textContent = msg;
         const b = document.getElementById("errorBanner");
-        b.textContent = `${msg} (server: python scripts/monitoring_server.py --port 8787)`;
+        b.textContent = `${msg} (${t("serverHint")})`;
         b.classList.remove("hidden");
       }
     }
@@ -737,11 +1057,11 @@
         if (!q) return true;
         return k.toLowerCase().includes(q) || String(v).toLowerCase().includes(q);
       });
-      const emptyMsg = `<tr><td colspan="2" class="px-5 py-6 text-xs text-mute font-mono">No artifacts match search.</td></tr>`;
+      const emptyMsg = `<tr><td colspan="2" class="px-5 py-6 text-xs text-mute font-mono">${t("noArtifactMatch")}</td></tr>`;
       document.getElementById("pathRows").innerHTML = rows.map(([k, v]) =>
         `<tr class="border-t border-white/5"><td class="px-5 py-3 font-mono text-xs text-cyan">${k}</td><td class="px-5 py-3 font-mono text-xs text-mute break-all">${v}</td></tr>`
       ).join("") || emptyMsg;
-      const mobileEmpty = `<p class="text-xs text-mute font-mono py-4 text-center">No artifacts match search.</p>`;
+      const mobileEmpty = `<p class="text-xs text-mute font-mono py-4 text-center">${t("noArtifactMatch")}</p>`;
       document.getElementById("pathCardsMobile").innerHTML = rows.map(([k, v]) =>
         `<div class="glass rounded-xl p-4 border border-white/5 space-y-2">
           <p class="font-mono text-xs text-cyan font-semibold break-all">${k}</p>
@@ -753,7 +1073,7 @@
     const chatInput = document.getElementById("chatInput");
     const chatSendBtn = document.getElementById("chatSendBtn");
     chatSendBtn.addEventListener("click", sendChat);
-    document.querySelectorAll("[data-quick-q]").forEach((btn) => {
+    document.querySelectorAll("[data-quick-id]").forEach((btn) => {
       btn.addEventListener("click", () => {
         chatInput.value = btn.getAttribute("data-quick-q") || "";
         autoResizeTextarea(chatInput);
@@ -787,7 +1107,6 @@
     document.getElementById("langToggleBtn").addEventListener("click", () => {
       appState.lang = appState.lang === "ko" ? "en" : "ko";
       applyLang();
-      refreshAccountUi();
     });
     document.getElementById("accountBtn").addEventListener("click", () => {
       if (appState.user) openMyPage();
@@ -813,11 +1132,18 @@
       refreshAccountUi();
       closeMyPage();
     });
+    document.getElementById("apiStatusViewerBtn").addEventListener("click", openApiJsonModal);
+    document.getElementById("apiStatusViewerBtnMobile").addEventListener("click", openApiJsonModal);
+    document.getElementById("apiJsonCloseBtn").addEventListener("click", closeApiJsonModal);
+    document.getElementById("apiJsonRefreshBtn").addEventListener("click", loadApiJsonIntoModal);
+    document.getElementById("apiJsonCopyBtn").addEventListener("click", async () => {
+      if (!apiJsonText) return;
+      try {
+        await navigator.clipboard.writeText(apiJsonText);
+      } catch (_) {}
+    });
     applyTheme();
     applyLang();
-    renderServiceHub();
-    refreshAccountUi();
-    loadStatus();
     setInterval(loadStatus, 10000);
   </script>
 </body>
