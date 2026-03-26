@@ -1,8 +1,11 @@
 import { JSON_HEADERS, defaultStatusPayload, isOpsQuery, nowIso, stylePrompt } from "./_shared.js";
+import { getCurrentUser } from "./_auth.js";
+import { ensureSchema } from "./_db.js";
 
 export async function onRequestPost(context) {
   try {
     const env = context.env || {};
+    if (env.DB) await ensureSchema(env);
     const body = await context.request.json();
     const message = String(body?.message || "").trim();
     if (!message) {
@@ -27,6 +30,13 @@ export async function onRequestPost(context) {
     const { toneRule, lengthRule } = stylePrompt(settings);
     const status = defaultStatusPayload();
     const model = String(env.GEMINI_MODEL || "gemini-2.5-flash").trim();
+    const maxPromptChars = Math.max(1000, Number(env.LLM_MAX_PROMPT_CHARS || 12000));
+    if (message.length > maxPromptChars) {
+      return new Response(JSON.stringify({ ok: false, error: "prompt_too_long", max_prompt_chars: maxPromptChars }), {
+        status: 400,
+        headers: JSON_HEADERS,
+      });
+    }
 
     const sys = [
       "You are an ops assistant for an autonomous company dashboard.",
@@ -76,17 +86,27 @@ export async function onRequestPost(context) {
       });
     }
 
-    return new Response(
-      JSON.stringify({
-        ok: true,
-        reply,
-        provider: "gemini",
-        model,
-        route,
-        generated_at_utc: nowIso(),
-      }),
-      { status: 200, headers: JSON_HEADERS },
-    );
+    if (env.DB) {
+      const user = await getCurrentUser(context);
+      await env.DB.prepare(
+        `INSERT INTO chat_logs (id, user_id, route, model, prompt_chars, response_chars, created_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)`,
+      )
+        .bind(
+          crypto.randomUUID(),
+          user?.id || null,
+          route,
+          model,
+          message.length + JSON.stringify(history).length,
+          reply.length,
+          nowIso(),
+        )
+        .run();
+    }
+    return new Response(JSON.stringify({ ok: true, reply, provider: "gemini", model, route, generated_at_utc: nowIso() }), {
+      status: 200,
+      headers: JSON_HEADERS,
+    });
   } catch (e) {
     return new Response(
       JSON.stringify({ ok: false, error: "chat_handler_error", detail: String(e?.message || e).slice(0, 300) }),

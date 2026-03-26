@@ -332,6 +332,68 @@
 
     <section class="glass rounded-2xl mt-4 overflow-hidden">
       <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+        <h2 class="font-headline text-sm uppercase tracking-widest">Governance Console</h2>
+        <span class="material-symbols-outlined mat text-mute">rule_settings</span>
+      </div>
+      <div class="p-4 sm:p-5 grid xl:grid-cols-2 gap-4">
+        <article class="glass rounded-xl border border-white/10 p-4">
+          <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Workflow Requests</h3>
+          <div class="grid sm:grid-cols-3 gap-2 mb-2">
+            <input id="wfTitleInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="Request title" />
+            <select id="wfRiskInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm">
+              <option value="low">low</option>
+              <option value="medium" selected>medium</option>
+              <option value="high">high</option>
+            </select>
+            <button id="wfCreateBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Create</button>
+          </div>
+          <div class="overflow-auto max-h-[260px]">
+            <table class="w-full text-xs">
+              <thead class="sticky-head">
+                <tr class="text-mute">
+                  <th class="text-left px-2 py-2">Title</th>
+                  <th class="text-left px-2 py-2">Status</th>
+                  <th class="text-left px-2 py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody id="wfRows"></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="glass rounded-xl border border-white/10 p-4">
+          <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Policy + Recovery</h3>
+          <div class="grid sm:grid-cols-4 gap-2 mb-3">
+            <input id="policyActionInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="action (e.g. workflow.execute)" />
+            <input id="policyResourceInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="resource (e.g. ops/live)" />
+            <select id="policyRiskInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm">
+              <option value="low">low</option>
+              <option value="medium" selected>medium</option>
+              <option value="high">high</option>
+            </select>
+            <button id="policyCheckBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Policy Check</button>
+          </div>
+          <pre id="policyResultPre" class="json-pre">{}</pre>
+          <div class="grid sm:grid-cols-3 gap-2 mt-3">
+            <input id="recoveryIncidentInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="incident_type" />
+            <input id="recoveryRetryInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="simulate_failures (0~3)" />
+            <button id="recoveryRunBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Run Recovery</button>
+          </div>
+        </article>
+      </div>
+      <div class="p-4 sm:p-5 pt-0 grid xl:grid-cols-2 gap-4">
+        <article class="glass rounded-xl border border-white/10 p-4">
+          <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Audit Events</h3>
+          <pre id="auditEventsPre" class="json-pre">[]</pre>
+        </article>
+        <article class="glass rounded-xl border border-white/10 p-4">
+          <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Policy Decisions</h3>
+          <pre id="policyDecisionsPre" class="json-pre">[]</pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="glass rounded-2xl mt-4 overflow-hidden">
+      <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
         <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="opsAssistant">Ops Assistant</h2>
         <span class="material-symbols-outlined mat text-mute">chat</span>
       </div>
@@ -789,6 +851,90 @@
         pre.textContent = String(e?.message || e);
       }
     }
+    async function apiFetchJson(url, options = {}) {
+      const res = await fetch(url, { credentials: "include", ...options });
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (_) {}
+      return { res, data };
+    }
+    function workflowActionButtons(item) {
+      const s = String(item.status || "");
+      if (s === "requested") return `<button class="quick-chip" onclick="wfAction('${item.id}','review')">review</button>`;
+      if (s === "in_review") {
+        return `<div class="flex gap-1"><button class="quick-chip" onclick="wfAction('${item.id}','approve')">approve</button><button class="quick-chip" onclick="wfAction('${item.id}','reject')">reject</button></div>`;
+      }
+      if (s === "approved") return `<button class="quick-chip" onclick="wfAction('${item.id}','execute')">execute</button>`;
+      if (s === "executed") return `<button class="quick-chip" onclick="wfAction('${item.id}','audit')">audit</button>`;
+      return `<span class="text-mute">done</span>`;
+    }
+    async function loadGovernance() {
+      const userRes = await apiFetchJson("/api/auth/me");
+      const me = userRes.data?.user || null;
+      const wf = await apiFetchJson("/api/workflows");
+      const wfItems = Array.isArray(wf.data?.items) ? wf.data.items : [];
+      document.getElementById("wfRows").innerHTML = wfItems.slice(0, 40).map((x) => `
+        <tr class="border-t border-white/5">
+          <td class="px-2 py-2">${x.title || "-"}</td>
+          <td class="px-2 py-2 font-mono">${x.status || "-"}</td>
+          <td class="px-2 py-2">${workflowActionButtons(x)}</td>
+        </tr>
+      `).join("") || `<tr><td colspan="3" class="px-2 py-3 text-mute">No workflow items.</td></tr>`;
+
+      const ev = await apiFetchJson("/api/audit/events?limit=20");
+      document.getElementById("auditEventsPre").textContent = JSON.stringify(ev.data?.items || [], null, 2);
+      const pd = await apiFetchJson("/api/audit/policy-decisions?limit=20");
+      document.getElementById("policyDecisionsPre").textContent = JSON.stringify(pd.data?.items || [], null, 2);
+      if (!me) {
+        document.getElementById("policyResultPre").textContent = JSON.stringify({ note: "login required" }, null, 2);
+      }
+    }
+    async function createWorkflow() {
+      const title = (document.getElementById("wfTitleInput").value || "").trim();
+      const risk = (document.getElementById("wfRiskInput").value || "medium").trim();
+      if (!title) return;
+      await apiFetchJson("/api/workflows", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, risk_level: risk, request_type: "ops_change", payload: { source: "dashboard" } }),
+      });
+      document.getElementById("wfTitleInput").value = "";
+      await loadGovernance();
+    }
+    async function wfAction(id, action) {
+      await apiFetchJson(`/api/workflows/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, note: "dashboard_action" }),
+      });
+      await loadGovernance();
+    }
+    window.wfAction = wfAction;
+    async function runPolicyCheck() {
+      const action = (document.getElementById("policyActionInput").value || "").trim();
+      const resource = (document.getElementById("policyResourceInput").value || "").trim();
+      const risk = (document.getElementById("policyRiskInput").value || "medium").trim();
+      if (!action || !resource) return;
+      const out = await apiFetchJson("/api/policy/enforce", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, resource, risk_level: risk }),
+      });
+      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
+      await loadGovernance();
+    }
+    async function runRecovery() {
+      const type = (document.getElementById("recoveryIncidentInput").value || "latency_spike").trim();
+      const n = Number((document.getElementById("recoveryRetryInput").value || "1").trim());
+      const out = await apiFetchJson("/api/ops/recovery", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ incident_type: type, simulate_failures: Number.isFinite(n) ? n : 1 }),
+      });
+      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
+      await loadGovernance();
+    }
     function renderServiceHub() {
       const grid = document.getElementById("serviceHubGrid");
       const st = t("implemented");
@@ -820,13 +966,27 @@
     }
     function openMyPage() {
       const p = document.getElementById("myPagePanel");
-      document.getElementById("myUserName").textContent = appState.user?.id || "-";
+      const who = appState.user ? `${appState.user.email || appState.user.id} (${appState.user.role || "viewer"})` : "-";
+      document.getElementById("myUserName").textContent = who;
       document.getElementById("myPrefs").textContent = `theme=${appState.theme}, lang=${appState.lang}, tone=${chatSettings.tone}, route=${chatSettings.route_mode}, length=${chatSettings.length}`;
       document.getElementById("myUsage").textContent = `chat_count=${appState.usageChats}, favorites=${appState.favorites.length}`;
       p.classList.remove("hidden");
     }
     function closeMyPage() {
       document.getElementById("myPagePanel").classList.add("hidden");
+    }
+    async function refreshSessionUser() {
+      try {
+        const r = await fetch("/api/auth/me", { credentials: "include", cache: "no-store" });
+        const d = await r.json();
+        appState.user = d?.authenticated ? d.user : null;
+        if (appState.user) localStorage.setItem("ops_user", JSON.stringify(appState.user));
+        else localStorage.removeItem("ops_user");
+      } catch (_) {
+        appState.user = null;
+      }
+      refreshAccountUi();
+      loadGovernance();
     }
     async function loadStatus() {
       const pulse = document.getElementById("livePulse");
@@ -1114,19 +1274,30 @@
     });
     document.getElementById("authCloseBtn").addEventListener("click", closeAuthModal);
     document.getElementById("myPageCloseBtn").addEventListener("click", closeMyPage);
-    document.getElementById("loginSubmitBtn").addEventListener("click", () => {
+    document.getElementById("loginSubmitBtn").addEventListener("click", async () => {
       const id = (document.getElementById("loginId").value || "").trim();
       const pw = (document.getElementById("loginPw").value || "").trim();
       if (!id || !pw) return;
-      if ((id === "demo" && pw === "demo1234") || pw.length >= 6) {
-        appState.user = { id, loginAt: new Date().toISOString() };
-        localStorage.setItem("ops_user", JSON.stringify(appState.user));
+      try {
+        const r = await fetch("/api/auth/login", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: id.includes("@") ? id : `${id}@acmvp.local`, password: pw }),
+        });
+        const d = await r.json();
+        if (!r.ok || !d.ok) return;
+        appState.user = d.user || null;
+        if (appState.user) localStorage.setItem("ops_user", JSON.stringify(appState.user));
         refreshAccountUi();
         closeAuthModal();
         openMyPage();
-      }
+      } catch (_) {}
     });
-    document.getElementById("logoutBtn").addEventListener("click", () => {
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      try {
+        await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+      } catch (_) {}
       appState.user = null;
       localStorage.removeItem("ops_user");
       refreshAccountUi();
@@ -1142,9 +1313,15 @@
         await navigator.clipboard.writeText(apiJsonText);
       } catch (_) {}
     });
+    document.getElementById("wfCreateBtn").addEventListener("click", createWorkflow);
+    document.getElementById("policyCheckBtn").addEventListener("click", runPolicyCheck);
+    document.getElementById("recoveryRunBtn").addEventListener("click", runRecovery);
     applyTheme();
     applyLang();
+    refreshSessionUser();
+    loadGovernance();
     setInterval(loadStatus, 10000);
+    setInterval(loadGovernance, 15000);
   </script>
 </body>
 </html>

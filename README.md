@@ -249,6 +249,13 @@ This repository supports Cloudflare backend endpoints via Pages Functions:
 - `/api/status`
 - `/api/chat` (Gemini)
 - `/metrics`
+- `/api/auth/login`, `/api/auth/me`, `/api/auth/logout`
+- `/api/rbac/check`
+- `/api/admin/users` (admin-only role/MFA management)
+- `/api/workflows` and `/api/workflows/:id` (state machine)
+- `/api/policy/enforce`
+- `/api/ops/recovery`
+- `/api/audit/events`, `/api/audit/policy-decisions`
 
 Deploy with Functions:
 
@@ -261,4 +268,23 @@ Set production secrets:
 ```bash
 npx wrangler pages secret put GEMINI_API_KEY --project-name autonomouscompany
 npx wrangler pages secret put GEMINI_MODEL --project-name autonomouscompany
+npx wrangler pages secret put LLM_MAX_PROMPT_CHARS --project-name autonomouscompany
 ```
+
+Bind Cloudflare D1 database to Pages project:
+
+1. Cloudflare Dashboard -> Pages -> `autonomouscompany` -> Settings -> Functions -> D1 bindings
+2. Add binding name: `DB`
+3. Connect your D1 database
+4. Deploy again
+
+Optional: initialize schema manually (if needed):
+
+```bash
+npx wrangler d1 execute <YOUR_DB_NAME> --file db/schema.sql
+```
+
+Demo auth users after schema boot:
+
+- `admin@acmvp.local / demo1234` (admin)
+- `operator@acmvp.local / demo1234` (operator)
