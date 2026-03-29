@@ -203,7 +203,7 @@
       <nav class="hidden lg:flex items-center gap-6 text-[11px] uppercase tracking-widest font-headline text-mute">
         <span class="text-cyan border-b-2 border-cyan pb-0.5" data-i18n="navOverview">Overview</span>
         <button type="button" id="apiStatusViewerBtn" class="hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 p-0 cursor-pointer text-mute" data-i18n="apiJson">API JSON</button>
-        <a href="/metrics" target="_blank" rel="noopener" class="hover:text-white" data-i18n="prometheus">Prometheus</a>
+        <button type="button" id="metricsViewerBtn" class="hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 p-0 cursor-pointer text-mute" data-i18n="prometheus">Prometheus</button>
       </nav>
     </div>
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -401,11 +401,35 @@
       <div class="p-4 sm:p-5 pt-0 grid xl:grid-cols-2 gap-4">
         <article class="glass rounded-xl border border-white/10 p-4">
           <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Audit Events</h3>
-          <pre id="auditEventsPre" class="json-pre">[]</pre>
+          <div class="overflow-auto max-h-[300px]">
+            <table class="w-full text-[11px]">
+              <thead class="sticky-head">
+                <tr class="text-mute text-left uppercase tracking-tighter">
+                  <th class="px-2 py-2">Time</th>
+                  <th class="px-2 py-2">Type</th>
+                  <th class="px-2 py-2">Severity</th>
+                  <th class="px-2 py-2">Details</th>
+                </tr>
+              </thead>
+              <tbody id="auditEventsRows"></tbody>
+            </table>
+          </div>
         </article>
         <article class="glass rounded-xl border border-white/10 p-4">
           <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Policy Decisions</h3>
-          <pre id="policyDecisionsPre" class="json-pre">[]</pre>
+          <div class="overflow-auto max-h-[300px]">
+            <table class="w-full text-[11px]">
+              <thead class="sticky-head">
+                <tr class="text-mute text-left uppercase tracking-tighter">
+                  <th class="px-2 py-2">Time</th>
+                  <th class="px-2 py-2">Action</th>
+                  <th class="px-2 py-2">Resource</th>
+                  <th class="px-2 py-2">Allowed</th>
+                </tr>
+              </thead>
+              <tbody id="policyDecisionsRows"></tbody>
+            </table>
+          </div>
         </article>
       </div>
       <div class="p-4 sm:p-5 pt-0">
@@ -511,18 +535,68 @@
     </div>
   </section>
 
+  <section id="metricsModal" class="hidden fixed inset-0 z-[125] modal-backdrop items-center justify-center p-4">
+    <div class="glass rounded-2xl w-full max-w-3xl p-5 border border-white/10 max-h-[90vh] flex flex-col">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h3 class="font-headline text-lg" data-i18n="metricsModalTitle">Prometheus 메트릭</h3>
+        <button id="metricsCloseBtn" type="button" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
+      </div>
+      <p class="text-xs text-mute mb-2 font-mono">GET /metrics</p>
+      <div id="metricsTableWrap" class="hidden flex-1 min-h-0 overflow-auto rounded-xl border border-white/10 max-h-[min(42vh,360px)] mb-3">
+        <table class="w-full text-left text-xs">
+          <thead class="sticky top-0 bg-black/55 backdrop-blur-sm border-b border-white/10">
+            <tr class="text-mute uppercase tracking-wider font-headline">
+              <th class="px-3 py-2" data-i18n="metricsThName">메트릭</th>
+              <th class="px-3 py-2" data-i18n="metricsThType">타입</th>
+              <th class="px-3 py-2" data-i18n="metricsThValue">값</th>
+              <th class="px-3 py-2 hidden sm:table-cell" data-i18n="metricsThHelp">설명</th>
+            </tr>
+          </thead>
+          <tbody id="metricsTableBody"></tbody>
+        </table>
+      </div>
+      <details id="metricsRawDetails" class="group flex-shrink-0 mb-1">
+        <summary class="text-xs text-cyan cursor-pointer font-mono hover:text-white marker:content-[''] marker:hidden flex items-center gap-1 list-none">
+          <span class="material-symbols-outlined mat text-base transition-transform group-open:rotate-180">expand_more</span>
+          <span data-i18n="metricsRawToggle">원문 (Prometheus 형식)</span>
+        </summary>
+        <pre id="metricsPre" class="json-pre mt-2 max-h-[min(38vh,300px)]">…</pre>
+      </details>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <button id="metricsCopyBtn" type="button" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-cyan" data-i18n="copyMetrics">복사</button>
+        <button id="metricsRefreshBtn" type="button" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-cyan" data-i18n="refreshMetrics">새로고침</button>
+        <a href="/metrics" target="_blank" rel="noopener" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-mute inline-flex items-center" data-i18n="openRawTab">원문(새 탭)</a>
+      </div>
+      <p class="text-[11px] text-mute mt-3" data-i18n="metricsModalHint">표는 파싱 요약입니다. 전체 원문은 위 접기 또는 새 탭에서 확인하세요.</p>
+    </div>
+  </section>
+
   <section id="authModal" class="hidden fixed inset-0 z-[120] modal-backdrop items-center justify-center p-4">
     <div class="glass rounded-2xl w-full max-w-md p-5 border border-white/10">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="font-headline text-lg" data-i18n="loginTitle">로그인</h3>
+        <h3 id="authTitle" class="font-headline text-lg" data-i18n="loginTitle">로그인</h3>
         <button id="authCloseBtn" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
       </div>
-      <div class="space-y-3">
+      <div id="loginForm" class="space-y-3">
         <input id="loginId" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="loginIdPh" placeholder="ID (demo)" />
         <input id="loginPw" type="password" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="loginPwPh" placeholder="Password (demo1234)" />
         <button id="loginSubmitBtn" class="focus-ring glass rounded-xl px-4 py-2 text-cyan hover:text-white w-full" data-i18n="login">Login</button>
+        <p class="text-xs text-mute text-center mt-2">
+          <span data-i18n="noAccount">계정이 없으신가요?</span>
+          <button id="switchToSignUpBtn" class="text-cyan hover:underline bg-transparent border-0 p-0 cursor-pointer ml-1" data-i18n="signUpBtn">회원가입</button>
+        </p>
       </div>
-      <p class="text-xs text-mute mt-3" data-i18n="loginDemo">Demo: demo / demo1234</p>
+      <div id="signUpForm" class="hidden space-y-3">
+        <input id="regId" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="regIdPh" placeholder="Email (example@domain.com)" />
+        <input id="regPw" type="password" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="regPwPh" placeholder="Password (min 8 chars)" />
+        <input id="regPwConfirm" type="password" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="regPwConfirmPh" placeholder="Confirm Password" />
+        <button id="signUpSubmitBtn" class="focus-ring glass rounded-xl px-4 py-2 text-cyan hover:text-white w-full" data-i18n="register">회원가입</button>
+        <p class="text-xs text-mute text-center mt-2">
+          <span data-i18n="hasAccount">이미 계정이 있으신가요?</span>
+          <button id="switchToLoginBtn" class="text-cyan hover:underline bg-transparent border-0 p-0 cursor-pointer ml-1" data-i18n="loginBtn">로그인</button>
+        </p>
+      </div>
+      <p id="loginDemoHint" class="text-xs text-mute mt-3" data-i18n="loginDemo">Demo: demo / demo1234</p>
     </div>
   </section>
 
@@ -532,19 +606,93 @@
       <button id="myPageCloseBtn" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
     </div>
     <div class="mt-4 space-y-3 text-sm">
-      <div class="glass rounded-xl p-3 border border-white/10">
-        <p class="text-mute text-xs" data-i18n="mpUser">User</p>
-        <p id="myUserName" class="font-semibold">-</p>
+      <div class="glass rounded-xl p-4 border border-white/10 bg-gradient-to-br from-white/[0.02] to-transparent">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="material-symbols-outlined mat text-mute text-sm">person</span>
+          <p class="text-mute text-[10px] uppercase tracking-widest font-headline" data-i18n="mpUser">User</p>
+        </div>
+        <p id="myUserName" class="font-semibold text-white tracking-tight ml-6">-</p>
       </div>
-      <div class="glass rounded-xl p-3 border border-white/10">
-        <p class="text-mute text-xs" data-i18n="mpPrefs">Preferences</p>
-        <p id="myPrefs" class="font-mono text-xs">-</p>
+      <div class="glass rounded-xl p-4 border border-white/10 bg-gradient-to-br from-white/[0.02] to-transparent">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="material-symbols-outlined mat text-mute text-sm">settings</span>
+          <p class="text-mute text-[10px] uppercase tracking-widest font-headline" data-i18n="mpPrefs">Preferences</p>
+        </div>
+        <div id="myPrefsGrid" class="grid grid-cols-2 gap-2 text-[11px]">
+          <div class="animate-pulse bg-white/5 h-10 rounded-lg"></div>
+          <div class="animate-pulse bg-white/5 h-10 rounded-lg"></div>
+          <div class="animate-pulse bg-white/5 h-10 rounded-lg"></div>
+          <div class="animate-pulse bg-white/5 h-10 rounded-lg"></div>
+        </div>
       </div>
-      <div class="glass rounded-xl p-3 border border-white/10">
-        <p class="text-mute text-xs" data-i18n="mpUsage">Usage</p>
-        <p id="myUsage" class="font-mono text-xs">-</p>
+      <div class="glass rounded-xl p-4 border border-white/10 bg-gradient-to-br from-white/[0.02] to-transparent">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="material-symbols-outlined mat text-mute text-sm">analytics</span>
+          <p class="text-mute text-[10px] uppercase tracking-widest font-headline" data-i18n="mpUsage">Usage</p>
+        </div>
+        <div id="myUsageList" class="space-y-4">
+          <div class="animate-pulse bg-white/5 h-8 rounded-lg"></div>
+          <div class="animate-pulse bg-white/5 h-8 rounded-lg"></div>
+        </div>
       </div>
-      <button id="logoutBtn" class="focus-ring glass rounded-xl px-4 py-2 text-bad hover:text-white w-full" data-i18n="logout">Logout</button>
+
+      <div class="glass rounded-xl p-4 border border-white/10 space-y-4 bg-gradient-to-br from-white/[0.02] to-transparent">
+        <div class="flex items-center gap-2 border-b border-white/5 pb-2">
+          <span class="material-symbols-outlined mat text-mute text-sm">key</span>
+          <h4 class="font-headline text-sm" data-i18n="apiAccountsTitle">계좌 및 API 관리</h4>
+        </div>
+        
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-1.5">
+            <span class="material-symbols-outlined mat text-[14px] text-cyan">account_balance</span>
+            <label class="text-mute text-[10px] uppercase tracking-wider" data-i18n="bankAccountLabel">케이뱅크 계좌번호</label>
+          </div>
+          <input id="bankAccount" type="text" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" data-i18n-placeholder="bankAccountPh" placeholder="계좌번호 입력" />
+        </div>
+
+        <div class="space-y-2 border-t border-white/5 pt-3">
+          <div class="flex items-center gap-1.5 mb-1">
+            <span class="material-symbols-outlined mat text-[14px] text-cyan">token</span>
+            <p class="text-mute text-[10px] uppercase tracking-wider">UPBIT API</p>
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center justify-between">
+              <label class="text-[10px] text-mute/70" data-i18n="upbitApiKeyLabel">Access Key</label>
+              <button id="testUpbitBtn" class="text-[9px] text-cyan hover:underline bg-transparent border-0 p-0 cursor-pointer" data-i18n="testConnShort">Test</button>
+            </div>
+            <input id="upbitKey" type="password" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" placeholder="Upbit Access Key" />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] text-mute/70" data-i18n="upbitApiSecretLabel">Secret Key</label>
+            <input id="upbitSecret" type="password" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" placeholder="Upbit Secret Key" />
+          </div>
+        </div>
+
+        <div class="space-y-2 border-t border-white/5 pt-3">
+          <div class="flex items-center gap-1.5 mb-1">
+            <span class="material-symbols-outlined mat text-[14px] text-cyan">account_balance_wallet</span>
+            <p class="text-mute text-[10px] uppercase tracking-wider">BINANCE API</p>
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center justify-between">
+              <label class="text-[10px] text-mute/70" data-i18n="binanceApiKeyLabel">API Key</label>
+              <button id="testBinanceBtn" class="text-[9px] text-cyan hover:underline bg-transparent border-0 p-0 cursor-pointer" data-i18n="testConnShort">Test</button>
+            </div>
+            <input id="binanceKey" type="password" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" placeholder="Binance API Key" />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] text-mute/70" data-i18n="binanceApiSecretLabel">Secret Key</label>
+            <input id="binanceSecret" type="password" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" placeholder="Binance Secret Key" />
+          </div>
+        </div>
+
+        <button id="saveApiSettingsBtn" class="focus-ring glass rounded-xl px-4 py-2 text-cyan hover:text-white w-full text-xs font-headline" data-i18n="saveSettings">설정 저장</button>
+      </div>
+
+      <button id="logoutBtn" class="focus-ring glass rounded-xl px-4 py-2 text-bad hover:text-white w-full flex items-center justify-center gap-2" data-i18n="logout">
+        <span class="material-symbols-outlined mat text-sm">logout</span>
+        Logout
+      </button>
     </div>
   </section>
 
@@ -561,10 +709,10 @@
       <span class="material-symbols-outlined mat text-xl">code</span>
       <span data-i18n="apiShort">API</span>
     </button>
-    <a href="/metrics" target="_blank" rel="noopener" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan">
+    <button type="button" id="metricsViewerBtnMobile" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan bg-transparent border-0">
       <span class="material-symbols-outlined mat text-xl">monitoring</span>
       <span data-i18n="navMetrics">Metrics</span>
-    </a>
+    </button>
   </nav>
 
   <script>
@@ -608,6 +756,15 @@
         refreshJson: "새로고침",
         openRawTab: "원문(새 탭)",
         apiJsonHint: "새 탭으로 열면 브라우저 기본 화면(흰 배경)으로 JSON만 보일 수 있습니다.",
+        metricsModalTitle: "Prometheus 메트릭",
+        copyMetrics: "복사",
+        refreshMetrics: "새로고침",
+        metricsModalHint: "표는 파싱 요약입니다. 전체 원문은 접기 영역 또는 새 탭에서 확인하세요.",
+        metricsRawToggle: "원문 (Prometheus 형식)",
+        metricsThName: "메트릭",
+        metricsThType: "타입",
+        metricsThValue: "값",
+        metricsThHelp: "설명",
         navOverview: "개요",
         prometheus: "Prometheus",
         liveSync: "동기화",
@@ -656,10 +813,34 @@
         chatWelcome: "안녕하세요. 운영 상태 요약, 실패 게이트 조치, 우선순위 액션 플랜을 도와드릴게요.",
         chatPh: "예) 지금 가장 위험한 이슈 3개와 즉시 조치 순서를 알려줘",
         rawPayload: "원시 페이로드",
+        apiAccountsTitle: "계좌 및 API 관리",
+        bankAccountLabel: "케이뱅크 계좌번호",
+        bankAccountPh: "계좌번호 입력 (예: 100-123-456789)",
+        upbitApiKeyLabel: "Upbit Access Key",
+        upbitApiSecretLabel: "Upbit Secret Key",
+        binanceApiKeyLabel: "Binance API Key",
+        binanceApiSecretLabel: "Binance Secret Key",
+        saveSettings: "설정 저장",
+        settingsSaved: "API 및 계좌 정보가 저장되었습니다.",
+        testConnShort: "연결 테스트",
+        connSuccess: "연결 성공!",
+        connFail: "연결 실패: 키를 확인하세요.",
         mpUser: "사용자",
         mpPrefs: "환경 설정",
         mpUsage: "사용량",
         logout: "로그아웃",
+        signUpBtn: "회원가입",
+        loginBtn: "로그인",
+        noAccount: "계정이 없으신가요?",
+        hasAccount: "이미 계정이 있으신가요?",
+        signUpTitle: "회원가입",
+        register: "가입하기",
+        regIdPh: "이메일 주소",
+        regPwPh: "비밀번호 (8자 이상)",
+        regPwConfirmPh: "비밀번호 확인",
+        pwMismatch: "비밀번호가 일치하지 않습니다.",
+        regSuccess: "회원가입 성공! 이제 로그인해주세요.",
+        regFail: "회원가입 실패. 이미 존재하는 이메일이거나 형식이 잘못되었습니다.",
         loginIdPh: "아이디 (데모)",
         loginPwPh: "비밀번호 (demo1234)",
         loginDemo: "데모: demo / demo1234",
@@ -702,6 +883,15 @@
         refreshJson: "Refresh",
         openRawTab: "Raw (new tab)",
         apiJsonHint: "A new tab shows plain JSON on the browser default white page.",
+        metricsModalTitle: "Prometheus metrics",
+        copyMetrics: "Copy",
+        refreshMetrics: "Refresh",
+        metricsModalHint: "The table is a parsed summary. Full text is in the foldout or a new tab.",
+        metricsRawToggle: "Raw exposition (Prometheus format)",
+        metricsThName: "Metric",
+        metricsThType: "Type",
+        metricsThValue: "Value",
+        metricsThHelp: "Help",
         navOverview: "Overview",
         prometheus: "Prometheus",
         liveSync: "Live Sync",
@@ -747,6 +937,18 @@
         mem4: "4 turns",
         mem8: "8 turns",
         roleAssistant: "Assistant",
+        apiAccountsTitle: "Accounts & API Keys",
+        bankAccountLabel: "K-Bank Account",
+        bankAccountPh: "Enter account number",
+        upbitApiKeyLabel: "Upbit Access Key",
+        upbitApiSecretLabel: "Upbit Secret Key",
+        binanceApiKeyLabel: "Binance API Key",
+        binanceApiSecretLabel: "Binance Secret Key",
+        saveSettings: "Save Settings",
+        settingsSaved: "API and account settings saved.",
+        testConnShort: "Test Conn",
+        connSuccess: "Connection Success!",
+        connFail: "Connection Failed: check keys.",
         chatWelcome: "Hi. I can summarize ops status, gate failures, and next actions.",
         chatPh: "e.g. Top 3 risks and the order of immediate actions",
         rawPayload: "Raw Payload",
@@ -754,6 +956,18 @@
         mpPrefs: "Preferences",
         mpUsage: "Usage",
         logout: "Logout",
+        signUpBtn: "Sign Up",
+        loginBtn: "Login",
+        noAccount: "Don't have an account?",
+        hasAccount: "Already have an account?",
+        signUpTitle: "Create Account",
+        register: "Register",
+        regIdPh: "Email address",
+        regPwPh: "Password (min 8 chars)",
+        regPwConfirmPh: "Confirm Password",
+        pwMismatch: "Passwords do not match.",
+        regSuccess: "Sign up successful! Please log in.",
+        regFail: "Sign up failed. User may already exist.",
         loginIdPh: "ID (demo)",
         loginPwPh: "Password (demo1234)",
         loginDemo: "Demo: demo / demo1234",
@@ -890,6 +1104,99 @@
         pre.textContent = String(e?.message || e);
       }
     }
+    let metricsText = "";
+    function parsePrometheusMetrics(text) {
+      const byName = Object.create(null);
+      const lines = String(text).split(/\r?\n/);
+      function ensure(name) {
+        if (!byName[name]) byName[name] = { help: "", type: "", lines: [] };
+        return byName[name];
+      }
+      for (const line of lines) {
+        if (line.startsWith("# HELP ")) {
+          const rest = line.slice(7).trim();
+          const idx = rest.indexOf(" ");
+          const name = idx >= 0 ? rest.slice(0, idx) : rest;
+          const help = idx >= 0 ? rest.slice(idx + 1).trim() : "";
+          ensure(name).help = help;
+        } else if (line.startsWith("# TYPE ")) {
+          const rest = line.slice(7).trim();
+          const parts = rest.split(/\s+/);
+          const name = parts[0];
+          const typ = parts[1] || "";
+          ensure(name).type = typ;
+        } else if (line.trim() && !line.startsWith("#")) {
+          const lastSpace = line.lastIndexOf(" ");
+          if (lastSpace <= 0) continue;
+          const valPart = line.slice(lastSpace + 1).trim();
+          const namePart = line.slice(0, lastSpace).trim();
+          const brace = namePart.indexOf("{");
+          const baseName = brace >= 0 ? namePart.slice(0, brace) : namePart;
+          if (!baseName) continue;
+          ensure(baseName).lines.push({ series: namePart, value: valPart });
+        }
+      }
+      return byName;
+    }
+    function renderMetricsTable(parsed) {
+      const tbody = document.getElementById("metricsTableBody");
+      const wrap = document.getElementById("metricsTableWrap");
+      tbody.textContent = "";
+      const names = Object.keys(parsed).sort();
+      if (names.length === 0) {
+        wrap.classList.add("hidden");
+        return;
+      }
+      wrap.classList.remove("hidden");
+      for (const name of names) {
+        const x = parsed[name];
+        const first = x.lines && x.lines[0];
+        const v = first ? first.value : "—";
+        const extra = x.lines && x.lines.length > 1 ? ` (+${x.lines.length - 1})` : "";
+        const tr = document.createElement("tr");
+        tr.className = "border-t border-white/5";
+        const tdName = document.createElement("td");
+        tdName.className = "px-3 py-2 text-cyan align-top";
+        tdName.textContent = name;
+        const tdType = document.createElement("td");
+        tdType.className = "px-3 py-2 text-mute align-top";
+        tdType.textContent = x.type || "—";
+        const tdVal = document.createElement("td");
+        tdVal.className = "px-3 py-2 align-top break-all";
+        tdVal.textContent = v + extra;
+        const tdHelp = document.createElement("td");
+        tdHelp.className = "px-3 py-2 text-mute align-top max-w-[220px] hidden sm:table-cell";
+        tdHelp.textContent = x.help || "—";
+        tdHelp.title = x.help || "";
+        tr.append(tdName, tdType, tdVal, tdHelp);
+        tbody.appendChild(tr);
+      }
+    }
+    function openMetricsModal() {
+      const m = document.getElementById("metricsModal");
+      m.classList.remove("hidden");
+      m.classList.add("flex");
+      loadMetricsIntoModal();
+    }
+    function closeMetricsModal() {
+      const m = document.getElementById("metricsModal");
+      m.classList.add("hidden");
+      m.classList.remove("flex");
+    }
+    async function loadMetricsIntoModal() {
+      const pre = document.getElementById("metricsPre");
+      pre.textContent = "…";
+      try {
+        const r = await fetch("/metrics", { cache: "no-store", credentials: "include" });
+        metricsText = await r.text();
+        pre.textContent = metricsText;
+        renderMetricsTable(parsePrometheusMetrics(metricsText));
+      } catch (e) {
+        metricsText = "";
+        pre.textContent = String(e?.message || e);
+        renderMetricsTable({});
+      }
+    }
     async function apiFetchJson(url, options = {}) {
       const res = await fetch(url, { credentials: "include", ...options });
       let data = {};
@@ -922,9 +1229,29 @@
       `).join("") || `<tr><td colspan="3" class="px-2 py-3 text-mute">No workflow items.</td></tr>`;
 
       const ev = await apiFetchJson("/api/audit/events?limit=20");
-      document.getElementById("auditEventsPre").textContent = JSON.stringify(ev.data?.items || [], null, 2);
+      const evItems = Array.isArray(ev.data?.items) ? ev.data.items : [];
+      document.getElementById("auditEventsRows").innerHTML = evItems.map(x => {
+        const payload = typeof x.payload_json === 'string' ? x.payload_json : JSON.stringify(x.payload_json || {});
+        return `
+          <tr class="border-t border-white/5">
+            <td class="px-2 py-2 truncate max-w-[70px] text-mute" title="${x.created_at || ''}">${(x.created_at || '').split('T')[1]?.split('.')[0] || '-'}</td>
+            <td class="px-2 py-2 font-mono text-cyan">${x.event_type || '-'}</td>
+            <td class="px-2 py-2"><span class="px-1.5 py-0.5 rounded text-[9px] uppercase ${x.severity === 'error' || x.severity === 'high' ? 'bg-red-500/20 text-red-300' : 'bg-white/5 text-mute'}">${x.severity || '-'}</span></td>
+            <td class="px-2 py-2 truncate max-w-[150px] text-mute italic" title='${payload}'>${payload}</td>
+          </tr>
+        `;
+      }).join("") || '<tr><td colspan="4" class="px-2 py-3 text-mute text-center">No events</td></tr>';
+
       const pd = await apiFetchJson("/api/audit/policy-decisions?limit=20");
-      document.getElementById("policyDecisionsPre").textContent = JSON.stringify(pd.data?.items || [], null, 2);
+      const pdItems = Array.isArray(pd.data?.items) ? pd.data.items : [];
+      document.getElementById("policyDecisionsRows").innerHTML = pdItems.map(x => `
+        <tr class="border-t border-white/5">
+          <td class="px-2 py-2 truncate max-w-[70px] text-mute" title="${x.created_at || ''}">${(x.created_at || '').split('T')[1]?.split('.')[0] || '-'}</td>
+          <td class="px-2 py-2 font-mono text-cyan">${x.action || '-'}</td>
+          <td class="px-2 py-2 truncate max-w-[100px] text-mute">${x.resource || '-'}</td>
+          <td class="px-2 py-2">${x.allowed ? '<span class="text-good font-bold">ALLOW</span>' : '<span class="text-bad font-bold">DENY</span>'}</td>
+        </tr>
+      `).join("") || '<tr><td colspan="4" class="px-2 py-3 text-mute text-center">No decisions</td></tr>';
       const usersRes = await apiFetchJson("/api/admin/users");
       const users = Array.isArray(usersRes.data?.items) ? usersRes.data.items : [];
       document.getElementById("adminUsersRows").innerHTML = users.map((u) => `
@@ -1067,8 +1394,59 @@
       const p = document.getElementById("myPagePanel");
       const who = appState.user ? `${appState.user.email || appState.user.id} (${appState.user.role || "viewer"})` : "-";
       document.getElementById("myUserName").textContent = who;
-      document.getElementById("myPrefs").textContent = `theme=${appState.theme}, lang=${appState.lang}, tone=${chatSettings.tone}, route=${chatSettings.route_mode}, length=${chatSettings.length}`;
-      document.getElementById("myUsage").textContent = `chat_count=${appState.usageChats}, favorites=${appState.favorites.length}`;
+
+      const prefsGrid = document.getElementById("myPrefsGrid");
+      const prefs = [
+        { icon: "palette", label: t("theme"), value: appState.theme },
+        { icon: "language", label: "Lang", value: appState.lang },
+        { icon: "psychology", label: t("labelTone"), value: chatSettings.tone },
+        { icon: "alt_route", label: t("labelRoute"), value: chatSettings.route_mode },
+        { icon: "format_align_left", label: t("labelLength"), value: chatSettings.length }
+      ];
+      if (prefsGrid) {
+        prefsGrid.innerHTML = prefs.map(pr => `
+          <div class="flex items-center gap-2 bg-white/5 rounded-lg px-2 py-1.5 border border-white/5">
+            <span class="material-symbols-outlined mat text-base text-cyan">${pr.icon}</span>
+            <div>
+              <p class="text-[9px] text-mute uppercase tracking-tighter leading-none mb-0.5">${pr.label}</p>
+              <p class="font-mono text-[10px] text-white/90 truncate">${pr.value}</p>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      const usageList = document.getElementById("myUsageList");
+      const usages = [
+        { icon: "chat", label: t("svcChatName") || "Chats", value: appState.usageChats, total: 100 },
+        { icon: "star", label: t("svcFavName") || "Favorites", value: appState.favorites.length, total: 20 }
+      ];
+      if (usageList) {
+        usageList.innerHTML = usages.map(us => {
+          const pct = Math.min(100, (us.value / us.total) * 100);
+          return `
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined mat text-base text-good">${us.icon}</span>
+                <span class="text-xs text-mute">${us.label}</span>
+              </div>
+              <span class="font-mono text-xs text-white">${us.value}</span>
+            </div>
+            <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+              <div class="h-full bg-good transition-all duration-700" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `}).join("");
+      }
+      
+      // Load saved API settings
+      const savedApis = JSON.parse(localStorage.getItem("ops_api_settings") || "{}");
+      document.getElementById("bankAccount").value = savedApis.bankAccount || "";
+      document.getElementById("upbitKey").value = savedApis.upbitKey || "";
+      document.getElementById("upbitSecret").value = savedApis.upbitSecret || "";
+      document.getElementById("binanceKey").value = savedApis.binanceKey || "";
+      document.getElementById("binanceSecret").value = savedApis.binanceSecret || "";
+      
       p.classList.remove("hidden");
     }
     function closeMyPage() {
@@ -1373,6 +1751,44 @@
     });
     document.getElementById("authCloseBtn").addEventListener("click", closeAuthModal);
     document.getElementById("myPageCloseBtn").addEventListener("click", closeMyPage);
+    document.getElementById("switchToSignUpBtn").addEventListener("click", () => {
+      document.getElementById("loginForm").classList.add("hidden");
+      document.getElementById("signUpForm").classList.remove("hidden");
+      document.getElementById("authTitle").textContent = t("signUpTitle");
+      document.getElementById("loginDemoHint").classList.add("hidden");
+    });
+    document.getElementById("switchToLoginBtn").addEventListener("click", () => {
+      document.getElementById("signUpForm").classList.add("hidden");
+      document.getElementById("loginForm").classList.remove("hidden");
+      document.getElementById("authTitle").textContent = t("loginTitle");
+      document.getElementById("loginDemoHint").classList.remove("hidden");
+    });
+    document.getElementById("signUpSubmitBtn").addEventListener("click", async () => {
+      const email = document.getElementById("regId").value.trim();
+      const password = document.getElementById("regPw").value;
+      const confirm = document.getElementById("regPwConfirm").value;
+      if (!email || !password) return;
+      if (password !== confirm) {
+        alert(t("pwMismatch"));
+        return;
+      }
+      try {
+        const r = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const d = await r.json();
+        if (r.ok && d.ok) {
+          alert(t("regSuccess"));
+          document.getElementById("switchToLoginBtn").click();
+        } else {
+          alert(t("regFail"));
+        }
+      } catch (e) {
+        alert(t("regFail"));
+      }
+    });
     document.getElementById("loginSubmitBtn").addEventListener("click", async () => {
       const id = (document.getElementById("loginId").value || "").trim();
       const pw = (document.getElementById("loginPw").value || "").trim();
@@ -1402,6 +1818,38 @@
       refreshAccountUi();
       closeMyPage();
     });
+    document.getElementById("saveApiSettingsBtn").addEventListener("click", () => {
+      const settings = {
+        bankAccount: document.getElementById("bankAccount").value,
+        upbitKey: document.getElementById("upbitKey").value,
+        upbitSecret: document.getElementById("upbitSecret").value,
+        binanceKey: document.getElementById("binanceKey").value,
+        binanceSecret: document.getElementById("binanceSecret").value,
+      };
+      localStorage.setItem("ops_api_settings", JSON.stringify(settings));
+      alert(t("settingsSaved"));
+    });
+    async function testApiConn(venue) {
+      const key = document.getElementById(venue === "upbit" ? "upbitKey" : "binanceKey").value;
+      const secret = document.getElementById(venue === "upbit" ? "upbitSecret" : "binanceSecret").value;
+      if (!key || !secret) {
+        alert(t("connFail"));
+        return;
+      }
+      try {
+        const out = await apiFetchJson("/api/ops/verify-credentials", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ venue, key, secret }),
+        });
+        if (out.data?.ok) alert(t("connSuccess"));
+        else alert(`${t("connFail")} (${out.data?.error || "unknown"})`);
+      } catch (e) {
+        alert(`${t("connFail")} (${e.message})`);
+      }
+    }
+    document.getElementById("testUpbitBtn").addEventListener("click", () => testApiConn("upbit"));
+    document.getElementById("testBinanceBtn").addEventListener("click", () => testApiConn("binance"));
     document.getElementById("apiStatusViewerBtn").addEventListener("click", openApiJsonModal);
     document.getElementById("apiStatusViewerBtnMobile").addEventListener("click", openApiJsonModal);
     document.getElementById("apiJsonCloseBtn").addEventListener("click", closeApiJsonModal);
@@ -1410,6 +1858,16 @@
       if (!apiJsonText) return;
       try {
         await navigator.clipboard.writeText(apiJsonText);
+      } catch (_) {}
+    });
+    document.getElementById("metricsViewerBtn").addEventListener("click", openMetricsModal);
+    document.getElementById("metricsViewerBtnMobile").addEventListener("click", openMetricsModal);
+    document.getElementById("metricsCloseBtn").addEventListener("click", closeMetricsModal);
+    document.getElementById("metricsRefreshBtn").addEventListener("click", loadMetricsIntoModal);
+    document.getElementById("metricsCopyBtn").addEventListener("click", async () => {
+      if (!metricsText) return;
+      try {
+        await navigator.clipboard.writeText(metricsText);
       } catch (_) {}
     });
     document.getElementById("wfCreateBtn").addEventListener("click", createWorkflow);

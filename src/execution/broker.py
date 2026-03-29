@@ -22,14 +22,20 @@ class Broker(ABC):
 class PaperBroker(Broker):
     """Simple paper broker with configurable pseudo slippage."""
 
-    def __init__(self, fills_path: str | Path, slippage_bps: float = 2.0, run_id: str = "") -> None:
+    def __init__(self, fills_path: str | Path, slippage_bps: float = 2.0, market_impact_factor: float = 0.5, run_id: str = "") -> None:
         self.fills_path = Path(fills_path)
         self.slippage_bps = slippage_bps
+        self.market_impact_factor = market_impact_factor
         self.run_id = run_id
         self.fills_path.parent.mkdir(parents=True, exist_ok=True)
 
     def submit(self, order: OrderRequest) -> FillEvent:
-        slip = (self.slippage_bps / 10000.0) * (1.0 + random.uniform(-0.2, 0.2))
+        # Market impact simulation: base slippage + impact depending on qty.
+        # Assuming typical liquidity makes impact quadratic or linear to order size.
+        impact_bps = self.market_impact_factor * (order.qty ** 1.5)
+        total_slip_bps = self.slippage_bps + impact_bps
+        
+        slip = (total_slip_bps / 10000.0) * (1.0 + random.uniform(-0.2, 0.2))
         direction = 1.0 if order.side == "buy" else -1.0
         fill_price = max(0.0001, order.price_hint * (1.0 + direction * slip))
         fill = FillEvent(

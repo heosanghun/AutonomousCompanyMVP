@@ -156,7 +156,7 @@ Long-run **paper** stability (no live orders):
 python scripts/run_operational_soak_test.py
 ```
 
-Policy and limits (human review, not auto-enforced everywhere yet):
+Policy and limits (auto-enforced against human approval bounds):
 
 - [configs/operational_limits.json](configs/operational_limits.json)
 - [configs/human_approval_policy.json](configs/human_approval_policy.json)
@@ -262,7 +262,10 @@ This repository supports Cloudflare backend endpoints via Pages Functions:
 - `/api/system/readiness` (weighted readiness score)
 - `/api/audit/events`, `/api/audit/policy-decisions`
 
-Deploy with Functions:
+## Frontend Management
+- **Accounts & APIs**: Register K-Bank, Upbit, and Binance credentials via the **My Page** panel for local-first persistence.
+
+## Deploy with Functions:
 
 ```bash
 npx wrangler pages deploy web/monitoring --project-name autonomouscompany --branch main --functions functions

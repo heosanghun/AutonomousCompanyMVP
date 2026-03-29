@@ -72,11 +72,18 @@ def main() -> int:
     proposal = propose_system2_policy(latency_p99_ms=latency, drift_detected=drift)
     sandbox = run_sandbox(proposal)
 
+    from src.agentic.cross_verify import cross_verify_decision
+    cross_verification = cross_verify_decision(
+        proposal={"policy_update": proposal, "sandbox_metrics": sandbox},
+        review_scope="system2_policy_update",
+    )
+
     payload = {
         "mode": "proposal_only",
         "input": {"latency_p99_ms": latency, "drift_detected": drift},
         "proposal": proposal,
         "sandbox_validation": sandbox,
+        "cross_verification": cross_verification,
         "requires_human_approval": True,
     }
     out = Path(args.out)

@@ -122,6 +122,7 @@ def run(output_dir: str = "outputs") -> dict:
     symbol = runtime_cfg.get("symbol", "BTCUSDT")
     qty = float(runtime_cfg.get("default_qty", 1.0))
     paper_slippage = float(runtime_cfg.get("paper_slippage_bps", 2.0))
+    market_impact = float(runtime_cfg.get("market_impact_factor", 0.5))
     live_guard_cfg = runtime_cfg.get("live_guard", {})
     readiness_file = live_guard_cfg.get("readiness_file", "outputs/live_readiness_approved.flag")
     live_test_order = bool(live_guard_cfg.get("test_order", True))
@@ -132,7 +133,7 @@ def run(output_dir: str = "outputs") -> dict:
         live_fills_path = Path(live_guard_cfg.get("fills_file", "outputs/live_fills.jsonl"))
 
     if mode == "paper":
-        broker = PaperBroker(out / "fills.jsonl", slippage_bps=paper_slippage, run_id=run_id)
+        broker = PaperBroker(out / "fills.jsonl", slippage_bps=paper_slippage, market_impact_factor=market_impact, run_id=run_id)
     elif mode == "live":
         broker = LiveBrokerEnvGuard(
             readiness_flag_path=readiness_file,
@@ -168,7 +169,17 @@ def run(output_dir: str = "outputs") -> dict:
         risk_guard.trigger_external_kill_switch("external_kill_switch.flag")
         send_alert("external_kill_switch", {"path": str(ext_ks)})
     audit.log("startup", {"n_ticks": len(ticks), "symbol": symbol, "data_source": runtime_cfg.get("data_source", "mock")})
-    result = engine.run(ticks=ticks, returns=returns)
+    
+    from src.ops.auto_healer import AutoHealer
+    import logging
+    healer = AutoHealer(logger=logging.getLogger("MainRuntime"))
+    
+    try:
+        result = healer.run_with_healing(engine.run, ticks=ticks, returns=returns)
+    except Exception as e:
+        audit.log("system_crash", {"error": str(e), "action": "abort_run"})
+        raise e
+        
     audit.log(
         "completed",
         {

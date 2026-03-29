@@ -17,6 +17,40 @@ export async function onRequestPost(context) {
     if (!email || !password) {
       return new Response(JSON.stringify({ ok: false, error: "email_password_required" }), { status: 400, headers: JSON_HEADERS });
     }
+
+    // --- Supabase Integration ---
+    if (env.SUPABASE_URL && env.SUPABASE_ANON_KEY) {
+      const res = await fetch(`${env.SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: "POST",
+        headers: {
+          "apikey": env.SUPABASE_ANON_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return new Response(JSON.stringify({ ok: false, error: data.error_description || "supabase_login_failed" }), { status: res.status, headers: JSON_HEADERS });
+      }
+      
+      const sid = crypto.randomUUID();
+      const headers = new Headers(JSON_HEADERS);
+      headers.append("Set-Cookie", createSessionCookie(sid));
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          user: { id: data.user.id, email: data.user.email, role: "viewer", mfa_enabled: false },
+          access_token: data.access_token
+        }),
+        { status: 200, headers },
+      );
+    }
+    // --- End Supabase Integration ---
+
+    if (!env.DB) {
+      return new Response(JSON.stringify({ ok: false, error: "d1_not_bound" }), { status: 500, headers: JSON_HEADERS });
+    }
+    await ensureSchema(env);
     const user = await env.DB.prepare(`SELECT id, email, password_hash, role, mfa_enabled, mfa_secret FROM users WHERE lower(email) = ?1`)
       .bind(email)
       .first();

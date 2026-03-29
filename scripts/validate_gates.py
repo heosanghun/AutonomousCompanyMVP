@@ -12,10 +12,15 @@ if str(ROOT) not in sys.path:
 
 from src.agentic.propose_agent import propose_next_actions
 from src.main import run
-
+from src.ops.policy_enforcer import enforce_policy_limits
 
 def validate(summary: dict) -> tuple[bool, list[str]]:
     errors: list[str] = []
+    
+    # Auto-enforce operational limits vs human policy bounds
+    policy_ok, policy_errors = enforce_policy_limits()
+    if not policy_ok:
+        errors.extend(policy_errors)
     metrics = summary["metrics"]
 
     if metrics["latency_p99_ms"] > 5.0:

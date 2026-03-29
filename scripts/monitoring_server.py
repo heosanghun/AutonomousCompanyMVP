@@ -204,6 +204,13 @@ class MonitoringHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(raw)
             return
+        if parsed.path == "/api/auth/me":
+            # Just return authenticated=false for local mock simplicity unless we had sessions
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"authenticated": False}).encode("utf-8"))
+            return
         if parsed.path == "/api/observe":
             payload = build_observe_payload()
             raw = json.dumps(payload, ensure_ascii=True, indent=2).encode("utf-8")
@@ -221,6 +228,11 @@ class MonitoringHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-Length", str(len(raw)))
             self.end_headers()
             self.wfile.write(raw)
+            return
+        if parsed.path == "/api/ops/verify-credentials":
+            # GET is not allowed for this, but we'll return a 405 or handle POST
+            self.send_response(405)
+            self.end_headers()
             return
         if parsed.path == "/metrics":
             st = build_status_payload()
@@ -278,6 +290,181 @@ class MonitoringHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
+        if parsed.path == "/api/auth/register":
+            try:
+                length = int(self.headers.get("Content-Length", "0") or "0")
+                body = self.rfile.read(max(length, 0)) if length > 0 else b"{}"
+                req = json.loads(body.decode("utf-8") or "{}")
+                email = str(req.get("email", "")).strip().lower()
+                password = str(req.get("password", "")).strip()
+                
+                if not email or len(password) < 8:
+                    print(f"Registration failed: invalid input email={email}")
+                    self.send_response(400)
+                    self.end_headers()
+                    return
+
+                # --- Supabase Local Proxy ---
+                supa_url = os.environ.get("SUPABASE_URL", "").strip()
+                supa_key = os.environ.get("SUPABASE_ANON_KEY", "").strip()
+                if supa_url and supa_key:
+                    print(f"Proxying registration to Supabase: {email}")
+                    try:
+                        supa_req = urllib.request.Request(
+                            f"{supa_url}/auth/v1/signup",
+                            data=json.dumps({"email": email, "password": password}).encode("utf-8"),
+                            headers={"apikey": supa_key, "Content-Type": "application/json"},
+                            method="POST"
+                        )
+                        with urllib.request.urlopen(supa_req, timeout=10) as supa_resp:
+                            supa_data = json.loads(supa_resp.read().decode("utf-8"))
+                        print(f"Supabase registration success: {email}")
+                        raw = json.dumps({"ok": True, "user": supa_data.get("user")}).encode("utf-8")
+                        self.send_response(201)
+                        self.send_header("Content-Type", "application/json")
+                        self.send_header("Content-Length", str(len(raw)))
+                        self.end_headers()
+                        self.wfile.write(raw)
+                        return
+                    except urllib.error.HTTPError as e:
+                        err_body = e.read().decode("utf-8")
+                        print(f"Supabase registration error: {e.code} {err_body}")
+                        self.send_response(e.code)
+                        self.send_header("Content-Type", "application/json")
+                        self.end_headers()
+                        self.wfile.write(err_body.encode("utf-8"))
+                        return
+                # --- End Supabase Proxy ---
+
+                users_path = OUTPUTS_DIR / "local_users.json"
+                users = _read_json(users_path)
+                if not isinstance(users, dict): users = {}
+                
+                print(f"DEBUG: checking email={email} in users keys={list(users.keys())}")
+                if email in users:
+                    print(f"Registration failed: user already exists {email}")
+                    raw = json.dumps({"ok": False, "error": "user_exists"}).encode("utf-8")
+                    self.send_response(409)
+                    self.send_header("Content-Type", "application/json")
+                    self.send_header("Content-Length", str(len(raw)))
+                    self.end_headers()
+                    self.wfile.write(raw)
+                    return
+                
+                users[email] = {"password": password, "role": "viewer", "id": email.split("@")[0]}
+                users_path.write_text(json.dumps(users, indent=2), encoding="utf-8")
+                print(f"Registration success: {email}")
+                
+                raw = json.dumps({"ok": True}).encode("utf-8")
+                self.send_response(201)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+            except Exception as e:
+                print(f"Registration error: {e}")
+                self.send_response(500)
+                self.end_headers()
+            return
+
+        if parsed.path == "/api/auth/login":
+            try:
+                length = int(self.headers.get("Content-Length", "0") or "0")
+                body = self.rfile.read(max(length, 0)) if length > 0 else b"{}"
+                req = json.loads(body.decode("utf-8") or "{}")
+                email = str(req.get("email", "")).strip().lower()
+                password = str(req.get("password", "")).strip()
+                
+                # --- Supabase Local Proxy ---
+                supa_url = os.environ.get("SUPABASE_URL", "").strip()
+                supa_key = os.environ.get("SUPABASE_ANON_KEY", "").strip()
+                if supa_url and supa_key:
+                    print(f"Proxying login to Supabase: {email}")
+                    try:
+                        url = f"{supa_url}/auth/v1/token?grant_type=password"
+                        supa_req = urllib.request.Request(
+                            url,
+                            data=json.dumps({"email": email, "password": password}).encode("utf-8"),
+                            headers={"apikey": supa_key, "Content-Type": "application/json"},
+                            method="POST"
+                        )
+                        with urllib.request.urlopen(supa_req, timeout=10) as supa_resp:
+                            supa_data = json.loads(supa_resp.read().decode("utf-8"))
+                        print(f"Supabase login success: {email}")
+                        user_data = supa_data.get("user")
+                        raw = json.dumps({"ok": True, "user": user_data, "access_token": supa_data.get("access_token")}).encode("utf-8")
+                        self.send_response(200)
+                        self.send_header("Content-Type", "application/json")
+                        self.send_header("Content-Length", str(len(raw)))
+                        self.end_headers()
+                        self.wfile.write(raw)
+                        return
+                    except urllib.error.HTTPError as e:
+                        err_body = e.read().decode("utf-8")
+                        print(f"Supabase login error: {e.code} {err_body}")
+                        self.send_response(e.code)
+                        self.send_header("Content-Type", "application/json")
+                        self.end_headers()
+                        self.wfile.write(err_body.encode("utf-8"))
+                        return
+                # --- End Supabase Proxy ---
+
+                users = _read_json(OUTPUTS_DIR / "local_users.json")
+                # Default demo user
+                if email == "demo@acmvp.local" and password == "demo1234":
+                    user_data = {"email": email, "role": "admin", "id": "demo"}
+                elif email in users and users[email]["password"] == password:
+                    user_data = {"email": email, "role": users[email]["role"], "id": users[email]["id"]}
+                else:
+                    print(f"Login failed: invalid credentials for {email}")
+                    self.send_response(401)
+                    self.end_headers()
+                    return
+                
+                print(f"Login success: {email}")
+                raw = json.dumps({"ok": True, "user": user_data}).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(raw)))
+                # In local mock, we don't handle real cookies, just return user
+                self.end_headers()
+                self.wfile.write(raw)
+            except Exception as e:
+                print(f"Login error: {e}")
+                self.send_response(500)
+                self.end_headers()
+            return
+
+        if parsed.path == "/api/ops/verify-credentials":
+            try:
+                length = int(self.headers.get("Content-Length", "0") or "0")
+                body = self.rfile.read(max(length, 0)) if length > 0 else b"{}"
+                req = json.loads(body.decode("utf-8") or "{}")
+                venue = str(req.get("venue", "")).lower()
+                key = str(req.get("key", "")).strip()
+                secret = str(req.get("secret", "")).strip()
+                
+                ok = False
+                if venue == "upbit" and len(key) >= 20 and len(secret) >= 20: ok = True
+                if venue == "binance" and len(key) >= 32 and len(secret) >= 32: ok = True
+                
+                payload = {
+                    "ok": ok,
+                    "venue": venue,
+                    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                    "note": "Local mock validation"
+                }
+                raw = json.dumps(payload).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+            return
+
         if parsed.path != "/api/chat":
             self.send_response(404)
             self.end_headers()

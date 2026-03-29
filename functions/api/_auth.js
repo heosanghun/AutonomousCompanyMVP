@@ -29,6 +29,18 @@ function clearSessionCookie() {
 
 async function getCurrentUser(context) {
   const env = context.env || {};
+  
+  // --- Supabase Integration ---
+  if (env.SUPABASE_URL && env.SUPABASE_ANON_KEY) {
+    const cookies = parseCookies(context.request);
+    const sid = String(cookies.acmvp_session || "").trim();
+    // In a real app, we might use the access_token from localStorage or a different cookie.
+    // For now, let's assume we want to check if the session exists in Supabase.
+    // However, without the JWT in the cookie, we can't easily verify with Supabase.
+    // If the user is logged in via Supabase, we should ideally have stored the JWT.
+  }
+  // --- End Supabase Integration ---
+
   if (!env.DB) return null;
   await ensureSchema(env);
   const cookies = parseCookies(context.request);
