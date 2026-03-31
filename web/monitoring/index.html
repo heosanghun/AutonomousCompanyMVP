@@ -52,6 +52,9 @@
     }
     .accent-glow { box-shadow: 0 0 44px rgba(0,212,236,.12); }
     .kpi-card { min-height: 126px; }
+    .tab-btn.active { color: #81ecff; border-bottom: 2px solid #81ecff; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
     .focus-ring:focus-visible { outline: 2px solid #81ecff; outline-offset: 2px; }
     .status-dot { display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:6px; }
     .status-ok { background:#69f6b8; box-shadow:0 0 12px rgba(105,246,184,.45); }
@@ -200,11 +203,12 @@
           <p class="hidden sm:block font-mono text-[9px] sm:text-[10px] text-mute tracking-[0.15em] uppercase truncate">AutonomousCompany MVP</p>
         </div>
       </div>
-      <nav class="hidden lg:flex items-center gap-6 text-[11px] uppercase tracking-widest font-headline text-mute">
-        <span class="text-cyan border-b-2 border-cyan pb-0.5" data-i18n="navOverview">Overview</span>
-        <button type="button" id="apiStatusViewerBtn" class="hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 p-0 cursor-pointer text-mute" data-i18n="apiJson">API JSON</button>
-        <button type="button" id="metricsViewerBtn" class="hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 p-0 cursor-pointer text-mute" data-i18n="prometheus">Prometheus</button>
-      </nav>
+    <nav class="hidden lg:flex items-center gap-6 text-[11px] uppercase tracking-widest font-headline text-mute">
+        <button type="button" class="tab-btn active hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 pb-1 cursor-pointer" onclick="switchTab('dashboard')">Dashboard</button>
+        <button type="button" class="tab-btn hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 pb-1 cursor-pointer" onclick="switchTab('ops')">Operations</button>
+        <button type="button" class="tab-btn hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 pb-1 cursor-pointer" onclick="switchTab('admin')">Governance</button>
+        <button type="button" class="tab-btn hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 pb-1 cursor-pointer" onclick="switchTab('logs')">Data & Logs</button>
+    </nav>
     </div>
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
       <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass">
@@ -238,7 +242,8 @@
   <main class="ml-0 md:ml-[88px] pt-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:pt-20 safe-pb px-4 sm:px-5 md:px-8">
     <section id="errorBanner" class="hidden mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"></section>
 
-    <section class="glass rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 accent-glow">
+    <div id="tab-dashboard" class="tab-content active">
+      <section class="glass rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 accent-glow">
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="min-w-0">
           <h1 class="font-headline text-xl sm:text-2xl md:text-3xl font-bold tracking-tight leading-tight" data-i18n="heroTitle">Oracle-Grade Runtime Control</h1>
@@ -258,33 +263,8 @@
       </div>
     </section>
 
-    <section class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6">
-      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
-        <div class="flex justify-between"><p class="text-[10px] uppercase tracking-widest text-mute font-headline">Sharpe</p><span class="material-symbols-outlined mat text-cyan text-base">query_stats</span></div>
-        <p id="kpiSharpe" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
-      </article>
-      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
-        <div class="flex justify-between"><p class="text-[10px] uppercase tracking-widest text-mute font-headline">MDD</p><span class="material-symbols-outlined mat text-bad text-base">trending_down</span></div>
-        <p id="kpiMdd" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
-      </article>
-      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
-        <div class="flex justify-between"><p class="text-[10px] uppercase tracking-widest text-mute font-headline">Win Rate</p><span class="h-1.5 w-1.5 rounded-full bg-good mt-1"></span></div>
-        <p id="kpiWin" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
-      </article>
-      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
-        <p class="text-[10px] uppercase tracking-widest text-mute font-headline">Cumulative Return</p>
-        <p id="kpiCum" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
-      </article>
-      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card">
-        <p class="text-[10px] uppercase tracking-widest text-mute font-headline">Latency p99</p>
-        <p id="kpiLat" class="font-mono text-2xl sm:text-3xl font-semibold mt-2 sm:mt-4 tabular-nums"><span id="kpiLatVal">—</span><span class="text-xs sm:text-sm text-mute ml-1">ms</span></p>
-      </article>
-      <article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card border border-cyan/30">
-        <p class="text-[10px] uppercase tracking-widest text-mute font-headline">Fills</p>
-        <p id="kpiFills" class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">—</p>
-        <p id="runIdLine" class="font-mono text-[11px] text-mute truncate mt-1">run_id —</p>
-      </article>
-    </section>
+    <section id="widgetContainer" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6">
+      <!-- Widgets will be injected here by JS -->
 
     <section class="grid xl:grid-cols-2 gap-4">
       <article class="glass rounded-2xl overflow-hidden">
@@ -322,19 +302,84 @@
       </article>
     </section>
 
-    <section class="glass rounded-2xl mt-4 overflow-hidden">
+    <section class="glass rounded-2xl mt-4 overflow-hidden" id="officeMapSection">
       <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-        <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="serviceHub">Service Hub</h2>
+        <h2 class="font-headline text-sm uppercase tracking-widest">AI Office Map (Agents)</h2>
+        <span class="material-symbols-outlined mat text-cyan">diversity_2</span>
+      </div>
+      <div class="p-4 sm:p-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <!-- Agent Cards -->
+        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-b from-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div class="text-4xl mb-2">🤖</div>
+          <h3 class="font-headline font-bold text-sm text-cyan">Trading Engine</h3>
+          <p class="text-[10px] text-mute font-mono mt-1">Generator</p>
+          <div class="mt-3 flex items-center justify-center gap-1.5">
+            <span class="status-dot status-ok"></span><span class="text-xs text-white">Running</span>
+          </div>
+        </article>
+        
+        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-b from-bad/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div class="text-4xl mb-2">👑</div>
+          <h3 class="font-headline font-bold text-sm text-bad">Risk Evaluator</h3>
+          <p class="text-[10px] text-mute font-mono mt-1">CRO Agent</p>
+          <div class="mt-3 flex items-center justify-center gap-1.5">
+            <span class="status-dot status-ok"></span><span class="text-xs text-white">Watching</span>
+          </div>
+        </article>
+
+        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-b from-[#69f6b8]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div class="text-4xl mb-2">📊</div>
+          <h3 class="font-headline font-bold text-sm text-[#69f6b8]">Market Analyst</h3>
+          <p class="text-[10px] text-mute font-mono mt-1">Research & Intent</p>
+          <div class="mt-3 flex items-center justify-center gap-1.5">
+            <span class="status-dot status-ok"></span><span class="text-xs text-white">Idle</span>
+          </div>
+        </article>
+
+        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div class="text-4xl mb-2">🛡️</div>
+          <h3 class="font-headline font-bold text-sm text-white">Compliance</h3>
+          <p class="text-[10px] text-mute font-mono mt-1">Policy Agent</p>
+          <div class="mt-3 flex items-center justify-center gap-1.5">
+            <span class="status-dot status-ok"></span><span class="text-xs text-white">Guarding</span>
+          </div>
+        </article>
+
+        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-b from-[#81ecff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          <div class="text-4xl mb-2">👨‍💻</div>
+          <h3 class="font-headline font-bold text-sm text-cyanDim">DevOps Healer</h3>
+          <p class="text-[10px] text-mute font-mono mt-1">Auto Healer</p>
+          <div class="mt-3 flex items-center justify-center gap-1.5">
+            <span class="status-dot status-ok"></span><span class="text-xs text-white">Idle</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    </div>
+
+    <div id="tab-ops" class="tab-content">
+      <section class="glass rounded-2xl mt-4 overflow-hidden">
+        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+          <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="serviceHub">Service Hub</h2>
         <span class="material-symbols-outlined mat text-mute">apps</span>
       </div>
       <div class="p-4 sm:p-5 grid md:grid-cols-2 xl:grid-cols-3 gap-3" id="serviceHubGrid"></div>
     </section>
 
-    <section class="glass rounded-2xl mt-4 overflow-hidden">
-      <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-        <h2 class="font-headline text-sm uppercase tracking-widest">Governance Console</h2>
-        <span class="material-symbols-outlined mat text-mute">rule_settings</span>
-      </div>
+    </div>
+
+    <div id="tab-admin" class="tab-content">
+      <section class="glass rounded-2xl mt-4 overflow-hidden">
+        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+          <h2 class="font-headline text-sm uppercase tracking-widest">Governance Console</h2>
+          <span class="material-symbols-outlined mat text-mute">rule_settings</span>
+        </div>
       <div class="p-4 sm:p-5 grid xl:grid-cols-2 gap-4">
         <article class="glass rounded-xl border border-white/10 p-4">
           <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Workflow Requests</h3>
@@ -398,6 +443,9 @@
           </div>
         </article>
       </div>
+    </div>
+
+    <div id="tab-logs" class="tab-content">
       <div class="p-4 sm:p-5 pt-0 grid xl:grid-cols-2 gap-4">
         <article class="glass rounded-xl border border-white/10 p-4">
           <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Audit Events</h3>
@@ -516,6 +564,7 @@
       <summary class="px-4 sm:px-5 py-4 cursor-pointer font-headline text-sm uppercase tracking-widest text-mute min-h-[48px] flex items-center" data-i18n="rawPayload">Raw Payload</summary>
       <pre id="raw" class="p-4 sm:p-5 border-t border-white/5 text-[11px] sm:text-xs font-mono text-cyan overflow-auto max-h-[min(45vh,360px)] sm:max-h-[360px]"></pre>
     </details>
+    </div>
   </main>
 
   <section id="apiJsonModal" class="hidden fixed inset-0 z-[125] modal-backdrop items-center justify-center p-4">
@@ -716,6 +765,33 @@
   </nav>
 
   <script>
+    function switchTab(tabId) {
+      // Hide all contents
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      // Show target content
+      const target = document.getElementById("tab-" + tabId);
+      if (target) target.classList.add("active");
+      
+      // Update tab buttons
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      // Find the button that was clicked or matching tabId
+      const buttons = document.querySelectorAll(".tab-btn");
+      buttons.forEach(btn => {
+        if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + tabId + "'")) {
+          btn.classList.add("active");
+        }
+      });
+      
+      // Store current tab
+      localStorage.setItem("activeTab", tabId);
+    }
+
+    // On Load: Restore active tab
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedTab = localStorage.getItem("activeTab") || "dashboard";
+      switchTab(savedTab);
+    });
+
     let latestPaths = {};
     let latestStatus = {};
     const chatHistory = [];
@@ -1477,14 +1553,40 @@
         const m = d.metrics || {};
         const s = d.summary || {};
         document.getElementById("generatedAt").textContent = `${t("generatedUtc")}: ${d.generated_at_utc || "—"}`;
-        document.getElementById("kpiSharpe").textContent = fmt(m.sharpe);
-        document.getElementById("kpiMdd").textContent = fmt(m.mdd);
-        document.getElementById("kpiWin").textContent = fmt(m.win_rate);
-        document.getElementById("kpiCum").textContent = fmt(m.cum_return);
-        document.getElementById("kpiLatVal").textContent = fmt(m.latency_p99_ms);
-        document.getElementById("kpiFills").textContent = s.n_fills != null ? fmt(s.n_fills) : "—";
-        const rid = s.run_id || "";
-        document.getElementById("runIdLine").textContent = rid ? `run ${rid.slice(0, 8)}…` : "run_id —";
+        
+        // Calculate Evaluator rejection rate based on fills (if data is exposed, otherwise simple count placeholder)
+        const evalRejRate = s.evaluator_rejections ? `${s.evaluator_rejections} rejected` : "0 rejections";
+
+        // Render modular widgets
+        const widgetConfig = [
+          { id: "sharpe", title: "Sharpe", icon: "query_stats", colorClass: "text-cyan", render: (m) => fmt(m.sharpe) },
+          { id: "mdd", title: "MDD", icon: "trending_down", colorClass: "text-bad", render: (m) => fmt(m.mdd) },
+          { id: "win_rate", title: "Win Rate", dotClass: "bg-good", render: (m) => fmt(m.win_rate) },
+          { id: "cum_return", title: "Cumulative Return", render: (m) => fmt(m.cum_return) },
+          { id: "latency", title: "Latency p99", rawRender: (m) => `<p class="font-mono text-2xl sm:text-3xl font-semibold mt-2 sm:mt-4 tabular-nums"><span>${fmt(m.latency_p99_ms)}</span><span class="text-xs sm:text-sm text-mute ml-1">ms</span></p>` },
+          { id: "fills", title: "Fills", borderClass: "border-cyan/30", rawRender: (m, s) => `<p class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">${s.n_fills != null ? fmt(s.n_fills) : "—"}</p><p class="font-mono text-[11px] text-mute truncate mt-1">run ${s.run_id ? s.run_id.slice(0, 8) : "—"}…</p>` },
+          // New Extension Widgets
+          { id: "llm_fallback", title: "LLM Status", icon: "psychology", colorClass: "text-cyan", render: (m, s) => s.llm_provider || "Gemini" },
+          { id: "dyn_risk", title: "Risk Limit", icon: "shield", colorClass: "text-bad", render: (m, s) => fmt(s.dynamic_risk_limit || 1.0) },
+          { id: "eval_rej", title: "AI Evaluator", icon: "policy", colorClass: "text-bad", rawRender: () => `<p class="font-headline text-lg sm:text-xl md:text-2xl font-bold mt-2 sm:mt-4 text-bad">${evalRejRate}</p>` }
+        ];
+
+        document.getElementById("widgetContainer").innerHTML = widgetConfig.map(w => {
+          let headHtml = `<p class="text-[10px] uppercase tracking-widest text-mute font-headline">${w.title}</p>`;
+          if (w.icon) {
+            headHtml = `<div class="flex justify-between">${headHtml}<span class="material-symbols-outlined mat ${w.colorClass} text-base">${w.icon}</span></div>`;
+          } else if (w.dotClass) {
+            headHtml = `<div class="flex justify-between">${headHtml}<span class="h-1.5 w-1.5 rounded-full ${w.dotClass} mt-1"></span></div>`;
+          }
+          
+          let bodyHtml = w.rawRender ? w.rawRender(m, s) : `<p class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">${w.render(m, s)}</p>`;
+          
+          return `<article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card ${w.borderClass || ''}">
+            ${headHtml}
+            ${bodyHtml}
+          </article>`;
+        }).join("");
+
         document.getElementById("heroMode").textContent = s.execution_mode || "—";
         document.getElementById("heroKill").textContent = s.kill_switch ? "ON" : "OFF";
         document.getElementById("badgePipeline").textContent = `pipeline: ${(d.gates||{}).mlops_pipeline_ok ? "ok" : "fail"}`;
@@ -1801,7 +1903,10 @@
           body: JSON.stringify({ email: id.includes("@") ? id : `${id}@acmvp.local`, password: pw }),
         });
         const d = await r.json();
-        if (!r.ok || !d.ok) return;
+        if (!r.ok || !d.ok) {
+          alert("Login failed: " + JSON.stringify(d));
+          return;
+        }
         appState.user = d.user || null;
         if (appState.user) localStorage.setItem("ops_user", JSON.stringify(appState.user));
         refreshAccountUi();

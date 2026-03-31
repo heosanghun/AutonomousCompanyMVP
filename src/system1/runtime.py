@@ -39,6 +39,10 @@ class FastLoopRuntime:
         self.policy_buffer = policy_buffer
         self.risk_guard = risk_guard
         self.order_router = order_router
+        
+        # Initialize Evaluator Agent for the AI Cross-Check Pipeline
+        from src.agentic.evaluator_agent import EvaluatorAgent
+        self.evaluator = EvaluatorAgent()
 
     def run(self, ticks: Iterable[np.ndarray], returns: np.ndarray) -> FastLoopResult:
         ticks_arr = np.asarray(list(ticks), dtype=np.float32)
@@ -69,16 +73,46 @@ class FastLoopRuntime:
                 week_pnl=week_pnl,
             )
 
+            # AI Evaluator Pipeline (Cross-Check)
+            # Only trigger LLM evaluation for actual trades (not holds) to save latency and tokens
+            ai_approved = True
+            reason_code = "fast_loop_signal"
+            
+            if safe_action != 1:  # If RiskGuard didn't block it and it's a Buy/Sell
+                proposal = {
+                    "action": int(safe_action),
+                    "symbol": self.order_router.config.symbol,
+                    "signal_strength": float(action)
+                }
+                portfolio_state = {
+                    "realized_pnl": float(strat[i - 1]) if i > 0 else 0.0,
+                    "day_pnl": day_pnl,
+                    "current_position": float(safe_action - 1)
+                }
+                market_context = {
+                    "volatility": volatility
+                }
+                
+                eval_res = self.evaluator.evaluate_trade(proposal, portfolio_state, market_context)
+                if not eval_res["approved"]:
+                    safe_action = 1  # Force Hold
+                    ai_approved = False
+                    reason_code = f"ai_evaluator_rejected: {eval_res['reason']}"
+                else:
+                    reason_code = f"ai_evaluator_approved: {eval_res['reason']}"
+
             actions[i] = safe_action
             position = float(safe_action - 1)  # sell=-1, hold=0, buy=+1
             strat[i] = position * float(returns[i])
             day_pnl += float(strat[i])
+            
+            # Fill logic
             fill = self.order_router.submit_action(
                 action=safe_action,
                 price_hint=max(0.0001, 100.0 + float(i) + float(row[0]) * 100.0),
                 decision_id=f"dec_{i:08d}",
-                reason_code="fast_loop_signal",
-                risk_approved=(safe_action == action),
+                reason_code=reason_code,
+                risk_approved=(safe_action == action) and ai_approved,
                 feature_row=row.astype(float).tolist(),
             )
             if fill is not None:

@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from urllib.error import HTTPError, URLError
 
 from src.execution.models import FillEvent, OrderRequest, utc_now_iso
+from src.execution.base_adapter import BaseExchangeAdapter
 
 
 @dataclass
@@ -26,7 +27,7 @@ class BinanceConfig:
     retry_backoff_sec: float = 0.5
 
 
-class BinanceLiveAdapter:
+class BinanceLiveAdapter(BaseExchangeAdapter):
     """Minimal Binance Spot signed-order adapter."""
 
     def __init__(self, config: BinanceConfig) -> None:
@@ -81,6 +82,33 @@ class BinanceLiveAdapter:
         units = (q / step).quantize(Decimal("1"), rounding=ROUND_DOWN)
         norm = (units * step).quantize(step, rounding=ROUND_DOWN)
         return float(norm)
+
+    def fetch_balance(self, asset: str) -> float:
+        """Fetches the free balance of the specified asset."""
+        if not self.api_key or not self.api_secret:
+            return 0.0
+            
+        params = {
+            "timestamp": int(time.time() * 1000),
+            "recvWindow": self.config.recv_window_ms,
+        }
+        
+        try:
+            query = self._signed_query(params)
+            req = urllib.request.Request(
+                f"{self.config.base_url}/api/v3/account?{query}",
+                method="GET",
+                headers={"X-MBX-APIKEY": self.api_key}
+            )
+            with urllib.request.urlopen(req, timeout=self.config.timeout_sec) as resp:
+                data = json.loads(resp.read().decode("utf-8") or "{}")
+                balances = data.get("balances", [])
+                for b in balances:
+                    if b.get("asset") == asset:
+                        return float(b.get("free", "0"))
+            return 0.0
+        except Exception:
+            return 0.0
 
     def submit(self, order: OrderRequest) -> FillEvent:
         if not self.api_key or not self.api_secret:

@@ -51,11 +51,22 @@ class RiskGuard:
         if self.kill_switch:
             self.last_reason = self.last_reason or "manual_or_previous_kill_switch"
             return 1
+
+        # Dynamic adjustments based on current volatility
+        dynamic_daily_loss = self.config.max_daily_loss
+        dynamic_max_position = self.config.max_position_abs
+
+        if volatility > self.config.hard_volatility_breaker * 0.5:
+            # Volatility is getting high, tighten limits
+            vol_penalty = min(volatility / self.config.hard_volatility_breaker, 1.0)
+            dynamic_daily_loss *= (1.0 - (vol_penalty * 0.5)) # Up to 50% tighter
+            dynamic_max_position *= (1.0 - (vol_penalty * 0.8)) # Up to 80% smaller max position
+
         if week_pnl <= -abs(self.config.max_weekly_loss):
             self.kill_switch = True
             self.last_reason = "max_weekly_loss"
             return 1
-        if day_pnl <= -abs(self.config.max_daily_loss):
+        if day_pnl <= -abs(dynamic_daily_loss):
             self.kill_switch = True
             self.last_reason = "max_daily_loss"
             return 1
@@ -64,11 +75,11 @@ class RiskGuard:
             return 1
 
         target_pos = float(action - 1)
-        if abs(target_pos) > self.config.max_position_abs:
-            self.last_reason = "max_position_abs"
+        if abs(target_pos) > dynamic_max_position:
+            self.last_reason = f"max_position_abs_dynamic_limit_exceeded (current limit: {dynamic_max_position:.2f})"
             return 1
 
-        if realized_pnl < -abs(self.config.max_daily_loss) * 0.5 and action == 2:
+        if realized_pnl < -abs(dynamic_daily_loss) * 0.5 and action == 2:
             self.last_reason = "buy_blocked_after_loss"
             return 1
         self.last_reason = ""

@@ -20,7 +20,6 @@ def cross_verify_decision(
 ) -> dict[str, Any]:
     """Runs a cross-verification over a proposed decision using different personas."""
     load_dotenv_files()
-    key = os.environ.get("GEMINI_API_KEY", "").strip()
     
     # Masking sensitive info
     safe_proposal = dict(proposal)
@@ -53,41 +52,20 @@ Your output MUST be ONLY valid JSON matching this schema:
   "review_time_utc": "ISO timestamp (e.g. 2026-03-27T12:00:00Z)"
 }}
 """
-    if not key:
-        return _fallback_cross_verify(review_scope)
-
-    payload = json.dumps(
-        {
-            "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.2}
-        }
-    ).encode("utf-8")
-
-    models = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-flash-latest"]
+    from src.agentic.llm_router import LLMRouter
+    router = LLMRouter()
+    text = router.generate_content(prompt, temperature=0.2)
     
-    for m in models:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={key}"
-        req = urllib.request.Request(
-            url, data=payload, method="POST", headers={"Content-Type": "application/json"}
-        )
+    if text:
         try:
-            with urllib.request.urlopen(req, timeout=45) as r:
-                data = json.loads(r.read().decode("utf-8"))
-            parts = data.get("candidates", [{}])[0].get("content", {}).get("parts", [])
-            text = (parts[0].get("text", "") if parts else "").strip()
-            
             if text.startswith("```json"):
                 text = text[7:]
             if text.endswith("```"):
                 text = text[:-3]
-                
             return json.loads(text.strip())
-        except urllib.error.HTTPError:
-            continue
         except Exception as e:
-            print(f"Cross-verify LLM call failed for {m}: {e}")
-            continue
-
+            print(f"Failed to parse JSON from LLM: {e}")
+            
     return _fallback_cross_verify(review_scope)
 
 

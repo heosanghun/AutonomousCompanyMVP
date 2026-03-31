@@ -6,10 +6,6 @@ import { verifyPassword, verifyTotp } from "../_crypto.js";
 export async function onRequestPost(context) {
   try {
     const env = context.env || {};
-    if (!env.DB) {
-      return new Response(JSON.stringify({ ok: false, error: "d1_not_bound" }), { status: 500, headers: JSON_HEADERS });
-    }
-    await ensureSchema(env);
     const body = await context.request.json();
     const email = String(body?.email || body?.id || "").trim().toLowerCase();
     const password = String(body?.password || "").trim();
@@ -30,7 +26,11 @@ export async function onRequestPost(context) {
       });
       const data = await res.json();
       if (!res.ok) {
-        return new Response(JSON.stringify({ ok: false, error: data.error_description || "supabase_login_failed" }), { status: res.status, headers: JSON_HEADERS });
+        return new Response(JSON.stringify({ 
+          ok: false, 
+          error: "supabase_login_failed", 
+          detail: data.error_description || data.message || data.error || JSON.stringify(data)
+        }), { status: res.status, headers: JSON_HEADERS });
       }
       
       const sid = crypto.randomUUID();
