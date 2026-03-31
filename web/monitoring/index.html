@@ -239,7 +239,7 @@
     <span class="material-symbols-outlined mat text-mute mt-auto mb-4">description</span>
   </aside>
 
-  <main class="ml-0 md:ml-[88px] pt-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:pt-20 safe-pb px-4 sm:px-5 md:px-8">
+  <main class="ml-0 md:ml-[88px] pt-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:pt-20 safe-pb px-4 sm:px-8 lg:px-12 xl:px-16 w-full">
     <section id="errorBanner" class="hidden mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"></section>
 
     <div id="tab-dashboard" class="tab-content active">
@@ -266,8 +266,10 @@
     <section id="widgetContainer" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6">
       <!-- Widgets will be injected here by JS -->
 
-    <section class="grid xl:grid-cols-2 gap-4">
-      <article class="glass rounded-2xl overflow-hidden">
+      <!-- Balanced 3-Column Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        <!-- 1. Gate Status -->
+        <article class="glass rounded-2xl overflow-hidden flex flex-col">
         <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
           <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="gateStatus">Gate Status</h2>
           <span class="material-symbols-outlined mat text-mute">verified_user</span>
@@ -293,73 +295,85 @@
           <input id="artifactSearch" type="search" enterkeyhint="search" autocomplete="off" class="focus-ring w-full rounded-lg bg-black/25 border border-white/10 px-3 py-3 sm:py-2 text-sm sm:text-xs font-mono text-white placeholder:text-mute min-h-[44px] sm:min-h-0" data-i18n-placeholder="artifactPh" placeholder="Search artifact key/path..." />
         </div>
         <div id="pathCardsMobile" class="md:hidden px-4 pb-4 space-y-2 max-h-[min(50vh,420px)] overflow-y-auto"></div>
-        <div class="hidden md:block overflow-auto max-h-[320px]">
-          <table class="w-full">
-            <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left" data-i18n="thKey">Key</th><th class="px-5 py-3 text-left" data-i18n="thPath">Path</th></tr></thead>
-            <tbody id="pathRows"></tbody>
-          </table>
-        </div>
-      </article>
-    </section>
+          <div class="hidden md:block overflow-auto max-h-[320px]">
+            <table class="w-full">
+              <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left" data-i18n="thKey">Key</th><th class="px-5 py-3 text-left" data-i18n="thPath">Path</th></tr></thead>
+              <tbody id="pathRows"></tbody>
+            </table>
+          </div>
+        </article>
 
-    <section class="glass rounded-2xl mt-4 overflow-hidden" id="officeMapSection">
-      <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-        <h2 class="font-headline text-sm uppercase tracking-widest">AI Office Map (Agents)</h2>
-        <span class="material-symbols-outlined mat text-cyan">diversity_2</span>
+        <!-- 3. AI Office Map (Enhanced Grid) -->
+        <article class="glass rounded-2xl overflow-hidden flex flex-col lg:col-span-2 xl:col-span-1" id="officeMapSection">
+          <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+            <h2 class="font-headline text-sm uppercase tracking-widest">AI Office Map (Agents)</h2>
+            <span class="material-symbols-outlined mat text-cyan">diversity_2</span>
+          </div>
+          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto flex-1 max-h-[450px]">
+            <!-- Agent Cards (Improved Horizontal Design) -->
+            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
+              <div class="absolute inset-0 bg-gradient-to-r from-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="text-3xl">🤖</div>
+              <div class="text-left min-w-0">
+                <h3 class="font-headline font-bold text-xs text-cyan truncate">Trading Engine</h3>
+                <p class="text-[10px] text-mute font-mono">Generator</p>
+                <div class="mt-1 flex items-center gap-1.5">
+                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Running</span>
+                </div>
+              </div>
+            </article>
+            
+            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
+              <div class="absolute inset-0 bg-gradient-to-r from-bad/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="text-3xl">👑</div>
+              <div class="text-left min-w-0">
+                <h3 class="font-headline font-bold text-xs text-bad truncate">Risk Evaluator</h3>
+                <p class="text-[10px] text-mute font-mono">CRO Agent</p>
+                <div class="mt-1 flex items-center gap-1.5">
+                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Watching</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
+              <div class="absolute inset-0 bg-gradient-to-r from-[#69f6b8]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="text-3xl">📊</div>
+              <div class="text-left min-w-0">
+                <h3 class="font-headline font-bold text-xs text-[#69f6b8] truncate">Market Analyst</h3>
+                <p class="text-[10px] text-mute font-mono">Research</p>
+                <div class="mt-1 flex items-center gap-1.5">
+                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Idle</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
+              <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="text-3xl">🛡️</div>
+              <div class="text-left min-w-0">
+                <h3 class="font-headline font-bold text-xs text-white truncate">Compliance</h3>
+                <p class="text-[10px] text-mute font-mono">Policy Hook</p>
+                <div class="mt-1 flex items-center gap-1.5">
+                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Guarding</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
+              <div class="absolute inset-0 bg-gradient-to-r from-[#81ecff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="text-3xl">👨‍💻</div>
+              <div class="text-left min-w-0">
+                <h3 class="font-headline font-bold text-xs text-cyanDim truncate">DevOps Healer</h3>
+                <p class="text-[10px] text-mute font-mono">Auto Healer</p>
+                <div class="mt-1 flex items-center gap-1.5">
+                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Idle</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </article>
       </div>
-      <div class="p-4 sm:p-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <!-- Agent Cards -->
-        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-b from-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div class="text-4xl mb-2">🤖</div>
-          <h3 class="font-headline font-bold text-sm text-cyan">Trading Engine</h3>
-          <p class="text-[10px] text-mute font-mono mt-1">Generator</p>
-          <div class="mt-3 flex items-center justify-center gap-1.5">
-            <span class="status-dot status-ok"></span><span class="text-xs text-white">Running</span>
-          </div>
-        </article>
-        
-        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-b from-bad/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div class="text-4xl mb-2">👑</div>
-          <h3 class="font-headline font-bold text-sm text-bad">Risk Evaluator</h3>
-          <p class="text-[10px] text-mute font-mono mt-1">CRO Agent</p>
-          <div class="mt-3 flex items-center justify-center gap-1.5">
-            <span class="status-dot status-ok"></span><span class="text-xs text-white">Watching</span>
-          </div>
-        </article>
 
-        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-b from-[#69f6b8]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div class="text-4xl mb-2">📊</div>
-          <h3 class="font-headline font-bold text-sm text-[#69f6b8]">Market Analyst</h3>
-          <p class="text-[10px] text-mute font-mono mt-1">Research & Intent</p>
-          <div class="mt-3 flex items-center justify-center gap-1.5">
-            <span class="status-dot status-ok"></span><span class="text-xs text-white">Idle</span>
-          </div>
-        </article>
-
-        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div class="text-4xl mb-2">🛡️</div>
-          <h3 class="font-headline font-bold text-sm text-white">Compliance</h3>
-          <p class="text-[10px] text-mute font-mono mt-1">Policy Agent</p>
-          <div class="mt-3 flex items-center justify-center gap-1.5">
-            <span class="status-dot status-ok"></span><span class="text-xs text-white">Guarding</span>
-          </div>
-        </article>
-
-        <article class="glass rounded-xl p-4 text-center relative overflow-hidden group">
-          <div class="absolute inset-0 bg-gradient-to-b from-[#81ecff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <div class="text-4xl mb-2">👨‍💻</div>
-          <h3 class="font-headline font-bold text-sm text-cyanDim">DevOps Healer</h3>
-          <p class="text-[10px] text-mute font-mono mt-1">Auto Healer</p>
-          <div class="mt-3 flex items-center justify-center gap-1.5">
-            <span class="status-dot status-ok"></span><span class="text-xs text-white">Idle</span>
-          </div>
-        </article>
-      </div>
-    </section>
 
     </div>
 
