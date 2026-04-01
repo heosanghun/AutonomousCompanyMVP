@@ -314,7 +314,24 @@
 
     <!-- ChatGPT Style Sovereign Command Center (Bottom Prompt) -->
     <div class="fixed bottom-6 left-64 right-0 px-8 z-50 transition-all flex justify-center" id="commandCenter">
-      <div class="w-full max-w-3xl">
+      <div class="w-full max-w-3xl space-y-2">
+
+        <!-- Cloud Mode: API Key Banner (shown only when no key saved) -->
+        <div id="apiKeyBanner" class="hidden items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-2.5 text-xs">
+          <span class="material-symbols-outlined text-amber-400 text-base shrink-0">key</span>
+          <input 
+            type="password" 
+            id="apiKeyInput" 
+            placeholder="Gemini API Key 입력 (aistudio.google.com 에서 발급) — 한 번만 저장됩니다" 
+            class="flex-1 bg-transparent border-none outline-none text-xs text-white placeholder:text-amber-400/60"
+          />
+          <button onclick="saveApiKey()" class="shrink-0 px-3 py-1 rounded-full bg-amber-500 text-black text-[10px] font-bold hover:bg-amber-400 transition-colors">저장</button>
+          <button onclick="document.getElementById('apiKeyBanner').classList.add('hidden')" class="shrink-0 text-mute hover:text-white">
+            <span class="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+
+        <!-- Main Input Bar -->
         <div class="relative flex items-center bg-[#1a1a1a] border border-white/10 rounded-full shadow-2xl p-1.5 focus-within:border-cyan/50 focus-within:shadow-[0_0_30px_rgba(129,236,255,0.1)] transition-all">
           <form id="missionForm" class="flex-1 flex items-center w-full">
             <input 
@@ -333,42 +350,45 @@
             </button>
           </form>
         </div>
-        <p class="text-[10px] text-center text-mute mt-3 uppercase tracking-widest opacity-40 font-mono">Sovereign Mission Control • QJC-OS v1.0</p>
+        <p class="text-[10px] text-center text-mute uppercase tracking-widest opacity-40 font-mono">Sovereign Mission Control • QJC-OS v1.0</p>
       </div>
     </div>
   </main>
 
   <script>
+    // ── Environment Detection ─────────────────────────────────────────────────
+    const IS_LOCAL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+
+    // ── Tab Navigation ────────────────────────────────────────────────────────
     function switchTab(tabId) {
       document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
       const target = document.getElementById("tab-" + tabId);
       if (target) target.classList.remove("hidden");
-      
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-      const buttons = document.querySelectorAll(".tab-btn");
-      buttons.forEach(btn => {
+      document.querySelectorAll(".tab-btn").forEach(btn => {
         if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + tabId + "'")) {
           btn.classList.add("active");
         }
       });
-      
       const titles = { 'dashboard': 'Dashboard', 'tasks': 'Tasks', 'agents': 'Agent Map', 'analysis': 'Analysis', 'governance': 'Governance', 'logs': 'Audit Logs' };
-      const descs = { 'dashboard': '운영 현황 한눈에 보기', 'tasks': '자동화 테스크 관리', 'agents': 'AI 에이전트 활동 현황', 'analysis': '성과 분석 지표', 'governance': '보안 및 규칙 관리', 'logs': '전체 활동 기록' };
-      
+      const descs = { 'dashboard': '운영 현황 한눈에 보기', 'tasks': '자동화 태스크 관리', 'agents': 'AI 에이전트 활동 현황', 'analysis': '성과 분석 지표', 'governance': '보안 및 규칙 관리', 'logs': '전체 활동 기록' };
       document.getElementById("currentTabTitle").innerText = titles[tabId] || 'Dashboard';
       document.getElementById("currentTabDesc").innerText = descs[tabId] || '';
       localStorage.setItem("activeTab", tabId);
     }
 
+    // ── Status API (local only) ───────────────────────────────────────────────
     async function loadStatus() {
+      if (!IS_LOCAL) return; // 클라우드에서는 로컬 백엔드 없음
       const btn = document.querySelector('button[onclick="loadStatus()"] span');
-      if(btn) btn.classList.add('animate-spin');
+      if (btn) btn.classList.add('animate-spin');
       try {
         const res = await fetch('/api/status');
+        if (!res.ok) return;
         const data = await res.json();
         updateUI(data);
-      } catch (e) { console.error("Fetch failed", e); }
-      finally { if(btn) setTimeout(() => btn.classList.remove('animate-spin'), 800); }
+      } catch (e) { /* silent — no local server */ }
+      finally { if (btn) setTimeout(() => btn.classList.remove('animate-spin'), 800); }
     }
 
     function updateUI(data) {
@@ -393,116 +413,162 @@
       }
     }
 
-    // ── Cloud Mode: Direct Gemini API call from browser ──────────────────────
-    const IS_LOCAL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
-
-    function getGeminiKey() {
-      let key = localStorage.getItem('qjcos_gemini_key');
-      if (!key) {
-        key = window.prompt('☁️ 클라우드 모드: Gemini API Key를 입력하세요 (한 번만 저장됩니다):');
-        if (key && key.trim()) {
-          localStorage.setItem('qjcos_gemini_key', key.trim());
-          key = key.trim();
-        }
-      }
-      return key;
+    // ── Cloud API Key Management ──────────────────────────────────────────────
+    function saveApiKey() {
+      const keyInput = document.getElementById('apiKeyInput');
+      const key = keyInput ? keyInput.value.trim() : '';
+      if (!key) return;
+      localStorage.setItem('qjcos_gemini_key', key);
+      keyInput.value = '';
+      document.getElementById('apiKeyBanner').classList.add('hidden');
+      addActivityToLog('시스템', 'API 키 저장 완료 — 이제 명령을 입력할 수 있습니다.', null);
     }
 
+    function checkApiKeyBanner() {
+      if (IS_LOCAL) return; // 로컬에서는 배너 불필요
+      const key = localStorage.getItem('qjcos_gemini_key');
+      const banner = document.getElementById('apiKeyBanner');
+      if (banner) {
+        if (key) {
+          banner.classList.add('hidden');
+        } else {
+          banner.classList.remove('hidden');
+          banner.classList.add('flex');
+        }
+      }
+    }
+
+    // ── Cloud Mode: Direct Gemini API Call ────────────────────────────────────
     async function callGeminiDirect(mission) {
-      const key = getGeminiKey();
-      if (!key) throw new Error('Gemini API Key가 없습니다. 새로고침 후 다시 시도하세요.');
+      const key = localStorage.getItem('qjcos_gemini_key');
+      if (!key) {
+        checkApiKeyBanner();
+        throw new Error('Gemini API Key가 설정되지 않았습니다. 위의 노란색 배너에서 키를 입력해주세요.');
+      }
       const model = 'gemini-2.0-flash';
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-      const sysPrompt = `당신은 QJC-OS 자율 운영 시스템의 수석 AI 에이전트입니다.
-사용자의 명령을 받아 분석하고, 무인회사(Autonomous Company)의 운영 원칙에 따라 최선의 판단을 내리세요.
-항상 한국어로 답변하며, 구체적이고 실행 가능한 인사이트를 제공하세요.`;
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          system_instruction: {
+            parts: [{
+              text: '당신은 QJC-OS 자율 운영 시스템의 수석 AI 에이전트입니다. 사용자의 명령을 받아 분석하고, 무인회사(Autonomous Company)의 운영 원칙에 따라 최선의 판단을 내리세요. 항상 한국어로 답변하며, 구체적이고 실행 가능한 인사이트를 제공하세요.'
+            }]
+          },
           contents: [
-            { role: 'user', parts: [{ text: sysPrompt }] },
             { role: 'user', parts: [{ text: mission }] }
           ],
-          generationConfig: { temperature: 0.4 }
+          generationConfig: { temperature: 0.4, maxOutputTokens: 2048 }
         })
       });
       if (!res.ok) {
-        const errText = await res.text();
+        const errBody = await res.text().catch(() => '');
         if (res.status === 400 || res.status === 403) {
-          localStorage.removeItem('qjcos_gemini_key'); // invalid key — reset
+          localStorage.removeItem('qjcos_gemini_key');
+          checkApiKeyBanner();
         }
-        throw new Error(`Gemini API 오류 (${res.status}): ${errText.slice(0, 200)}`);
+        throw new Error(`Gemini API 오류 (${res.status}): ${errBody.slice(0, 300)}`);
       }
       const data = await res.json();
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '(응답 없음)';
-      return { workflow_status: 'Completed (Cloud)', ai_reply: text };
+      return { workflow_status: 'Completed ☁ Cloud', ai_reply: text };
     }
 
-    // Mission Submission
-    document.getElementById("missionForm").onsubmit = async (e) => {
-      e.preventDefault();
+    // ── Mission Submission ────────────────────────────────────────────────────
+    function submitMission() {
       const input = document.getElementById("missionInput");
-      const mission = input.value.replace(/\\n/g, '').trim();
+      const mission = (input.value || '').trim();
       if (!mission) return;
 
       const btn = document.getElementById("submitBtn");
       btn.disabled = true;
       btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-lg">sync</span>`;
 
-      try {
-        let result;
-        if (IS_LOCAL) {
-          // ── 로컬 모드: Python 풀 파이프라인 백엔드 ──
-          const response = await fetch('/api/mission', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mission })
-          });
-          if (!response.ok) throw new Error("로컬 서버 에러 (" + response.status + ")");
-          result = await response.json();
-        } else {
-          // ── 클라우드 모드: Gemini API 직접 호출 ──
-          result = await callGeminiDirect(mission);
+      (async () => {
+        try {
+          let result;
+          if (IS_LOCAL) {
+            const response = await fetch('/api/mission', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ mission })
+            });
+            if (!response.ok) throw new Error("로컬 서버 에러 (" + response.status + ")");
+            result = await response.json();
+          } else {
+            result = await callGeminiDirect(mission);
+          }
+          addActivityToLog(mission, result.workflow_status || "Completed", result.ai_reply || null);
+          input.value = "";
+        } catch (err) {
+          console.error("Mission failed:", err);
+          addActivityToLog(mission, "오류: " + (err.message || "알 수 없는 오류"), null);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = `<span class="material-symbols-outlined font-bold text-lg">arrow_upward</span>`;
+          if (IS_LOCAL) loadStatus();
         }
-        const statusLabel = result.workflow_status || "Completed";
-        addActivityToLog(mission, statusLabel, result.ai_reply || null);
-        input.value = "";
-      } catch (err) {
-        console.error("Mission failed", err);
-        addActivityToLog(mission, "Error: " + (err.message || "알 수 없는 오류"), null);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<span class="material-symbols-outlined font-bold text-lg">arrow_upward</span>`;
-        loadStatus();
-      }
-    };
+      })();
+    }
 
+    // Form submit (button click or implicit Enter)
+    document.getElementById("missionForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      submitMission();
+    });
+
+    // Explicit keydown Enter listener (belt-and-suspenders)
+    document.getElementById("missionInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        submitMission();
+      }
+    });
+
+    // ── Activity Log ──────────────────────────────────────────────────────────
     function addActivityToLog(text, status, aiReply) {
       const log = document.getElementById("activityLog");
-      const isError = status && status.startsWith('Error');
+      if (!log) return;
+      const isError = typeof status === 'string' && (status.startsWith('오류') || status.startsWith('Error'));
+      const safeText = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const safeStatus = String(status).replace(/&/g,'&amp;').replace(/</g,'&lt;');
       const replyHtml = aiReply
-        ? `<div class="mt-2 p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 leading-relaxed max-h-40 overflow-y-auto whitespace-pre-wrap">${aiReply.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`
+        ? `<div class="mt-3 p-4 rounded-2xl bg-white/[0.04] border border-white/10 text-xs text-slate-300 leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap font-mono">${String(aiReply).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`
         : '';
-      const newItem = `
-        <div class="flex gap-5 group">
-          <div class="w-10 h-10 rounded-2xl ${isError ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-cyan/10 text-cyan border-cyan/20'} flex items-center justify-center shrink-0 border">
-            <span class="material-symbols-outlined text-lg">${isError ? 'error' : 'psychology'}</span>
+      log.insertAdjacentHTML('afterbegin', `
+        <div class="flex gap-4 animate-pulse" style="animation-iteration-count:1">
+          <div class="w-9 h-9 rounded-2xl flex-shrink-0 flex items-center justify-center border
+            ${isError ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-cyan/10 text-cyan border-cyan/20'}">
+            <span class="material-symbols-outlined text-base">${isError ? 'error' : 'psychology'}</span>
           </div>
-          <div class="min-w-0 flex-1">
-            <p class="text-sm font-bold text-white">미션: ${text.replace(/</g,'&lt;')}</p>
-            <p class="text-[10px] text-mute mt-1 font-mono uppercase tracking-tighter">방금 전 • ${status}</p>
+          <div class="min-w-0 flex-1 pb-4 border-b border-white/[0.04]">
+            <p class="text-sm font-semibold text-white leading-snug">${safeText}</p>
+            <p class="text-[10px] text-mute mt-1 font-mono uppercase tracking-tighter">${new Date().toLocaleTimeString('ko-KR')} • ${safeStatus}</p>
             ${replyHtml}
           </div>
         </div>
-      `;
-      log.insertAdjacentHTML('afterbegin', newItem);
+      `);
+      // Auto-scroll to top of log
+      log.scrollTop = 0;
     }
 
+    // ── Init ──────────────────────────────────────────────────────────────────
     window.addEventListener("DOMContentLoaded", () => {
       const savedTab = localStorage.getItem("activeTab") || "dashboard";
       switchTab(savedTab);
-      loadStatus();
+      checkApiKeyBanner();
+      if (IS_LOCAL) loadStatus();
+    });
+
+    // Allow Enter key in API Key input
+    document.addEventListener("DOMContentLoaded", () => {
+      const apiKeyInput = document.getElementById('apiKeyInput');
+      if (apiKeyInput) {
+        apiKeyInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') saveApiKey();
+        });
+      }
     });
   </script>
 </body>
