@@ -53,11 +53,24 @@
       background: linear-gradient(180deg, rgba(129, 236, 255, 0.05) 0%, transparent 100%);
       border-bottom: 1px solid rgba(129, 236, 255, 0.1);
     }
+    
+    #commandCenter {
+      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ChatGPT Style Input Glow */
+    #missionInput:focus {
+      box-shadow: 0 0 20px rgba(129, 236, 255, 0.1);
+    }
   </style>
 </head>
 <body class="font-body min-h-screen overflow-x-hidden">
 
-  <!-- Left Sidebar (Inspired by Image 1, 4) -->
+  <!-- Left Sidebar -->
   <aside class="fixed left-0 top-0 bottom-0 w-64 bg-[#111] border-r border-white/5 z-50 hidden lg:flex flex-col">
     <div class="p-8">
       <div class="flex items-center gap-3">
@@ -104,7 +117,7 @@
   </aside>
 
   <!-- Main Content Area -->
-  <main class="lg:ml-64 min-h-screen relative">
+  <main class="lg:ml-64 min-h-screen relative pb-40">
     
     <!-- Top Bar -->
     <header class="sticky top-0 h-20 px-8 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 z-40">
@@ -129,7 +142,7 @@
       <!-- Dashboard Tab -->
       <div id="tab-dashboard" class="tab-content active space-y-8">
         
-        <!-- KPI Grid (Image 1 Style) -->
+        <!-- KPI Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
           <div class="glass p-6 rounded-3xl border border-white/5 flex flex-col justify-between hover:scale-[1.02] transition-transform">
             <div class="flex justify-between items-start">
@@ -137,7 +150,7 @@
               <span class="material-symbols-outlined text-cyan text-xl">groups</span>
             </div>
             <div class="mt-5">
-              <h3 class="text-3xl font-bold tracking-tighter text-white">1,078</h3>
+              <h3 class="text-3xl font-bold tracking-tighter text-white" data-kpi="total_users">1,078</h3>
               <p class="text-[10px] text-cyan mt-1.5 font-mono">+12 From Yesterday</p>
             </div>
           </div>
@@ -147,7 +160,7 @@
               <span class="material-symbols-outlined text-green-400 text-xl">bolt</span>
             </div>
             <div class="mt-5">
-              <h3 class="text-3xl font-bold tracking-tighter text-white">1,077</h3>
+              <h3 class="text-3xl font-bold tracking-tighter text-white" data-kpi="active_subs">1,077</h3>
               <p class="text-[10px] text-green-400 mt-1.5 font-mono">99.9% Retention</p>
             </div>
           </div>
@@ -157,7 +170,7 @@
               <span class="material-symbols-outlined text-orange-400 text-xl">payments</span>
             </div>
             <div class="mt-5">
-              <h3 class="text-3xl font-bold tracking-tighter text-white">$ --</h3>
+              <h3 class="text-3xl font-bold tracking-tighter text-white" data-kpi="mtd_revenue">$ 0.00</h3>
               <p class="text-[10px] text-orange-400 mt-1.5 font-mono">Processing...</p>
             </div>
           </div>
@@ -167,7 +180,7 @@
               <span class="material-symbols-outlined text-purple-400 text-xl">lan</span>
             </div>
             <div class="mt-5">
-              <h3 class="text-3xl font-bold tracking-tighter text-white">2,347</h3>
+              <h3 class="text-3xl font-bold tracking-tighter text-white" data-kpi="total_sessions">2,347</h3>
               <p class="text-[10px] text-purple-400 mt-1.5 font-mono">Active Pipelines</p>
             </div>
           </div>
@@ -177,7 +190,7 @@
               <span class="material-symbols-outlined text-cyan text-xl">construction</span>
             </div>
             <div class="mt-5">
-              <h3 class="text-3xl font-bold tracking-tighter text-white">90,248</h3>
+              <h3 class="text-3xl font-bold tracking-tighter text-white" data-kpi="total_tool_usage">90,248</h3>
               <p class="text-[10px] text-cyan mt-1.5 font-mono">System Events</p>
             </div>
           </div>
@@ -187,22 +200,19 @@
               <span class="material-symbols-outlined text-cyan text-xl">person_search</span>
             </div>
             <div class="mt-5">
-              <h3 class="text-3xl font-bold tracking-tighter text-white">2,508</h3>
+              <h3 class="text-3xl font-bold tracking-tighter text-white" data-kpi="crm_leads">2,508</h3>
               <p class="text-[10px] text-cyan mt-1.5 font-mono">Synced Records</p>
             </div>
           </div>
         </div>
 
-        <!-- Dashboard Widgets (3 Columns) -->
+        <!-- Dashboard Widgets -->
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          
-          <!-- Recent Activity (Image 1 Style) -->
           <section class="glass rounded-[32px] border border-white/5 flex flex-col h-[520px] overflow-hidden">
             <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
               <h4 class="text-xs uppercase tracking-widest font-bold text-mute flex items-center gap-2">
                 <span class="material-symbols-outlined text-sm">history</span> Recent Activity
               </h4>
-              <button class="text-[10px] text-cyan uppercase tracking-widest font-bold hover:underline">Full Log</button>
             </div>
             <div id="activityLog" class="flex-1 overflow-y-auto p-8 space-y-8">
               <div class="flex gap-5 group cursor-pointer">
@@ -210,23 +220,13 @@
                   <span class="material-symbols-outlined text-lg">check_circle</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-sm font-bold text-white group-hover:text-cyan transition-colors">테스크 완료: [운영] 거래소 잔고 불일치 자동 조정 완료</p>
-                  <p class="text-[10px] text-mute mt-1.5 font-mono uppercase tracking-tighter">1시간 전 • Trading Engine</p>
-                </div>
-              </div>
-              <div class="flex gap-5 group cursor-pointer">
-                <div class="w-10 h-10 rounded-2xl bg-purple-400/10 flex items-center justify-center text-purple-400 shrink-0 border border-purple-400/20">
-                  <span class="material-symbols-outlined text-lg">psychology</span>
-                </div>
-                <div class="min-w-0">
-                  <p class="text-sm font-bold text-white">전략 수립: 시장 변동성 증가에 따른 리스크 가이드라인 업데이트</p>
-                  <p class="text-[10px] text-mute mt-1.5 font-mono uppercase tracking-tighter">3시간 전 • Risk Evaluator</p>
+                  <p class="text-sm font-bold text-white group-hover:text-cyan transition-colors">시스템 준비 완료: QJC-OS 가동</p>
+                  <p class="text-[10px] text-mute mt-1.5 font-mono uppercase tracking-tighter">방금 전 • System</p>
                 </div>
               </div>
             </div>
           </section>
 
-          <!-- Runtime Gates (Image 1 Style) -->
           <section class="glass rounded-[32px] border border-white/5 flex flex-col h-[520px] overflow-hidden">
             <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
               <h4 class="text-xs uppercase tracking-widest font-bold text-mute flex items-center gap-2">
@@ -252,13 +252,11 @@
                   </tr>
                 </thead>
                 <tbody id="gateRows" class="divide-y divide-white/[0.03]">
-                  <!-- Dynamically populated -->
                 </tbody>
               </table>
             </div>
           </section>
 
-          <!-- Agent Map Card (Image 6 Style) -->
           <section class="glass rounded-[32px] border border-white/5 flex flex-col h-[520px] overflow-hidden">
             <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
               <h4 class="text-xs uppercase tracking-widest font-bold text-mute flex items-center gap-2">
@@ -266,7 +264,6 @@
               </h4>
             </div>
             <div class="p-6 grid grid-cols-1 gap-3 overflow-y-auto" id="officeMapGrid">
-              <!-- Agent Card Horizontal -->
               <div class="glass p-4 rounded-2xl border border-white/5 flex items-center gap-5 hover:bg-white/[0.05] transition-colors cursor-pointer group relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-r from-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div class="text-3xl shrink-0 grayscale group-hover:grayscale-0 transition-all">🤖</div>
@@ -275,7 +272,7 @@
                   <p class="text-[10px] text-mute font-mono uppercase tracking-widest">Generator Agent</p>
                   <div class="mt-2 flex items-center gap-2">
                     <span class="status-dot status-ok"></span>
-                    <span class="text-[9px] text-white/70 font-mono">Running (Opus 4.5)</span>
+                    <span class="text-[9px] text-white/70 font-mono">Running (Gemini 2.5)</span>
                   </div>
                 </div>
               </div>
@@ -291,45 +288,15 @@
                   </div>
                 </div>
               </div>
-              <!-- more agents -->
             </div>
           </section>
-
         </div>
       </div>
 
-      <!-- Other Tabs (Analysis - Image 3 Style) -->
-      <div id="tab-analysis" class="tab-content hidden space-y-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="glass rounded-[32px] border border-white/5 p-8 flex flex-col h-[400px]">
-            <h4 class="text-xs uppercase tracking-widest font-bold text-mute mb-6">Session Volume Analysis</h4>
-            <div class="flex-1 chart-placeholder rounded-2xl flex items-center justify-center">
-               <span class="material-symbols-outlined text-mute text-4xl opacity-20">show_chart</span>
-            </div>
-          </div>
-          <div class="glass rounded-[32px] border border-white/5 p-8 flex flex-col h-[400px]">
-            <h4 class="text-xs uppercase tracking-widest font-bold text-mute mb-6">Daily GitHub Commits</h4>
-            <div class="flex-1 chart-placeholder rounded-2xl flex items-center justify-center">
-               <span class="material-symbols-outlined text-mute text-4xl opacity-20">bar_chart</span>
-            </div>
-          </div>
-          <div class="glass rounded-[32px] border border-white/5 p-8 flex flex-col h-[400px]">
-            <h4 class="text-xs uppercase tracking-widest font-bold text-mute mb-6">Cumulative Tool Usage</h4>
-            <div class="flex-1 space-y-4 overflow-y-auto">
-               <div class="space-y-1.5">
-                 <div class="flex justify-between text-[10px] font-mono uppercase"><span class="text-white">Bash</span><span class="text-mute">12,045</span></div>
-                 <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-cyan w-[85%]"></div></div>
-               </div>
-               <div class="space-y-1.5">
-                 <div class="flex justify-between text-[10px] font-mono uppercase"><span class="text-white">Edit</span><span class="text-mute">8,231</span></div>
-                 <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-cyan w-[60%]"></div></div>
-               </div>
-            </div>
-          </div>
-        </div>
+      <!-- Other Tabs -->
+      <div id="tab-tasks" class="tab-content hidden h-full flex items-center justify-center">
+        <p class="text-mute">Task Management System v2.0</p>
       </div>
-
-      <!-- Agent Office Tab (Image 6, 7, 8 Style) -->
       <div id="tab-agents" class="tab-content hidden space-y-8 h-[calc(100vh-160px)]">
         <div class="glass rounded-[32px] border border-white/5 w-full h-full p-12 flex flex-col items-center justify-center text-center space-y-6 bg-white/[0.01] relative overflow-hidden">
            <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(rgba(129,236,255,0.2) 1px, transparent 1px); background-size: 40px 40px;"></div>
@@ -343,7 +310,31 @@
            <button class="px-8 py-3 rounded-full bg-cyan text-black font-bold text-sm hover:scale-105 transition-transform">Launch Visualizer Canvas</button>
         </div>
       </div>
+    </div>
 
+    <!-- ChatGPT Style Sovereign Command Center (Bottom Prompt) -->
+    <div class="fixed bottom-6 left-64 right-0 px-8 z-50 transition-all pointer-events-none" id="commandCenter">
+      <div class="max-w-3xl mx-auto pointer-events-auto">
+        <div class="relative flex items-center bg-[#1a1a1a] border border-white/10 rounded-full shadow-2xl p-1.5 focus-within:border-cyan/30 transition-all">
+          <form id="missionForm" class="flex-1 flex items-center">
+            <input 
+              type="text" 
+              id="missionInput" 
+              autocomplete="off"
+              placeholder="에이전트에게 명령을 내리세요..." 
+              class="flex-1 bg-transparent border-none py-2.5 px-6 text-sm text-white placeholder:text-mute focus:ring-0 outline-none"
+            />
+            <button 
+              type="submit" 
+              id="submitBtn"
+              class="w-9 h-9 rounded-full bg-cyan text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-[0_0_10px_rgba(129,236,255,0.2)] disabled:opacity-50 disabled:grayscale"
+            >
+              <span class="material-symbols-outlined font-bold text-base">arrow_upward</span>
+            </button>
+          </form>
+        </div>
+        <p class="text-[8px] text-center text-mute mt-2 uppercase tracking-widest opacity-30">Sovereign Mission Control • QJC-OS v1.0</p>
+      </div>
     </div>
   </main>
 
@@ -361,22 +352,8 @@
         }
       });
       
-      const titles = {
-        'dashboard': 'Dashboard',
-        'tasks': 'Task Management',
-        'agents': 'Agent Office Map',
-        'analysis': 'Operational Analysis',
-        'governance': 'Compliance & Governance',
-        'logs': 'Audit Logs'
-      };
-      const descs = {
-        'dashboard': '운영 현황을 한눈에 확인하세요',
-        'tasks': '진행 중인 모든 자동화 테스크를 관리합니다',
-        'agents': 'AI 에이전트들의 실시간 활동 현황입니다',
-        'analysis': '데이터 기반의 성과 분석 지표입니다',
-        'governance': '시스템 보안 및 의사결정 규칙 관리',
-        'logs': '모든 변경 및 활동의 원장 기록'
-      };
+      const titles = { 'dashboard': 'Dashboard', 'tasks': 'Tasks', 'agents': 'Agent Map', 'analysis': 'Analysis', 'governance': 'Governance', 'logs': 'Audit Logs' };
+      const descs = { 'dashboard': '운영 현황 한눈에 보기', 'tasks': '자동화 테스크 관리', 'agents': 'AI 에이전트 활동 현황', 'analysis': '성과 분석 지표', 'governance': '보안 및 규칙 관리', 'logs': '전체 활동 기록' };
       
       document.getElementById("currentTabTitle").innerText = titles[tabId] || 'Dashboard';
       document.getElementById("currentTabDesc").innerText = descs[tabId] || '';
@@ -384,52 +361,81 @@
     }
 
     async function loadStatus() {
-      console.log("Status update triggered...");
-      // Mock loading for visual feedback
       const btn = document.querySelector('button[onclick="loadStatus()"] span');
-      btn.classList.add('animate-spin');
-      
+      if(btn) btn.classList.add('animate-spin');
       try {
         const res = await fetch('/api/status');
         const data = await res.json();
         updateUI(data);
-      } catch (e) {
-        console.error("Fetch failed", e);
-      } finally {
-        setTimeout(() => btn.classList.remove('animate-spin'), 1000);
-      }
+      } catch (e) { console.error("Fetch failed", e); }
+      finally { if(btn) setTimeout(() => btn.classList.remove('animate-spin'), 800); }
     }
 
     function updateUI(data) {
-      // 1. KPI 지표 업데이트 (Image 1 상단 위젯)
       if (data.kpis) {
-        const kpiMap = {};
-        data.kpis.forEach(item => kpiMap[item.metric_key] = item.metric_value);
-        
-        document.querySelector('[data-kpi="total_users"]').innerText = (kpiMap['total_users'] || 0).toLocaleString();
-        document.querySelector('[data-kpi="active_subs"]').innerText = (kpiMap['active_subs'] || 0).toLocaleString();
-        document.querySelector('[data-kpi="mtd_revenue"]').innerText = '$' + (kpiMap['mtd_revenue'] || 0).toFixed(2);
-        document.querySelector('[data-kpi="total_sessions"]').innerText = (kpiMap['total_sessions'] || 0).toLocaleString();
-        document.querySelector('[data-kpi="total_tool_usage"]').innerText = (kpiMap['total_tool_usage'] || 0).toLocaleString();
-        document.querySelector('[data-kpi="crm_leads"]').innerText = (kpiMap['crm_leads'] || 0).toLocaleString();
+        data.kpis.forEach(item => {
+          const el = document.querySelector(`[data-kpi="${item.metric_key}"]`);
+          if (el) el.innerText = item.metric_value.toLocaleString();
+        });
       }
-
-      // 2. 게이트 상태 업데이트 (Image 1 중앙)
       const gateRows = document.getElementById("gateRows");
       if (gateRows && data.gates) {
-        gateRows.innerHTML = data.gates.map(g => `
+        gateRows.innerHTML = Object.entries(data.gates).map(([name, passed]) => `
           <tr class="hover:bg-white/[0.02] transition-colors border-b border-white/[0.03]">
-            <td class="px-8 py-5 text-sm font-medium text-white">${g.name}</td>
+            <td class="px-8 py-5 text-xs font-medium text-white font-mono">${name}</td>
             <td class="px-8 py-5 text-right">
-              <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${g.passed ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'bg-bad/10 text-bad border border-bad/20'}">
-                ${g.passed ? 'Passed' : 'Failed'}
+              <span class="px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${passed ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'bg-bad/10 text-bad border border-bad/20'}">
+                ${passed ? 'Passed' : 'Failed'}
               </span>
             </td>
           </tr>
         `).join('');
-        document.getElementById("gatePassCount").innerText = data.gates.filter(g => g.passed).length;
-        document.getElementById("gateFailCount").innerText = data.gates.filter(g => !g.passed).length;
       }
+    }
+
+    // Mission Submission
+    document.getElementById("missionForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const input = document.getElementById("missionInput");
+      const mission = input.value.trim();
+      if (!mission) return;
+
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin material-symbols-outlined text-lg">sync</span>`;
+
+      try {
+        const response = await fetch('/api/mission', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mission })
+        });
+        const result = await response.json();
+        addActivityToLog(mission, result.workflow_status || "In-Progress");
+        input.value = "";
+      } catch (err) {
+        console.error("Mission failed", err);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<span class="material-symbols-outlined font-bold text-lg">arrow_upward</span>`;
+        loadStatus();
+      }
+    };
+
+    function addActivityToLog(text, status) {
+      const log = document.getElementById("activityLog");
+      const newItem = `
+        <div class="flex gap-5 group animate-pulse">
+          <div class="w-10 h-10 rounded-2xl bg-cyan/10 flex items-center justify-center text-cyan shrink-0 border border-cyan/20">
+            <span class="material-symbols-outlined text-lg">psychology</span>
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-bold text-white">미션 수립: ${text}</p>
+            <p class="text-[10px] text-mute mt-1.5 font-mono uppercase tracking-tighter">방금 전 • ${status}</p>
+          </div>
+        </div>
+      `;
+      log.insertAdjacentHTML('afterbegin', newItem);
     }
 
     window.addEventListener("DOMContentLoaded", () => {

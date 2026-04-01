@@ -21,9 +21,13 @@ from src.bootstrap_env import load_dotenv_files
 from src.agentic.observe_agent import summarize_status
 from src.agentic.propose_agent import propose_next_actions
 
+from src.agentic.pipeline_engine import PipelineEngine
+
 WEB_DIR = ROOT / "web" / "monitoring"
 OUTPUTS_DIR = ROOT / "outputs"
 
+# Global engine instance for the API
+_engine = PipelineEngine()
 
 def _read_json(path: Path) -> dict:
     if not path.exists():
@@ -461,6 +465,33 @@ class MonitoringHandler(SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(raw)
             except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+            return
+
+        if parsed.path == "/api/mission":
+            try:
+                length = int(self.headers.get("Content-Length", "0") or "0")
+                body = self.rfile.read(max(length, 0)) if length > 0 else b"{}"
+                req = json.loads(body.decode("utf-8") or "{}")
+                mission_text = str(req.get("mission", "")).strip()
+                
+                if not mission_text:
+                    self.send_response(400)
+                    self.end_headers()
+                    return
+                
+                print(f"🚀 [API] Received Mission: {mission_text}")
+                result = _engine.run_workflow(mission_text)
+                
+                raw = json.dumps(result, ensure_ascii=True, indent=2).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+            except Exception as e:
+                print(f"🚨 [API] Mission error: {e}")
                 self.send_response(500)
                 self.end_headers()
             return
