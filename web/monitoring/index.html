@@ -316,21 +316,6 @@
     <div class="fixed bottom-6 left-0 lg:left-64 right-0 px-4 lg:px-8 z-50 transition-all flex justify-center" id="commandCenter">
       <div class="w-full max-w-3xl space-y-2">
 
-        <!-- Cloud Mode: API Key Banner (shown only when no key saved) -->
-        <div id="apiKeyBanner" class="hidden items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-2.5 text-xs">
-          <span class="material-symbols-outlined text-amber-400 text-base shrink-0">key</span>
-          <input 
-            type="password" 
-            id="apiKeyInput" 
-            placeholder="Gemini API Key 입력 (aistudio.google.com 에서 발급) — 한 번만 저장됩니다" 
-            class="flex-1 bg-transparent border-none outline-none text-xs text-white placeholder:text-amber-400/60"
-          />
-          <button onclick="saveApiKey()" class="shrink-0 px-3 py-1 rounded-full bg-amber-500 text-black text-[10px] font-bold hover:bg-amber-400 transition-colors">저장</button>
-          <button onclick="document.getElementById('apiKeyBanner').classList.add('hidden')" class="shrink-0 text-mute hover:text-white">
-            <span class="material-symbols-outlined text-sm">close</span>
-          </button>
-        </div>
-
         <!-- Main Input Bar -->
         <div class="relative flex items-center bg-[#1a1a1a] border border-white/10 rounded-full shadow-2xl p-1.5 focus-within:border-cyan/50 focus-within:shadow-[0_0_30px_rgba(129,236,255,0.1)] transition-all">
           <form id="missionForm" class="flex-1 flex items-center w-full">
@@ -356,9 +341,6 @@
   </main>
 
   <script>
-    // ── Environment Detection ─────────────────────────────────────────────────
-    const IS_LOCAL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
-
     // ── Tab Navigation ────────────────────────────────────────────────────────
     function switchTab(tabId) {
       document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
@@ -377,9 +359,8 @@
       localStorage.setItem("activeTab", tabId);
     }
 
-    // ── Status API (local only) ───────────────────────────────────────────────
+    // ── Status API ────────────────────────────────────────────────────────────
     async function loadStatus() {
-      if (!IS_LOCAL) return; // 클라우드에서는 로컬 백엔드 없음
       const btn = document.querySelector('button[onclick="loadStatus()"] span');
       if (btn) btn.classList.add('animate-spin');
       try {
@@ -387,7 +368,7 @@
         if (!res.ok) return;
         const data = await res.json();
         updateUI(data);
-      } catch (e) { /* silent — no local server */ }
+      } catch (e) { /* silent — no status endpoint on cloud */ }
       finally { if (btn) setTimeout(() => btn.classList.remove('animate-spin'), 800); }
     }
 
@@ -413,69 +394,10 @@
       }
     }
 
-    // ── Cloud API Key Management ──────────────────────────────────────────────
-    function saveApiKey() {
-      const keyInput = document.getElementById('apiKeyInput');
-      const key = keyInput ? keyInput.value.trim() : '';
-      if (!key) return;
-      localStorage.setItem('qjcos_gemini_key', key);
-      keyInput.value = '';
-      document.getElementById('apiKeyBanner').classList.add('hidden');
-      addActivityToLog('시스템', 'API 키 저장 완료 — 이제 명령을 입력할 수 있습니다.', null);
-    }
-
-    function checkApiKeyBanner() {
-      if (IS_LOCAL) return; // 로컬에서는 배너 불필요
-      const key = localStorage.getItem('qjcos_gemini_key');
-      const banner = document.getElementById('apiKeyBanner');
-      if (banner) {
-        if (key) {
-          banner.classList.add('hidden');
-        } else {
-          banner.classList.remove('hidden');
-          banner.classList.add('flex');
-        }
-      }
-    }
-
-    // ── Cloud Mode: Direct Gemini API Call ────────────────────────────────────
-    async function callGeminiDirect(mission) {
-      const key = localStorage.getItem('qjcos_gemini_key');
-      if (!key) {
-        checkApiKeyBanner();
-        throw new Error('Gemini API Key가 설정되지 않았습니다. 위의 노란색 배너에서 키를 입력해주세요.');
-      }
-      const model = 'gemini-2.5-flash';
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{
-              text: '당신은 QJC-OS 자율 운영 시스템의 수석 AI 에이전트입니다. 사용자의 명령을 받아 분석하고, 무인회사(Autonomous Company)의 운영 원칙에 따라 최선의 판단을 내리세요. 항상 한국어로 답변하며, 구체적이고 실행 가능한 인사이트를 제공하세요.'
-            }]
-          },
-          contents: [
-            { role: 'user', parts: [{ text: mission }] }
-          ],
-          generationConfig: { temperature: 0.4, maxOutputTokens: 2048 }
-        })
-      });
-      if (!res.ok) {
-        const errBody = await res.text().catch(() => '');
-        if (res.status === 400 || res.status === 403) {
-          localStorage.removeItem('qjcos_gemini_key');
-          checkApiKeyBanner();
-        }
-        throw new Error(`Gemini API 오류 (${res.status}): ${errBody.slice(0, 300)}`);
-      }
-      const data = await res.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '(응답 없음)';
-      return { workflow_status: 'Completed ☁ Cloud', ai_reply: text };
-    }
-
     // ── Mission Submission ────────────────────────────────────────────────────
+    // 로컬/클라우드 모두 /api/mission 단일 엔드포인트 사용
+    // - 로컬: Python 백엔드 (Planner → Generator → Evaluator 풀 파이프라인)
+    // - 클라우드: Cloudflare Pages Function → Gemini API (env.GEMINI_API_KEY 사용)
     function submitMission() {
       const input = document.getElementById("missionInput");
       const mission = (input.value || '').trim();
@@ -487,17 +409,14 @@
 
       (async () => {
         try {
-          let result;
-          if (IS_LOCAL) {
-            const response = await fetch('/api/mission', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ mission })
-            });
-            if (!response.ok) throw new Error("로컬 서버 에러 (" + response.status + ")");
-            result = await response.json();
-          } else {
-            result = await callGeminiDirect(mission);
+          const response = await fetch('/api/mission', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mission })
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.error || result.detail || `서버 에러 (${response.status})`);
           }
           addActivityToLog(mission, result.workflow_status || "Completed", result.ai_reply || null);
           input.value = "";
@@ -507,7 +426,7 @@
         } finally {
           btn.disabled = false;
           btn.innerHTML = `<span class="material-symbols-outlined font-bold text-lg">arrow_upward</span>`;
-          if (IS_LOCAL) loadStatus();
+          loadStatus();
         }
       })();
     }
@@ -557,18 +476,7 @@
     window.addEventListener("DOMContentLoaded", () => {
       const savedTab = localStorage.getItem("activeTab") || "dashboard";
       switchTab(savedTab);
-      checkApiKeyBanner();
-      if (IS_LOCAL) loadStatus();
-    });
-
-    // Allow Enter key in API Key input
-    document.addEventListener("DOMContentLoaded", () => {
-      const apiKeyInput = document.getElementById('apiKeyInput');
-      if (apiKeyInput) {
-        apiKeyInput.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') saveApiKey();
-        });
-      }
+      loadStatus();
     });
   </script>
 </body>
