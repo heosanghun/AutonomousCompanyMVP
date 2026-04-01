@@ -445,7 +445,7 @@
         checkApiKeyBanner();
         throw new Error('Gemini API Key가 설정되지 않았습니다. 위의 노란색 배너에서 키를 입력해주세요.');
       }
-      const model = 'gemini-2.0-flash';
+      const model = 'gemini-2.5-flash';
       const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
       const res = await fetch(url, {
         method: 'POST',
