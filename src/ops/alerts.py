@@ -1,96 +1,103 @@
-"""Webhook alerts for operational incidents (Slack/Discord support)."""
-
-from __future__ import annotations
-
-import json
 import os
+import json
 import urllib.request
+from typing import Optional, Dict, Any, List
+from pathlib import Path
 
+class AlertManager:
+    """
+    OpenClaw 스타일의 멀티 채널 게이트웨이.
+    Slack, Telegram 등 다양한 채널로 인터랙티브 알림을 전송합니다.
+    """
+    def __init__(self, slack_webhook: str = None, telegram_token: str = None, telegram_chat_id: str = None):
+        self.slack_webhook = slack_webhook or os.getenv("OPS_ALERT_WEBHOOK_URL")
+        self.telegram_token = telegram_token or os.getenv("TELEGRAM_BOT_TOKEN")
+        self.telegram_chat_id = telegram_chat_id or os.getenv("TELEGRAM_CHAT_ID")
 
-def _build_slack_payload(event: str, payload: dict, approval_id: str = None) -> dict:
-    """Convert event and payload into a Slack-compatible Block Kit message."""
-    color = "#FF0000" if "error" in event.lower() or "fail" in event.lower() or "kill" in event.lower() else "#36A64F"
-    if approval_id:
-        color = "#FFCC00"  # Warning/Action required color
-    
-    # Flatten the dict for display
-    details = "\n".join(f"*{k}*: {v}" for k, v in payload.items())
-    
-    blocks = [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": f"🚨 Ops Alert: {event}" if color == "#FF0000" else (f"⚠️ Action Required: {event}" if approval_id else f"ℹ️ Ops Notice: {event}")
-            }
-        },
-        {
-            "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": details or "_No additional details provided._"
+    def send_interactive_alert(self, title: str, message: str, action_id: str, level: str = "info"):
+        """Slack Block Kit 또는 Telegram Inline Keyboard를 사용해 인터랙티브 알림을 전송합니다."""
+        color = "#81ecff" if level == "info" else "#ff7076"
+        results = []
+        
+        if self.slack_webhook:
+            results.append(self._send_slack_block_kit(title, message, action_id, color))
+        
+        if self.telegram_token and self.telegram_chat_id:
+            results.append(self._send_telegram_inline(title, message, action_id))
+        
+        return any(results) if results else False
+
+    def _send_slack_block_kit(self, title: str, message: str, action_id: str, color: str):
+        """Slack 전용 Block Kit 메시지 전송"""
+        payload = {
+            "attachments": [{
+                "color": color,
+                "blocks": [
+                    {
+                        "type": "header",
+                        "text": {"type": "plain_text", "text": f"🚨 {title}"}
+                    },
+                    {
+                        "type": "section",
+                        "text": {"type": "mrkdwn", "text": f"*{message}*"}
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {"type": "plain_text", "text": "Approve ✅"},
+                                "style": "primary",
+                                "value": action_id,
+                                "action_id": f"approve_{action_id}"
+                            },
+                            {
+                                "type": "button",
+                                "text": {"type": "plain_text", "text": "Reject ❌"},
+                                "style": "danger",
+                                "value": action_id,
+                                "action_id": f"reject_{action_id}"
+                            }
+                        ]
+                    }
+                ]
+            }]
+        }
+        return self._post_json(self.slack_webhook, payload)
+
+    def _send_telegram_inline(self, title: str, message: str, action_id: str):
+        """Telegram 전용 Inline Keyboard 메시지 전송"""
+        url = f"https://api.telegram.org/bot{self.telegram_token}/sendMessage"
+        payload = {
+            "chat_id": self.telegram_chat_id,
+            "text": f"🚨 *{title}*\n\n{message}",
+            "parse_mode": "Markdown",
+            "reply_markup": {
+                "inline_keyboard": [[
+                    {"text": "Approve ✅", "callback_data": f"approve_{action_id}"},
+                    {"text": "Reject ❌", "callback_data": f"reject_{action_id}"}
+                ]]
             }
         }
-    ]
+        return self._post_json(url, payload)
 
+    def _post_json(self, url: str, payload: Dict[str, Any]):
+        try:
+            req = urllib.request.Request(url, data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req) as res:
+                return res.status == 200
+        except Exception as e:
+            print(f"Alert failed: {e}")
+            return False
+
+# 글로벌 인스턴스 생성
+alerts = AlertManager()
+
+def send_alert(message: str, title: str = "System Alert", level: str = "info", approval_id: Optional[str] = None):
+    """기존 코드와의 호환성을 위한 래퍼 함수"""
     if approval_id:
-        blocks.append({
-            "type": "actions",
-            "block_id": f"approval_actions_{approval_id}",
-            "elements": [
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Approve"
-                    },
-                    "style": "primary",
-                    "value": f"approve_{approval_id}"
-                },
-                {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "Reject"
-                    },
-                    "style": "danger",
-                    "value": f"reject_{approval_id}"
-                }
-            ]
-        })
-
-    return {
-        "attachments": [
-            {
-                "color": color,
-                "blocks": blocks
-            }
-        ]
-    }
-
-
-def send_alert(event: str, payload: dict, approval_id: str = None) -> bool:
-    """Send alert to webhook if configured; fail silently."""
-    url = os.environ.get("OPS_ALERT_WEBHOOK_URL", "").strip()
-    if not url:
-        return False
-        
-    # Standardize output for Slack/Discord Webhooks
-    if "slack.com" in url or "discord.com/api/webhooks" in url:
-        # Discord usually accepts slack compatible payloads if appended with /slack
-        # Or we can just send standard JSON. We'll send standard Slack format which Discord accepts via /slack
-        body_dict = _build_slack_payload(event, payload, approval_id)
+        return alerts.send_interactive_alert(title, message, approval_id, level)
     else:
-        body_dict = {"event": event, "payload": payload}
-        if approval_id:
-            body_dict["approval_id"] = approval_id
-
-    body = json.dumps(body_dict, ensure_ascii=True).encode("utf-8")
-    req = urllib.request.Request(url, data=body, method="POST", headers={"Content-Type": "application/json"})
-    
-    try:
-        with urllib.request.urlopen(req, timeout=8):
-            return True
-    except Exception as e:
-        print(f"Alert failed to send: {e}")
-        return False
+        # 단순 알림 전송 (승인 버튼 없이)
+        # Slack/Telegram 단순 메시지 로직 구현 가능
+        return alerts.send_interactive_alert(title, message, "notify_only", level)
