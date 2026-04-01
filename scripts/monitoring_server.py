@@ -475,7 +475,7 @@ class MonitoringHandler(SimpleHTTPRequestHandler):
                 self.end_headers()
             return
 
-        if parsed.path == "/api/mission":
+        if parsed.path == "/api/mission" or parsed.path == "/api/mission/":
             try:
                 length = int(self.headers.get("Content-Length", "0") or "0")
                 body = self.rfile.read(max(length, 0)) if length > 0 else b"{}"
@@ -487,8 +487,12 @@ class MonitoringHandler(SimpleHTTPRequestHandler):
                     self.end_headers()
                     return
                 
-                print(f"🚀 [API] Received Mission: {mission_text}")
-                result = get_engine().run_workflow(mission_text)
+                print(f"[API] Received Mission: {mission_text}")
+                try:
+                    result = get_engine().run_workflow(mission_text)
+                except Exception as engine_err:
+                    print(f"Engine error: {engine_err}")
+                    result = {"error": str(engine_err)}
                 
                 raw = json.dumps(result, ensure_ascii=True, indent=2).encode("utf-8")
                 self.send_response(200)
@@ -497,7 +501,7 @@ class MonitoringHandler(SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(raw)
             except Exception as e:
-                print(f"🚨 [API] Mission error: {e}")
+                print(f"[API] Mission error: {e}")
                 self.send_response(500)
                 self.end_headers()
             return

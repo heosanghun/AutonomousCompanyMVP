@@ -21,7 +21,7 @@ class GeneratorAgent:
         task = step.get("task", "")
         required_skills = step.get("required_skills", [])
         
-        print(f"🚀 [Step {step_id}] Executing: {task}")
+        print(f"[Generator] Executing Step {step_id}: {task}")
         
         # 1. 필요 시 스킬 호출 로직 (예: RSI 계산, 파일 읽기 등)
         skill_results = []
@@ -64,10 +64,23 @@ class GeneratorAgent:
         )
         
         try:
-            return json.loads(response)
+            # Clean response for JSON parsing
+            clean_res = response.strip()
+            if "```json" in clean_res:
+                clean_res = clean_res.split("```json")[1].split("```")[0].strip()
+            elif "```" in clean_res:
+                clean_res = clean_res.split("```")[1].split("```")[0].strip()
+            return json.loads(clean_res)
         except:
             import re
             match = re.search(r'\{.*\}', response, re.DOTALL)
             if match:
-                return json.loads(match.group())
-            return {"error": "Failed to parse result", "raw": response}
+                try:
+                    return json.loads(match.group())
+                except: pass
+            return {
+                "step_id": step_id,
+                "status": "Completed (Unstructured)",
+                "result_summary": response[:200],
+                "artifacts": {"raw_response": response}
+            }

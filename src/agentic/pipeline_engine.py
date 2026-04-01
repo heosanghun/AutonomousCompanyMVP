@@ -29,40 +29,40 @@ class PipelineEngine:
         self.current_session_id = str(uuid.uuid4())
         start_time = datetime.now().isoformat()
         
-        # [Logging] 세션 시작 기록 (DB 연동은 API 레이어에서 처리하거나 직접 수행)
-        print(f"🧩 [PipelineEngine] New Session: {self.current_session_id}")
-        print(f"📝 Request: '{request_text}'")
+        # [Logging] 세션 시작 기록
+        print(f"[PipelineEngine] New Session: {self.current_session_id}")
+        print(f"[PipelineEngine] Request: '{request_text}'")
         
         # 1. Planning (기획)
         plan = self.planner.create_plan(request_text, context)
-        print(f"📋 Plan Created: {len(plan.get('steps', []))} steps defined.")
+        steps = plan.get("steps", [])
+        print(f"[PipelineEngine] Plan Created: {len(steps)} steps defined.")
         
         all_results = []
-        
+        success = False if not steps else True # 기본값 설정
+
         # 2. Execution & Evaluation (실행 및 검증 루프)
-        for step in plan.get("steps", []):
+        for step in steps:
             step_id = step.get("step_id")
-            
-            # (최대 3회 재시도 피드백 루프)
-            success = False
+            step_success = False
             for attempt in range(1, 4):
-                print(f"🔄 Attempt {attempt} for Step {step_id}")
+                print(f"[PipelineEngine] Attempt {attempt} for Step {step_id}")
                 
                 # Execution (Generator)
                 result = self.generator.execute_step(step, self.current_session_artifacts)
                 
                 # Evaluation (Evaluator)
-                # EvaluatorAgent.evaluate_trade()를 범용 evaluate()로 확장 필요 시점
-                # 여기서는 임시로 제안된 결과물을 검증
                 evaluation = self.evaluator.evaluate_trade(
                     proposal=result, 
                     portfolio_state=self.current_session_artifacts, 
                     market_context=context or {}
                 )
                 
-                if evaluation.get("decision") == "Approved":
-                    print(f"✅ Step {step_id} APPROVED by Evaluator.")
-                    success = True
+                is_approved = evaluation.get("approved") is True or evaluation.get("decision") == "Approved"
+                
+                if is_approved:
+                    print(f"[PipelineEngine] Step {step_id} APPROVED by Evaluator.")
+                    step_success = True
                     # 결과물 업데이트 (Artifacts 누적)
                     self.current_session_artifacts.update(result.get("artifacts", {}))
                     all_results.append({
@@ -73,12 +73,13 @@ class PipelineEngine:
                     })
                     break
                 else:
-                    print(f"⚠️ Step {step_id} REJECTED: {evaluation.get('reason')}")
+                    print(f"[PipelineEngine] Step {step_id} REJECTED: {evaluation.get('reason')}")
                     # 피드백을 context에 추가하여 재수행
                     step["task"] += f"\n[Feedback from Evaluator]: {evaluation.get('reason')}"
             
-            if not success:
-                print(f"❌ Step {step_id} FAILED after 3 attempts.")
+            if not step_success:
+                print(f"[PipelineEngine] Step {step_id} FAILED after 3 attempts.")
+                success = False
                 all_results.append({
                     "step_id": step_id,
                     "status": "Failed",
