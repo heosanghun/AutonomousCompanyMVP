@@ -17,8 +17,27 @@ class LLMRouter:
         self.openai_key = os.environ.get("OPENAI_API_KEY", "").strip()
         self.anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
 
-    def generate_content(self, prompt: str, temperature: float = 0.2, preferred_provider: str = "gemini") -> Optional[str]:
+    def generate(self, system_prompt: str, user_prompt: str, model_hint: str = "sonnet", temperature: float = 0.2) -> str:
+        """
+        에이전트가 사용하는 표준 생성 메서드.
+        system_prompt와 user_prompt를 결합하여 최적의 모델로 전달합니다.
+        """
+        full_prompt = f"[SYSTEM]\n{system_prompt}\n\n[USER]\n{user_prompt}"
+        
+        # model_hint에 따른 선호 제공자 설정
+        preferred = "gemini"
+        if "opus" in model_hint.lower() or "sonnet" in model_hint.lower():
+            preferred = "anthropic"
+        elif "gpt" in model_hint.lower():
+            preferred = "openai"
+            
+        return self.generate_content(full_prompt, temperature, preferred_provider=preferred) or "Error: No response from LLM."
+
+    def generate_content(self, prompt: str, temperature: float = 0.2, preferred_provider: str = "gemini", system_instruction: str = None) -> Optional[str]:
         """Tries preferred provider first, falls back to others if it fails."""
+        if system_instruction:
+            prompt = f"[SYSTEM]\n{system_instruction}\n\n[USER]\n{prompt}"
+            
         providers = [preferred_provider]
         for p in ["gemini", "openai", "anthropic"]:
             if p not in providers:

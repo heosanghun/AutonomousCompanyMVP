@@ -1,0 +1,29 @@
+{
+  "forbidden_files": [
+    ".env",
+    "secrets.json",
+    "credentials.json",
+    "*.pem",
+    "*.key",
+    "db/passwords.txt",
+    "configs/auth_tokens.json"
+  ],
+  "forbidden_commands": [
+    "rm -rf /",
+    "format",
+    "mkfs",
+    "shutdown",
+    "reboot",
+    "nmap",
+    "ssh-keygen",
+    "chmod 777"
+  ],
+  "sensitive_keywords": [
+    "password",
+    "api_key",
+    "secret_key",
+    "salary",
+    "user_identity",
+    "private_key"
+  ]
+}

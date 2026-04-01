@@ -62,11 +62,25 @@ class PlannerAgent:
         )
         
         try:
-            return json.loads(response)
+            # Clean response for JSON parsing
+            clean_res = response.strip()
+            if "```json" in clean_res:
+                clean_res = clean_res.split("```json")[1].split("```")[0].strip()
+            elif "```" in clean_res:
+                clean_res = clean_res.split("```")[1].split("```")[0].strip()
+                
+            return json.loads(clean_res)
         except:
             # 폴백: JSON 추출 시도
             import re
             match = re.search(r'\{.*\}', response, re.DOTALL)
             if match:
-                return json.loads(match.group())
-            return {"error": "Failed to parse plan", "raw": response}
+                try:
+                    return json.loads(match.group())
+                except: pass
+            
+            # 기본 계획 반환 (LLM이 형식을 못 맞췄을 경우)
+            return {
+                "request_analysis": "Parsing failed, using fallback plan",
+                "steps": [{"step_id": 1, "task": user_request, "required_skills": [], "expected_outcome": "Outcome defined by request"}]
+            }

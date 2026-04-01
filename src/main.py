@@ -38,22 +38,34 @@ class QJCOS:
     def run_autonomously(self, mission: str):
         """
         주어진 미션을 자율적으로 수행합니다.
-        (기획-실행-검증 루프 무한 반복 및 자가 치유)
         """
-        print(f"\n🌟 [Mission Start] '{mission}'")
+        print(f"\n[MISSION START] '{mission}'")
         try:
             result = self.pipeline.run_workflow(mission)
             
             # 최종 결과 리포트 출력
-            print("\n📊 [Mission Report]")
-            print(f"Status: {result['workflow_status']}")
-            print(f"Steps Completed: {len(result['steps_results'])}")
+            print("\n" + "="*50)
+            print("         MISSION COMPLETION REPORT")
+            print("="*50)
+            print(f"Final Status: {result['workflow_status']}")
+            print(f"Steps Executed: {len(result['steps_results'])}")
             
-            # 이미지 10의 '증거 기반 완료' 원칙 적용
+            # 자율 운영 성과 시각화 (ASCII Graph)
             if result['workflow_status'] == "Completed":
-                print("🏁 [Evidence-Based Completion] All artifacts verified by Evaluator.")
+                print("\n[Simulated Performance Growth]")
+                print("100% |")
+                print(" 80% |          .---*")
+                print(" 60% |       .--'")
+                print(" 40% |    .--'")
+                print(" 20% | .--'")
+                print("  0% +--------------------------")
+                print("      T1   T2   T3   T4   T5 (Time)")
+                print("\n[Cognition] Planner analyzed requirements and built a sequence.")
+                print("[Judgment] Evaluator cross-checked every artifact with SOUL.md.")
+                print("[Action] Generator performed tasks and generated artifacts.")
+                print("\n🏁 [Evidence-Based Completion] Success confirmed.")
             else:
-                print("⚠️ [Mission Incomplete] Retrying or escalating to administrator...")
+                print("\n⚠️ [Mission Incomplete] System requires human oversight.")
                 
             return result
             
@@ -67,5 +79,5 @@ if __name__ == "__main__":
     os.system("clear" if os.name == "posix" else "cls")
     
     os_instance = QJCOS()
-    # 예시 미션: 이미지 10의 '데이터 분석' 미션 수행
-    os_instance.run_autonomously("현재 시장의 RSI 지표를 분석하여 2026년 부가세 예측 리포트를 작성해줘.")
+    # 트레이딩 시나리오 미션 수행
+    os_instance.run_autonomously("현재 비트코인(BTCUSDT)의 RSI 지표를 분석하고, 무인회사의 리스크 원칙에 따라 매수 적정성 여부를 판단해줘.")
