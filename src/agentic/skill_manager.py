@@ -79,9 +79,34 @@ class SkillManager:
         return self.tool_definitions
 
     def execute_skill(self, skill_id: str, **kwargs) -> Any:
-        """스킬을 실행하고 결과를 반환합니다."""
+        """
+        스킬을 실행하기 전에 보안 후크(Guardrail)를 검사합니다.
+        AI 에이전트가 민감 정보에 접근하거나 위험한 명령을 내리는 것을 물리적으로 차단합니다.
+        """
+        from src.ops.security_hooks import security_guard
+        
+        # 보안 체크: 파일 접근 시도 검사 (path, file_path, filename 등의 인자 확인)
+        for key in ["path", "file_path", "filename", "src", "dest"]:
+            if key in kwargs:
+                if not security_guard.check_file_access(str(kwargs[key])):
+                    raise PermissionError(f"🚫 [Guardrail] Access to '{kwargs[key]}' is strictly forbidden by QJC-OS Policy.")
+
+        # 보안 체크: 명령어 실행 시도 검사 (bash, shell, cmd 등의 인자 확인)
+        for key in ["command", "cmd", "shell_script"]:
+            if key in kwargs:
+                if not security_guard.check_command_execution(str(kwargs[key])):
+                    raise PermissionError(f"🚫 [Guardrail] Execution of command '{kwargs[key]}' is strictly forbidden by QJC-OS Policy.")
+
         if skill_id in self.skills:
-            return self.skills[skill_id](**kwargs)
+            print(f"🛠️ [SkillManager] Executing skill: {skill_id}")
+            result = self.skills[skill_id](**kwargs)
+            
+            # 결과물 유출 검사 (민감 정보 필터링)
+            if isinstance(result, str) and not security_guard.check_content_leak(result):
+                 print("⚠️ [Guardrail] Sensitive data detected in output. Redacting...")
+                 return "[Security Warning]: Sensitive data detected and redacted by QJC-OS GuardrailHook."
+                 
+            return result
         raise ValueError(f"Skill '{skill_id}' not found.")
 
 if __name__ == "__main__":

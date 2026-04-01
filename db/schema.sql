@@ -65,12 +65,33 @@ CREATE TABLE IF NOT EXISTS ops_events (
   created_at TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS chat_logs (
+-- 7. 에이전트 세션 통계 (이미지 11: 사용 통계 분석 대응)
+CREATE TABLE IF NOT EXISTS agent_sessions (
   id TEXT PRIMARY KEY,
-  user_id TEXT,
-  route TEXT,
-  model TEXT,
-  prompt_chars INTEGER NOT NULL,
-  response_chars INTEGER NOT NULL,
-  created_at TEXT NOT NULL
+  request_text TEXT,
+  status TEXT DEFAULT 'active', -- active, completed, failed
+  start_time TEXT NOT NULL,
+  end_time TEXT,
+  total_tokens INTEGER DEFAULT 0,
+  cost_usd REAL DEFAULT 0.0
+);
+
+-- 8. 도구 사용 기록 (이미지 11: 도구 사용 순위 대응)
+CREATE TABLE IF NOT EXISTS tool_usage_logs (
+  id TEXT PRIMARY KEY,
+  session_id TEXT,
+  agent_name TEXT,
+  tool_name TEXT NOT NULL,
+  arguments TEXT,
+  status TEXT, -- success, blocked, failed
+  created_at TEXT NOT NULL,
+  FOREIGN KEY(session_id) REFERENCES agent_sessions(id)
+);
+
+-- 9. 실시간 KPI 지표 (이미지 1: 상단 위젯 대응)
+CREATE TABLE IF NOT EXISTS system_kpis (
+  id TEXT PRIMARY KEY,
+  metric_key TEXT UNIQUE, -- total_users, mtd_revenue, etc.
+  metric_value REAL,
+  updated_at TEXT NOT NULL
 );

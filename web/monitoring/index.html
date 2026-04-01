@@ -1,794 +1,359 @@
 <!DOCTYPE html>
-<html class="dark" lang="ko">
+<html lang="ko" class="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0e0e0e" />
-  <title>Sovereign Ops | AutonomousCompanyMVP</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>QJC-OS Visualizer | Autonomous Company</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <script>
     tailwind.config = {
-      darkMode: "class",
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            bg0: "#0e0e0e",
-            bg1: "#131313",
-            bg2: "#1d1d1d",
-            line: "#2a2a2a",
-            mute: "#a3a3a3",
-            text: "#f2f2f2",
-            cyan: "#81ecff",
-            cyanDim: "#00d4ec",
-            good: "#69f6b8",
-            bad: "#ff7076"
+            cyan: '#81ecff',
+            mute: '#888',
+            glass: 'rgba(255, 255, 255, 0.03)',
+            bad: '#ff6b6b'
           },
           fontFamily: {
-            headline: ["Space Grotesk", "sans-serif"],
-            body: ["Inter", "sans-serif"],
-            mono: ["Roboto Mono", "monospace"]
+            body: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+            headline: ['Space Grotesk', 'sans-serif']
           }
         }
       }
-    };
+    }
   </script>
   <style>
-    body {
-      background:
-        radial-gradient(1000px 500px at 10% -20%, rgba(129,236,255,0.12), transparent 45%),
-        radial-gradient(900px 420px at 110% 0%, rgba(105,246,184,0.06), transparent 45%),
-        #0e0e0e;
-    }
-    .mat { font-variation-settings: "FILL" 0, "wght" 350, "GRAD" 0, "opsz" 24; }
+    :root { --accent: #81ecff; }
+    body { background-color: #0a0a0a; color: #e5e5e5; }
     .glass {
-      background: rgba(28, 28, 28, 0.52);
-      backdrop-filter: blur(34px);
-      -webkit-backdrop-filter: blur(34px);
-      box-shadow: inset 0 0 0 .5px rgba(255,255,255,.09);
-    }
-    .accent-glow { box-shadow: 0 0 44px rgba(0,212,236,.12); }
-    .kpi-card { min-height: 126px; }
-    .tab-btn.active { color: #81ecff; border-bottom: 2px solid #81ecff; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .focus-ring:focus-visible { outline: 2px solid #81ecff; outline-offset: 2px; }
-    .status-dot { display:inline-block; width:8px; height:8px; border-radius:999px; margin-right:6px; }
-    .status-ok { background:#69f6b8; box-shadow:0 0 12px rgba(105,246,184,.45); }
-    .status-bad { background:#ff7076; box-shadow:0 0 12px rgba(255,112,118,.45); }
-    .status-warn { background:#81ecff; box-shadow:0 0 12px rgba(129,236,255,.45); }
-    .soft-divider { border-top: 1px solid rgba(255,255,255,.06); }
-    .pill {
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-family: "Roboto Mono", monospace;
-      color: #cfcfcf;
-      background: rgba(255,255,255,.03);
-    }
-    .sticky-head { position: sticky; top: 0; background: rgba(18,18,18,.94); backdrop-filter: blur(10px); }
-    @media (max-width: 900px) {
-      aside { display: none; }
-      main { margin-left: 0 !important; padding-left: 14px !important; padding-right: 14px !important; }
-      .mobile-hidden { display: none !important; }
-    }
-    .safe-pb { padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
-    @media (min-width: 901px) {
-      .safe-pb { padding-bottom: 2.5rem; }
-    }
-    .mobile-bottom-nav {
-      padding-bottom: env(safe-area-inset-bottom, 0px);
-      background: rgba(10,10,10,.92);
+      background: rgba(255, 255, 255, 0.02);
       backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255,255,255,.08);
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .tap-target { min-height: 44px; min-width: 44px; }
-    .chat-scroll::-webkit-scrollbar { width: 6px; }
-    .chat-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.2); border-radius: 999px; }
-    .chat-msg-user { background: linear-gradient(135deg, rgba(0,212,236,.28), rgba(0,212,236,.12)); }
-    .chat-msg-assistant { background: rgba(255,255,255,.04); }
-    .chat-card-title { font-size: 12px; color: #9ec7cf; font-family: "Roboto Mono", monospace; margin-bottom: 8px; }
-    .chat-card-subtitle { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-    .chat-kv { font-size: 14px; line-height: 1.55; }
-    .chat-kv b { color: #eaf9fc; font-weight: 600; }
-    .quick-chip {
-      border: 1px solid rgba(129,236,255,.28);
-      color: #b3ebf5;
-      background: rgba(16, 42, 48, .45);
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 12px;
-      line-height: 1;
-      transition: all .15s ease;
-    }
-    .quick-chip:hover { color: #fff; border-color: rgba(129,236,255,.5); background: rgba(16, 42, 48, .68); }
-    .quick-chip.active { color: #fff; border-color: rgba(129,236,255,.72); background: rgba(20, 64, 74, .88); }
-    .typing-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: #9ca3af;
-      display: inline-block;
-      animation: typingBounce 1s infinite ease-in-out;
-      opacity: .7;
-    }
-    .typing-dot:nth-child(2) { animation-delay: .12s; }
-    .typing-dot:nth-child(3) { animation-delay: .24s; }
-    @keyframes typingBounce {
-      0%, 80%, 100% { transform: translateY(0); opacity: .5; }
-      40% { transform: translateY(-3px); opacity: 1; }
-    }
-    /* Light theme: soft paper / slate (avoid harsh white) */
-    html.light body,
-    html.light body.text-text {
-      color: #1e293b !important;
-      background:
-        radial-gradient(900px 480px at 8% -15%, rgba(14, 165, 233, 0.14), transparent 50%),
-        radial-gradient(800px 400px at 100% 0%, rgba(52, 211, 153, 0.1), transparent 48%),
-        linear-gradient(165deg, #c5d0e0 0%, #d4dce8 38%, #cbd5e1 100%) !important;
-    }
-    html.light .glass {
-      background: rgba(248, 250, 252, 0.78);
-      box-shadow: inset 0 0 0 1px rgba(51, 65, 85, 0.1);
-    }
-    html.light header {
-      background: rgba(226, 232, 240, 0.88) !important;
-      border-bottom-color: rgba(51, 65, 85, 0.12) !important;
-    }
-    html.light aside {
-      background: rgba(203, 213, 225, 0.55) !important;
-      border-right-color: rgba(51, 65, 85, 0.12) !important;
-    }
-    html.light .mobile-bottom-nav {
-      background: rgba(226, 232, 240, 0.95) !important;
-      border-top-color: rgba(51, 65, 85, 0.12) !important;
-    }
-    html.light .sticky-head {
-      background: rgba(241, 245, 249, 0.96) !important;
-    }
-    html.light .text-mute { color: #64748b !important; }
-    html.light .text-text { color: #1e293b !important; }
-    html.light .chat-msg-assistant { background: rgba(51, 65, 85, 0.06); }
-    html.light .chat-msg-user { background: linear-gradient(135deg, rgba(14,165,233,.22), rgba(14,165,233,.1)); }
-    html.light .quick-chip {
-      color: #0e7490;
-      background: rgba(14, 165, 233, 0.1);
-      border-color: rgba(14, 165, 233, 0.35);
-    }
-    html.light .pill {
-      color: #475569;
-      background: rgba(51, 65, 85, 0.06);
-      border-color: rgba(51, 65, 85, 0.15);
-    }
-    html.light input,
-    html.light textarea,
-    html.light select {
-      color: #0f172a !important;
-      background: rgba(255, 255, 255, 0.65) !important;
-      border-color: rgba(51, 65, 85, 0.18) !important;
-    }
-    html.light .chat-footer-bar {
-      background: rgba(241, 245, 249, 0.92) !important;
-      border-top-color: rgba(51, 65, 85, 0.12) !important;
-    }
-    .modal-backdrop { background: rgba(2,6,23,.55); backdrop-filter: blur(4px); }
-    .json-pre {
-      max-height: min(60vh, 480px);
-      overflow: auto;
-      font-family: "Roboto Mono", monospace;
-      font-size: 11px;
-      line-height: 1.45;
-      white-space: pre-wrap;
-      word-break: break-word;
+    .tab-btn.active {
+      background: rgba(129, 236, 255, 0.1);
       color: #81ecff;
-      background: rgba(0,0,0,.35);
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 12px;
-      padding: 12px;
+      border-right: 2px solid #81ecff;
     }
-    .light .json-pre { color: #0369a1; background: rgba(15,23,42,.06); border-color: rgba(15,23,42,.12); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+    .status-ok { background-color: #81ecff; box-shadow: 0 0 8px #81ecff; }
+    .status-warning { background-color: #f59e0b; }
+    .status-bad { background-color: #ff6b6b; box-shadow: 0 0 8px #ff6b6b; }
+    
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+    
+    .chart-placeholder {
+      background: linear-gradient(180deg, rgba(129, 236, 255, 0.05) 0%, transparent 100%);
+      border-bottom: 1px solid rgba(129, 236, 255, 0.1);
+    }
   </style>
 </head>
-<body id="top" class="text-text font-body min-h-screen overflow-x-hidden">
-  <header class="fixed top-0 left-0 right-0 z-50 h-14 sm:h-16 px-4 sm:px-5 md:px-8 flex items-center justify-between bg-black/35 backdrop-blur-3xl border-b border-white/5 pt-[env(safe-area-inset-top,0px)]">
-    <div class="flex items-center gap-2 sm:gap-3 md:gap-8 min-w-0">
-      <div class="flex items-center gap-2 sm:gap-2.5 min-w-0">
-        <span class="material-symbols-outlined mat text-cyan text-xl sm:text-2xl shrink-0">hub</span>
-        <div class="min-w-0">
-          <p class="font-headline font-bold tracking-tight text-cyan text-base sm:text-lg leading-none truncate">SOVEREIGN OPS</p>
-          <p class="hidden sm:block font-mono text-[9px] sm:text-[10px] text-mute tracking-[0.15em] uppercase truncate">AutonomousCompany MVP</p>
+<body class="font-body min-h-screen overflow-x-hidden">
+
+  <!-- Left Sidebar (Inspired by Image 1, 4) -->
+  <aside class="fixed left-0 top-0 bottom-0 w-64 bg-[#111] border-r border-white/5 z-50 hidden lg:flex flex-col">
+    <div class="p-8">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan flex items-center justify-center shadow-[0_0_20px_rgba(129,236,255,0.3)]">
+          <span class="material-symbols-outlined text-black font-bold text-2xl">hub</span>
+        </div>
+        <div>
+          <h1 class="font-headline font-bold text-xl tracking-tight text-white leading-none">QJC-OS</h1>
+          <p class="text-[9px] text-mute font-mono mt-1 uppercase tracking-widest opacity-50">Enterprise Edition</p>
         </div>
       </div>
-    <nav class="hidden lg:flex items-center gap-6 text-[11px] uppercase tracking-widest font-headline text-mute">
-        <button type="button" class="tab-btn active hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 pb-1 cursor-pointer" onclick="switchTab('dashboard')">Dashboard</button>
-        <button type="button" class="tab-btn hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 pb-1 cursor-pointer" onclick="switchTab('ops')">Operations</button>
-        <button type="button" class="tab-btn hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 pb-1 cursor-pointer" onclick="switchTab('admin')">Governance</button>
-        <button type="button" class="tab-btn hover:text-white font-headline uppercase tracking-widest bg-transparent border-0 pb-1 cursor-pointer" onclick="switchTab('logs')">Data & Logs</button>
-    </nav>
     </div>
-    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass">
-        <span class="h-2 w-2 rounded-full bg-cyan animate-pulse"></span>
-        <span id="livePulse" class="font-mono text-[10px] uppercase text-mute" data-i18n="liveSync">Live Sync</span>
-      </div>
-      <button id="themeToggleBtn" type="button" class="tap-target focus-ring glass rounded-full px-3 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
-        <span class="material-symbols-outlined mat text-xl sm:text-base">contrast</span><span class="hidden sm:inline" data-i18n="theme">Theme</span>
-      </button>
-      <button id="langToggleBtn" type="button" class="tap-target focus-ring glass rounded-full px-3 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
-        <span class="material-symbols-outlined mat text-xl sm:text-base">translate</span><span class="hidden sm:inline" data-i18n="langBtn">English</span>
-      </button>
-      <button id="accountBtn" type="button" class="tap-target focus-ring glass rounded-full px-3 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
-        <span class="material-symbols-outlined mat text-xl sm:text-base">person</span><span class="hidden sm:inline" data-i18n="login">Login</span>
-      </button>
-      <button type="button" onclick="loadStatus()" aria-label="Refresh status" class="tap-target focus-ring glass rounded-full px-3 sm:px-4 py-2 text-xs font-headline uppercase tracking-wider text-cyan hover:text-white transition-colors inline-flex items-center justify-center gap-1">
-        <span class="material-symbols-outlined mat text-xl sm:text-base">refresh</span><span class="hidden sm:inline" data-i18n="refresh">Refresh</span>
-      </button>
-    </div>
-  </header>
 
-  <aside class="hidden md:flex md:flex-col fixed left-0 top-16 bottom-0 w-[76px] bg-black/30 backdrop-blur-2xl border-r border-white/5 items-center pt-5">
-    <div class="w-full py-4 text-cyan bg-cyan/10 border-r-2 border-cyan flex flex-col items-center gap-2">
-      <span class="material-symbols-outlined mat">monitoring</span>
-      <span class="font-mono text-[9px] uppercase tracking-widest">Ops</span>
+    <nav class="flex-1 px-4 space-y-1 mt-4">
+      <button onclick="switchTab('dashboard')" class="tab-btn active w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-medium transition-all text-mute hover:text-white group">
+        <span class="material-symbols-outlined text-xl group-hover:text-cyan transition-colors">grid_view</span> Dashboard
+      </button>
+      <button onclick="switchTab('tasks')" class="tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-medium transition-all text-mute hover:text-white group">
+        <span class="material-symbols-outlined text-xl group-hover:text-cyan transition-colors">assignment</span> Tasks
+      </button>
+      <button onclick="switchTab('agents')" class="tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-medium transition-all text-mute hover:text-white group">
+        <span class="material-symbols-outlined text-xl group-hover:text-cyan transition-colors">diversity_3</span> Agent Office
+      </button>
+      <button onclick="switchTab('analysis')" class="tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-medium transition-all text-mute hover:text-white group">
+        <span class="material-symbols-outlined text-xl group-hover:text-cyan transition-colors">analytics</span> Analysis
+      </button>
+      <button onclick="switchTab('governance')" class="tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-medium transition-all text-mute hover:text-white group">
+        <span class="material-symbols-outlined text-xl group-hover:text-cyan transition-colors">security</span> Governance
+      </button>
+      <button onclick="switchTab('logs')" class="tab-btn w-full flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-medium transition-all text-mute hover:text-white group">
+        <span class="material-symbols-outlined text-xl group-hover:text-cyan transition-colors">history</span> Data & Logs
+      </button>
+    </nav>
+
+    <div class="p-6 border-t border-white/5 mt-auto">
+      <div class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors cursor-pointer">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan to-blue-600 flex items-center justify-center font-bold text-black text-xs">AD</div>
+        <div class="min-w-0">
+          <p class="text-xs font-bold text-white truncate">Administrator</p>
+          <p class="text-[9px] text-mute truncate uppercase tracking-tighter">Root Authority</p>
+        </div>
+      </div>
     </div>
-    <span class="material-symbols-outlined mat text-mute mt-6">security</span>
-    <span class="material-symbols-outlined mat text-mute mt-auto mb-4">description</span>
   </aside>
 
-  <main class="ml-0 md:ml-[88px] pt-[calc(3.5rem+env(safe-area-inset-top,0px))] sm:pt-20 safe-pb px-4 sm:px-8 lg:px-12 xl:px-16 w-full">
-    <section id="errorBanner" class="hidden mb-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200"></section>
-
-    <div id="tab-dashboard" class="tab-content active">
-      <section class="glass rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 accent-glow">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <div class="min-w-0">
-          <h1 class="font-headline text-xl sm:text-2xl md:text-3xl font-bold tracking-tight leading-tight" data-i18n="heroTitle">Oracle-Grade Runtime Control</h1>
-          <p class="text-xs sm:text-sm text-mute mt-1" data-i18n="heroSub">실시간 전략·리스크·게이트 상태를 한 화면에서 운영</p>
-        </div>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="glass rounded-xl px-3 py-2"><span class="text-mute" data-i18n="labelMode">Mode</span><p id="heroMode" class="font-mono mt-1">—</p></div>
-          <div class="glass rounded-xl px-3 py-2"><span class="text-mute" data-i18n="labelKill">Kill-switch</span><p id="heroKill" class="font-mono mt-1">—</p></div>
-        </div>
+  <!-- Main Content Area -->
+  <main class="lg:ml-64 min-h-screen relative">
+    
+    <!-- Top Bar -->
+    <header class="sticky top-0 h-20 px-8 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 z-40">
+      <div>
+        <h2 id="currentTabTitle" class="font-headline font-bold text-2xl tracking-tight text-white">Dashboard</h2>
+        <p id="currentTabDesc" class="text-xs text-mute mt-0.5">운영 현황을 한눈에 확인하세요</p>
       </div>
-      <p id="generatedAt" class="font-mono text-[11px] text-mute mt-4">Loading status…</p>
-      <div class="soft-divider mt-3 pt-3 flex flex-wrap gap-2">
-        <span id="badgePipeline" class="pill">pipeline: —</span>
-        <span id="badgeReconcile" class="pill">reconcile: —</span>
-        <span id="badgeGate" class="pill">gate: —</span>
-        <span id="badgeDrift" class="pill">drift: —</span>
+      
+      <div class="flex items-center gap-4">
+        <div class="hidden md:flex items-center gap-2.5 px-4 py-2 rounded-full bg-cyan/5 border border-cyan/10">
+          <span class="h-1.5 w-1.5 rounded-full bg-cyan animate-pulse"></span>
+          <span class="font-mono text-[10px] uppercase text-cyan tracking-[0.2em]">System Live</span>
+        </div>
+        <button onclick="loadStatus()" class="w-11 h-11 rounded-full glass flex items-center justify-center text-cyan hover:bg-cyan hover:text-black transition-all">
+          <span class="material-symbols-outlined">refresh</span>
+        </button>
       </div>
-    </section>
+    </header>
 
-    <section id="widgetContainer" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-4 sm:mb-6">
-      <!-- Widgets will be injected here by JS -->
-
-      <!-- Balanced 3-Column Layout -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-        <!-- 1. Gate Status -->
-        <article class="glass rounded-2xl overflow-hidden flex flex-col">
-        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-          <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="gateStatus">Gate Status</h2>
-          <span class="material-symbols-outlined mat text-mute">verified_user</span>
-        </div>
-        <div class="px-5 py-3 text-xs text-mute flex items-center gap-3">
-          <span><span class="status-dot status-ok"></span><span id="gatePassCount">0</span> <span data-i18n="passLabel">PASS</span></span>
-          <span><span class="status-dot status-bad"></span><span id="gateFailCount">0</span> <span data-i18n="failLabel">FAIL</span></span>
-        </div>
-        <div id="gateCardsMobile" class="md:hidden px-4 pb-4 space-y-2"></div>
-        <div class="hidden md:block overflow-x-auto">
-          <table class="w-full">
-            <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left" data-i18n="thCheck">Check</th><th class="px-5 py-3 text-left" data-i18n="thState">State</th></tr></thead>
-            <tbody id="gateRows"></tbody>
-          </table>
-        </div>
-      </article>
-      <article class="glass rounded-2xl overflow-hidden">
-        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-          <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="artifacts">Artifacts</h2>
-          <span class="material-symbols-outlined mat text-mute">folder_open</span>
-        </div>
-        <div class="px-4 sm:px-5 py-3 border-b border-white/5">
-          <input id="artifactSearch" type="search" enterkeyhint="search" autocomplete="off" class="focus-ring w-full rounded-lg bg-black/25 border border-white/10 px-3 py-3 sm:py-2 text-sm sm:text-xs font-mono text-white placeholder:text-mute min-h-[44px] sm:min-h-0" data-i18n-placeholder="artifactPh" placeholder="Search artifact key/path..." />
-        </div>
-        <div id="pathCardsMobile" class="md:hidden px-4 pb-4 space-y-2 max-h-[min(50vh,420px)] overflow-y-auto"></div>
-          <div class="hidden md:block overflow-auto max-h-[320px]">
-            <table class="w-full">
-              <thead class="sticky-head"><tr class="text-xs uppercase tracking-widest text-mute"><th class="px-5 py-3 text-left" data-i18n="thKey">Key</th><th class="px-5 py-3 text-left" data-i18n="thPath">Path</th></tr></thead>
-              <tbody id="pathRows"></tbody>
-            </table>
+    <div class="p-8 space-y-8 max-w-[1600px] mx-auto">
+      
+      <!-- Dashboard Tab -->
+      <div id="tab-dashboard" class="tab-content active space-y-8">
+        
+        <!-- KPI Grid (Image 1 Style) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
+          <div class="glass p-6 rounded-3xl border border-white/5 flex flex-col justify-between hover:scale-[1.02] transition-transform">
+            <div class="flex justify-between items-start">
+              <p class="text-[10px] text-mute uppercase tracking-widest font-bold">Total Users</p>
+              <span class="material-symbols-outlined text-cyan text-xl">groups</span>
+            </div>
+            <div class="mt-5">
+              <h3 class="text-3xl font-bold tracking-tighter text-white">1,078</h3>
+              <p class="text-[10px] text-cyan mt-1.5 font-mono">+12 From Yesterday</p>
+            </div>
           </div>
-        </article>
-
-        <!-- 3. AI Office Map (Enhanced Grid) -->
-        <article class="glass rounded-2xl overflow-hidden flex flex-col lg:col-span-2 xl:col-span-1" id="officeMapSection">
-          <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-            <h2 class="font-headline text-sm uppercase tracking-widest">AI Office Map (Agents)</h2>
-            <span class="material-symbols-outlined mat text-cyan">diversity_2</span>
+          <div class="glass p-6 rounded-3xl border border-white/5 flex flex-col justify-between hover:scale-[1.02] transition-transform">
+            <div class="flex justify-between items-start">
+              <p class="text-[10px] text-mute uppercase tracking-widest font-bold">Active Subs</p>
+              <span class="material-symbols-outlined text-green-400 text-xl">bolt</span>
+            </div>
+            <div class="mt-5">
+              <h3 class="text-3xl font-bold tracking-tighter text-white">1,077</h3>
+              <p class="text-[10px] text-green-400 mt-1.5 font-mono">99.9% Retention</p>
+            </div>
           </div>
-          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto flex-1 max-h-[450px]">
-            <!-- Agent Cards (Improved Horizontal Design) -->
-            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
-              <div class="absolute inset-0 bg-gradient-to-r from-cyan/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div class="text-3xl">🤖</div>
-              <div class="text-left min-w-0">
-                <h3 class="font-headline font-bold text-xs text-cyan truncate">Trading Engine</h3>
-                <p class="text-[10px] text-mute font-mono">Generator</p>
-                <div class="mt-1 flex items-center gap-1.5">
-                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Running</span>
+          <div class="glass p-6 rounded-3xl border border-white/5 flex flex-col justify-between hover:scale-[1.02] transition-transform">
+            <div class="flex justify-between items-start">
+              <p class="text-[10px] text-mute uppercase tracking-widest font-bold">MTD Revenue</p>
+              <span class="material-symbols-outlined text-orange-400 text-xl">payments</span>
+            </div>
+            <div class="mt-5">
+              <h3 class="text-3xl font-bold tracking-tighter text-white">$ --</h3>
+              <p class="text-[10px] text-orange-400 mt-1.5 font-mono">Processing...</p>
+            </div>
+          </div>
+          <div class="glass p-6 rounded-3xl border border-white/5 flex flex-col justify-between hover:scale-[1.02] transition-transform">
+            <div class="flex justify-between items-start">
+              <p class="text-[10px] text-mute uppercase tracking-widest font-bold">Sessions</p>
+              <span class="material-symbols-outlined text-purple-400 text-xl">lan</span>
+            </div>
+            <div class="mt-5">
+              <h3 class="text-3xl font-bold tracking-tighter text-white">2,347</h3>
+              <p class="text-[10px] text-purple-400 mt-1.5 font-mono">Active Pipelines</p>
+            </div>
+          </div>
+          <div class="glass p-6 rounded-3xl border border-white/5 flex flex-col justify-between hover:scale-[1.02] transition-transform">
+            <div class="flex justify-between items-start">
+              <p class="text-[10px] text-mute uppercase tracking-widest font-bold">Tool Usage</p>
+              <span class="material-symbols-outlined text-cyan text-xl">construction</span>
+            </div>
+            <div class="mt-5">
+              <h3 class="text-3xl font-bold tracking-tighter text-white">90,248</h3>
+              <p class="text-[10px] text-cyan mt-1.5 font-mono">System Events</p>
+            </div>
+          </div>
+          <div class="glass p-6 rounded-3xl border border-white/5 flex flex-col justify-between hover:scale-[1.02] transition-transform">
+            <div class="flex justify-between items-start">
+              <p class="text-[10px] text-mute uppercase tracking-widest font-bold">CRM Leads</p>
+              <span class="material-symbols-outlined text-cyan text-xl">person_search</span>
+            </div>
+            <div class="mt-5">
+              <h3 class="text-3xl font-bold tracking-tighter text-white">2,508</h3>
+              <p class="text-[10px] text-cyan mt-1.5 font-mono">Synced Records</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Widgets (3 Columns) -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          
+          <!-- Recent Activity (Image 1 Style) -->
+          <section class="glass rounded-[32px] border border-white/5 flex flex-col h-[520px] overflow-hidden">
+            <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+              <h4 class="text-xs uppercase tracking-widest font-bold text-mute flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">history</span> Recent Activity
+              </h4>
+              <button class="text-[10px] text-cyan uppercase tracking-widest font-bold hover:underline">Full Log</button>
+            </div>
+            <div id="activityLog" class="flex-1 overflow-y-auto p-8 space-y-8">
+              <div class="flex gap-5 group cursor-pointer">
+                <div class="w-10 h-10 rounded-2xl bg-cyan/10 flex items-center justify-center text-cyan shrink-0 border border-cyan/20 group-hover:bg-cyan group-hover:text-black transition-all">
+                  <span class="material-symbols-outlined text-lg">check_circle</span>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-bold text-white group-hover:text-cyan transition-colors">테스크 완료: [운영] 거래소 잔고 불일치 자동 조정 완료</p>
+                  <p class="text-[10px] text-mute mt-1.5 font-mono uppercase tracking-tighter">1시간 전 • Trading Engine</p>
                 </div>
               </div>
-            </article>
-            
-            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
-              <div class="absolute inset-0 bg-gradient-to-r from-bad/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div class="text-3xl">👑</div>
-              <div class="text-left min-w-0">
-                <h3 class="font-headline font-bold text-xs text-bad truncate">Risk Evaluator</h3>
-                <p class="text-[10px] text-mute font-mono">CRO Agent</p>
-                <div class="mt-1 flex items-center gap-1.5">
-                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Watching</span>
+              <div class="flex gap-5 group cursor-pointer">
+                <div class="w-10 h-10 rounded-2xl bg-purple-400/10 flex items-center justify-center text-purple-400 shrink-0 border border-purple-400/20">
+                  <span class="material-symbols-outlined text-lg">psychology</span>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-bold text-white">전략 수립: 시장 변동성 증가에 따른 리스크 가이드라인 업데이트</p>
+                  <p class="text-[10px] text-mute mt-1.5 font-mono uppercase tracking-tighter">3시간 전 • Risk Evaluator</p>
                 </div>
               </div>
-            </article>
+            </div>
+          </section>
 
-            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
-              <div class="absolute inset-0 bg-gradient-to-r from-[#69f6b8]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div class="text-3xl">📊</div>
-              <div class="text-left min-w-0">
-                <h3 class="font-headline font-bold text-xs text-[#69f6b8] truncate">Market Analyst</h3>
-                <p class="text-[10px] text-mute font-mono">Research</p>
-                <div class="mt-1 flex items-center gap-1.5">
-                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Idle</span>
+          <!-- Runtime Gates (Image 1 Style) -->
+          <section class="glass rounded-[32px] border border-white/5 flex flex-col h-[520px] overflow-hidden">
+            <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+              <h4 class="text-xs uppercase tracking-widest font-bold text-mute flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">verified_user</span> System Gates
+              </h4>
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="status-dot status-ok"></span>
+                  <span class="text-[10px] text-mute font-bold" id="gatePassCount">0</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="status-dot status-bad"></span>
+                  <span class="text-[10px] text-mute font-bold" id="gateFailCount">0</span>
                 </div>
               </div>
-            </article>
+            </div>
+            <div class="flex-1 overflow-y-auto">
+              <table class="w-full text-left">
+                <thead class="sticky top-0 bg-[#0a0a0a] z-10 border-b border-white/5">
+                  <tr class="text-[10px] text-mute uppercase tracking-widest">
+                    <th class="px-8 py-5">Verification Check</th>
+                    <th class="px-8 py-5 text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="gateRows" class="divide-y divide-white/[0.03]">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </section>
 
-            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
-              <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div class="text-3xl">🛡️</div>
-              <div class="text-left min-w-0">
-                <h3 class="font-headline font-bold text-xs text-white truncate">Compliance</h3>
-                <p class="text-[10px] text-mute font-mono">Policy Hook</p>
-                <div class="mt-1 flex items-center gap-1.5">
-                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Guarding</span>
+          <!-- Agent Map Card (Image 6 Style) -->
+          <section class="glass rounded-[32px] border border-white/5 flex flex-col h-[520px] overflow-hidden">
+            <div class="px-8 py-6 border-b border-white/5 flex items-center justify-between bg-white/[0.01]">
+              <h4 class="text-xs uppercase tracking-widest font-bold text-mute flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">diversity_2</span> Agent Office Map
+              </h4>
+            </div>
+            <div class="p-6 grid grid-cols-1 gap-3 overflow-y-auto" id="officeMapGrid">
+              <!-- Agent Card Horizontal -->
+              <div class="glass p-4 rounded-2xl border border-white/5 flex items-center gap-5 hover:bg-white/[0.05] transition-colors cursor-pointer group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="text-3xl shrink-0 grayscale group-hover:grayscale-0 transition-all">🤖</div>
+                <div class="min-w-0">
+                  <h5 class="text-sm font-bold text-white group-hover:text-cyan transition-colors">Trading Engine</h5>
+                  <p class="text-[10px] text-mute font-mono uppercase tracking-widest">Generator Agent</p>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="status-dot status-ok"></span>
+                    <span class="text-[9px] text-white/70 font-mono">Running (Opus 4.5)</span>
+                  </div>
                 </div>
               </div>
-            </article>
-
-            <article class="glass rounded-xl p-3 flex items-center gap-4 relative overflow-hidden group border border-white/5">
-              <div class="absolute inset-0 bg-gradient-to-r from-[#81ecff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div class="text-3xl">👨‍💻</div>
-              <div class="text-left min-w-0">
-                <h3 class="font-headline font-bold text-xs text-cyanDim truncate">DevOps Healer</h3>
-                <p class="text-[10px] text-mute font-mono">Auto Healer</p>
-                <div class="mt-1 flex items-center gap-1.5">
-                  <span class="status-dot status-ok"></span><span class="text-[10px] text-white">Idle</span>
+              <div class="glass p-4 rounded-2xl border border-white/5 flex items-center gap-5 hover:bg-white/[0.05] transition-colors cursor-pointer group relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-bad/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="text-3xl shrink-0 grayscale group-hover:grayscale-0 transition-all">👑</div>
+                <div class="min-w-0">
+                  <h5 class="text-sm font-bold text-white group-hover:text-bad transition-colors">Risk Evaluator</h5>
+                  <p class="text-[10px] text-mute font-mono uppercase tracking-widest">CRO Agent</p>
+                  <div class="mt-2 flex items-center gap-2">
+                    <span class="status-dot status-ok"></span>
+                    <span class="text-[9px] text-white/70 font-mono">Watching</span>
+                  </div>
                 </div>
               </div>
-            </article>
-          </div>
-        </article>
-      </div>
+              <!-- more agents -->
+            </div>
+          </section>
 
-
-    </div>
-
-    <div id="tab-ops" class="tab-content">
-      <section class="glass rounded-2xl mt-4 overflow-hidden">
-        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-          <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="serviceHub">Service Hub</h2>
-        <span class="material-symbols-outlined mat text-mute">apps</span>
-      </div>
-      <div class="p-4 sm:p-5 grid md:grid-cols-2 xl:grid-cols-3 gap-3" id="serviceHubGrid"></div>
-    </section>
-
-    </div>
-
-    <div id="tab-admin" class="tab-content">
-      <section class="glass rounded-2xl mt-4 overflow-hidden">
-        <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-          <h2 class="font-headline text-sm uppercase tracking-widest">Governance Console</h2>
-          <span class="material-symbols-outlined mat text-mute">rule_settings</span>
-        </div>
-      <div class="p-4 sm:p-5 grid xl:grid-cols-2 gap-4">
-        <article class="glass rounded-xl border border-white/10 p-4">
-          <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Workflow Requests</h3>
-          <div class="grid sm:grid-cols-3 gap-2 mb-2">
-            <input id="wfTitleInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="Request title" />
-            <select id="wfRiskInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm">
-              <option value="low">low</option>
-              <option value="medium" selected>medium</option>
-              <option value="high">high</option>
-            </select>
-            <button id="wfCreateBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Create</button>
-          </div>
-          <div class="overflow-auto max-h-[260px]">
-            <table class="w-full text-xs">
-              <thead class="sticky-head">
-                <tr class="text-mute">
-                  <th class="text-left px-2 py-2">Title</th>
-                  <th class="text-left px-2 py-2">Status</th>
-                  <th class="text-left px-2 py-2">Action</th>
-                </tr>
-              </thead>
-              <tbody id="wfRows"></tbody>
-            </table>
-          </div>
-        </article>
-        <article class="glass rounded-xl border border-white/10 p-4">
-          <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Policy + Recovery</h3>
-          <div class="grid sm:grid-cols-4 gap-2 mb-3">
-            <input id="policyActionInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="action (e.g. workflow.execute)" />
-            <input id="policyResourceInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="resource (e.g. ops/live)" />
-            <select id="policyRiskInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm">
-              <option value="low">low</option>
-              <option value="medium" selected>medium</option>
-              <option value="high">high</option>
-            </select>
-            <button id="policyCheckBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Policy Check</button>
-          </div>
-          <pre id="policyResultPre" class="json-pre">{}</pre>
-          <div class="grid sm:grid-cols-3 gap-2 mt-3">
-            <input id="recoveryIncidentInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="incident_type" />
-            <input id="recoveryRetryInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="simulate_failures (0~3)" />
-            <button id="recoveryRunBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Run Recovery</button>
-          </div>
-          <div class="grid sm:grid-cols-3 gap-2 mt-3">
-            <select id="playbookIdInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm">
-              <option value="latency_spike">latency_spike</option>
-              <option value="gate_failure">gate_failure</option>
-              <option value="drift_detected">drift_detected</option>
-            </select>
-            <button id="playbookRunBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Run Playbook</button>
-            <button id="readinessBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Readiness</button>
-          </div>
-          <div class="grid sm:grid-cols-3 gap-2 mt-3">
-            <select id="policyTemplateInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm">
-              <option value="trade-high-risk">trade-high-risk</option>
-              <option value="ops-change-medium">ops-change-medium</option>
-              <option value="data-pipeline-deploy">data-pipeline-deploy</option>
-            </select>
-            <input id="policyChecksInput" class="focus-ring rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-sm" placeholder="checks csv" />
-            <button id="policyTemplateEvalBtn" class="focus-ring glass rounded-lg px-3 py-2 text-sm text-cyan">Eval Template</button>
-          </div>
-        </article>
-      </div>
-    </div>
-
-    <div id="tab-logs" class="tab-content">
-      <div class="p-4 sm:p-5 pt-0 grid xl:grid-cols-2 gap-4">
-        <article class="glass rounded-xl border border-white/10 p-4">
-          <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Audit Events</h3>
-          <div class="overflow-auto max-h-[300px]">
-            <table class="w-full text-[11px]">
-              <thead class="sticky-head">
-                <tr class="text-mute text-left uppercase tracking-tighter">
-                  <th class="px-2 py-2">Time</th>
-                  <th class="px-2 py-2">Type</th>
-                  <th class="px-2 py-2">Severity</th>
-                  <th class="px-2 py-2">Details</th>
-                </tr>
-              </thead>
-              <tbody id="auditEventsRows"></tbody>
-            </table>
-          </div>
-        </article>
-        <article class="glass rounded-xl border border-white/10 p-4">
-          <h3 class="font-headline text-xs uppercase tracking-widest text-mute mb-3">Policy Decisions</h3>
-          <div class="overflow-auto max-h-[300px]">
-            <table class="w-full text-[11px]">
-              <thead class="sticky-head">
-                <tr class="text-mute text-left uppercase tracking-tighter">
-                  <th class="px-2 py-2">Time</th>
-                  <th class="px-2 py-2">Action</th>
-                  <th class="px-2 py-2">Resource</th>
-                  <th class="px-2 py-2">Allowed</th>
-                </tr>
-              </thead>
-              <tbody id="policyDecisionsRows"></tbody>
-            </table>
-          </div>
-        </article>
-      </div>
-      <div class="p-4 sm:p-5 pt-0">
-        <article class="glass rounded-xl border border-white/10 p-4">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="font-headline text-xs uppercase tracking-widest text-mute">Admin Users</h3>
-            <button id="adminUsersRefreshBtn" class="focus-ring glass rounded-lg px-3 py-1 text-xs text-cyan">Refresh</button>
-          </div>
-          <div class="overflow-auto max-h-[300px]">
-            <table class="w-full text-xs">
-              <thead class="sticky-head">
-                <tr class="text-mute">
-                  <th class="text-left px-2 py-2">Email</th>
-                  <th class="text-left px-2 py-2">Role</th>
-                  <th class="text-left px-2 py-2">MFA</th>
-                  <th class="text-left px-2 py-2">Update</th>
-                </tr>
-              </thead>
-              <tbody id="adminUsersRows"></tbody>
-            </table>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="glass rounded-2xl mt-4 overflow-hidden">
-      <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-        <h2 class="font-headline text-sm uppercase tracking-widest" data-i18n="opsAssistant">Ops Assistant</h2>
-        <span class="material-symbols-outlined mat text-mute">chat</span>
-      </div>
-      <div id="chatIntro" class="px-4 sm:px-5 py-3 text-xs text-mute font-mono border-b border-white/5" data-i18n="chatIntro">
-        자유롭게 질문하세요. 현재 운영 상태를 기반으로 요약/가이드 답변을 제공합니다.
-      </div>
-      <div class="px-4 sm:px-5 py-3 border-b border-white/5 flex flex-wrap gap-2">
-        <button type="button" class="quick-chip" data-quick-id="risk">위험요약</button>
-        <button type="button" class="quick-chip" data-quick-id="checklist">조치체크리스트</button>
-        <button type="button" class="quick-chip" data-quick-id="plan30">30분 운영계획</button>
-      </div>
-      <div class="px-4 sm:px-5 py-3 border-b border-white/5 space-y-3">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-[11px] font-mono text-mute mr-1" data-i18n="labelTone">톤</span>
-          <button type="button" class="quick-chip active" data-tone="friendly" data-i18n="toneFriendly">친근</button>
-          <button type="button" class="quick-chip" data-tone="professional" data-i18n="tonePro">전문</button>
-          <button type="button" class="quick-chip" data-tone="concise" data-i18n="toneConcise">간결</button>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-[11px] font-mono text-mute mr-1" data-i18n="labelRoute">라우팅</span>
-          <button type="button" class="quick-chip active" data-route="auto" data-i18n="routeAuto">자동분리</button>
-          <button type="button" class="quick-chip" data-route="ops" data-i18n="routeOps">운영상태기반</button>
-          <button type="button" class="quick-chip" data-route="general" data-i18n="routeGen">일반잡담</button>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-[11px] font-mono text-mute mr-1" data-i18n="labelLength">응답길이</span>
-          <button type="button" class="quick-chip" data-length="one_line" data-i18n="lenOne">한 줄</button>
-          <button type="button" class="quick-chip active" data-length="three_lines" data-i18n="lenThree">3줄</button>
-          <button type="button" class="quick-chip" data-length="detailed" data-i18n="lenDetail">상세</button>
-          <span class="text-[11px] font-mono text-mute ml-2" data-i18n="labelMemory">메모리</span>
-          <select id="memoryTurns" class="focus-ring rounded-xl bg-black/30 border border-white/10 px-3 py-1.5 text-xs font-mono">
-            <option value="0" data-i18n="memOff">OFF</option>
-            <option value="2" data-i18n="mem2">2턴</option>
-            <option value="4" selected data-i18n="mem4">4턴</option>
-            <option value="8" data-i18n="mem8">8턴</option>
-          </select>
         </div>
       </div>
-      <div id="chatThread" class="chat-scroll max-h-[360px] overflow-y-auto px-4 sm:px-5 py-4 space-y-3">
-        <div class="chat-msg-assistant rounded-2xl px-4 py-3 border border-white/10">
-          <p class="text-xs text-mute mb-1 font-mono" data-i18n="roleAssistant">Assistant</p>
-          <p id="chatWelcome" class="text-sm leading-relaxed" data-i18n="chatWelcome">안녕하세요. 운영 상태 요약, 실패 게이트 조치, 우선순위 액션 플랜을 도와드릴게요.</p>
-        </div>
-      </div>
-      <div class="chat-footer-bar px-4 sm:px-5 py-3 border-t border-white/5 bg-black/20">
-        <div class="flex items-end gap-2">
-          <textarea id="chatInput" rows="1" data-i18n-placeholder="chatPh" placeholder="예) 지금 가장 위험한 이슈 3개와 즉시 조치 순서를 알려줘"
-            class="focus-ring flex-1 resize-none rounded-2xl bg-black/30 border border-white/10 px-4 py-3 text-sm text-white placeholder:text-mute min-h-[48px] max-h-40"></textarea>
-          <button id="chatSendBtn" type="button" class="tap-target focus-ring glass rounded-2xl px-4 py-3 text-cyan hover:text-white">
-            <span class="material-symbols-outlined mat">send</span>
-          </button>
-        </div>
-      </div>
-    </section>
 
-    <details class="glass rounded-xl sm:rounded-2xl mt-4 overflow-hidden">
-      <summary class="px-4 sm:px-5 py-4 cursor-pointer font-headline text-sm uppercase tracking-widest text-mute min-h-[48px] flex items-center" data-i18n="rawPayload">Raw Payload</summary>
-      <pre id="raw" class="p-4 sm:p-5 border-t border-white/5 text-[11px] sm:text-xs font-mono text-cyan overflow-auto max-h-[min(45vh,360px)] sm:max-h-[360px]"></pre>
-    </details>
+      <!-- Other Tabs (Analysis - Image 3 Style) -->
+      <div id="tab-analysis" class="tab-content hidden space-y-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="glass rounded-[32px] border border-white/5 p-8 flex flex-col h-[400px]">
+            <h4 class="text-xs uppercase tracking-widest font-bold text-mute mb-6">Session Volume Analysis</h4>
+            <div class="flex-1 chart-placeholder rounded-2xl flex items-center justify-center">
+               <span class="material-symbols-outlined text-mute text-4xl opacity-20">show_chart</span>
+            </div>
+          </div>
+          <div class="glass rounded-[32px] border border-white/5 p-8 flex flex-col h-[400px]">
+            <h4 class="text-xs uppercase tracking-widest font-bold text-mute mb-6">Daily GitHub Commits</h4>
+            <div class="flex-1 chart-placeholder rounded-2xl flex items-center justify-center">
+               <span class="material-symbols-outlined text-mute text-4xl opacity-20">bar_chart</span>
+            </div>
+          </div>
+          <div class="glass rounded-[32px] border border-white/5 p-8 flex flex-col h-[400px]">
+            <h4 class="text-xs uppercase tracking-widest font-bold text-mute mb-6">Cumulative Tool Usage</h4>
+            <div class="flex-1 space-y-4 overflow-y-auto">
+               <div class="space-y-1.5">
+                 <div class="flex justify-between text-[10px] font-mono uppercase"><span class="text-white">Bash</span><span class="text-mute">12,045</span></div>
+                 <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-cyan w-[85%]"></div></div>
+               </div>
+               <div class="space-y-1.5">
+                 <div class="flex justify-between text-[10px] font-mono uppercase"><span class="text-white">Edit</span><span class="text-mute">8,231</span></div>
+                 <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-cyan w-[60%]"></div></div>
+               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Office Tab (Image 6, 7, 8 Style) -->
+      <div id="tab-agents" class="tab-content hidden space-y-8 h-[calc(100vh-160px)]">
+        <div class="glass rounded-[32px] border border-white/5 w-full h-full p-12 flex flex-col items-center justify-center text-center space-y-6 bg-white/[0.01] relative overflow-hidden">
+           <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(rgba(129,236,255,0.2) 1px, transparent 1px); background-size: 40px 40px;"></div>
+           <div class="w-20 h-20 rounded-3xl bg-cyan/10 flex items-center justify-center text-cyan animate-bounce">
+             <span class="material-symbols-outlined text-4xl">map</span>
+           </div>
+           <div>
+             <h3 class="text-2xl font-bold text-white">Agent Office Visualizer</h3>
+             <p class="text-mute mt-2 max-w-md mx-auto">부서별 에이전트의 실시간 위치와 협업 상태를 시각화하는 인터랙티브 맵입니다.</p>
+           </div>
+           <button class="px-8 py-3 rounded-full bg-cyan text-black font-bold text-sm hover:scale-105 transition-transform">Launch Visualizer Canvas</button>
+        </div>
+      </div>
+
     </div>
   </main>
 
-  <section id="apiJsonModal" class="hidden fixed inset-0 z-[125] modal-backdrop items-center justify-center p-4">
-    <div class="glass rounded-2xl w-full max-w-3xl p-5 border border-white/10 max-h-[90vh] flex flex-col">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <h3 class="font-headline text-lg" data-i18n="apiJsonTitle">상태 API (JSON)</h3>
-        <button id="apiJsonCloseBtn" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
-      </div>
-      <p class="text-xs text-mute mb-2 font-mono">GET /api/status</p>
-      <pre id="apiJsonPre" class="json-pre flex-1 min-h-0">{}</pre>
-      <div class="flex flex-wrap gap-2 mt-4">
-        <button id="apiJsonCopyBtn" type="button" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-cyan" data-i18n="copyJson">복사</button>
-        <button id="apiJsonRefreshBtn" type="button" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-cyan" data-i18n="refreshJson">새로고침</button>
-        <a id="apiJsonRawLink" href="/api/status" target="_blank" rel="noopener" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-mute inline-flex items-center" data-i18n="openRawTab">원문(새 탭)</a>
-      </div>
-      <p class="text-[11px] text-mute mt-3" data-i18n="apiJsonHint">새 탭으로 열면 브라우저 기본 화면(흰 배경)으로 JSON만 보일 수 있습니다.</p>
-    </div>
-  </section>
-
-  <section id="metricsModal" class="hidden fixed inset-0 z-[125] modal-backdrop items-center justify-center p-4">
-    <div class="glass rounded-2xl w-full max-w-3xl p-5 border border-white/10 max-h-[90vh] flex flex-col">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <h3 class="font-headline text-lg" data-i18n="metricsModalTitle">Prometheus 메트릭</h3>
-        <button id="metricsCloseBtn" type="button" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
-      </div>
-      <p class="text-xs text-mute mb-2 font-mono">GET /metrics</p>
-      <div id="metricsTableWrap" class="hidden flex-1 min-h-0 overflow-auto rounded-xl border border-white/10 max-h-[min(42vh,360px)] mb-3">
-        <table class="w-full text-left text-xs">
-          <thead class="sticky top-0 bg-black/55 backdrop-blur-sm border-b border-white/10">
-            <tr class="text-mute uppercase tracking-wider font-headline">
-              <th class="px-3 py-2" data-i18n="metricsThName">메트릭</th>
-              <th class="px-3 py-2" data-i18n="metricsThType">타입</th>
-              <th class="px-3 py-2" data-i18n="metricsThValue">값</th>
-              <th class="px-3 py-2 hidden sm:table-cell" data-i18n="metricsThHelp">설명</th>
-            </tr>
-          </thead>
-          <tbody id="metricsTableBody"></tbody>
-        </table>
-      </div>
-      <details id="metricsRawDetails" class="group flex-shrink-0 mb-1">
-        <summary class="text-xs text-cyan cursor-pointer font-mono hover:text-white marker:content-[''] marker:hidden flex items-center gap-1 list-none">
-          <span class="material-symbols-outlined mat text-base transition-transform group-open:rotate-180">expand_more</span>
-          <span data-i18n="metricsRawToggle">원문 (Prometheus 형식)</span>
-        </summary>
-        <pre id="metricsPre" class="json-pre mt-2 max-h-[min(38vh,300px)]">…</pre>
-      </details>
-      <div class="flex flex-wrap gap-2 mt-4">
-        <button id="metricsCopyBtn" type="button" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-cyan" data-i18n="copyMetrics">복사</button>
-        <button id="metricsRefreshBtn" type="button" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-cyan" data-i18n="refreshMetrics">새로고침</button>
-        <a href="/metrics" target="_blank" rel="noopener" class="focus-ring glass rounded-xl px-4 py-2 text-sm text-mute inline-flex items-center" data-i18n="openRawTab">원문(새 탭)</a>
-      </div>
-      <p class="text-[11px] text-mute mt-3" data-i18n="metricsModalHint">표는 파싱 요약입니다. 전체 원문은 위 접기 또는 새 탭에서 확인하세요.</p>
-    </div>
-  </section>
-
-  <section id="authModal" class="hidden fixed inset-0 z-[120] modal-backdrop items-center justify-center p-4">
-    <div class="glass rounded-2xl w-full max-w-md p-5 border border-white/10">
-      <div class="flex items-center justify-between mb-4">
-        <h3 id="authTitle" class="font-headline text-lg" data-i18n="loginTitle">로그인</h3>
-        <button id="authCloseBtn" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
-      </div>
-      <div id="loginForm" class="space-y-3">
-        <input id="loginId" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="loginIdPh" placeholder="ID (demo)" />
-        <input id="loginPw" type="password" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="loginPwPh" placeholder="Password (demo1234)" />
-        <button id="loginSubmitBtn" class="focus-ring glass rounded-xl px-4 py-2 text-cyan hover:text-white w-full" data-i18n="login">Login</button>
-        <p class="text-xs text-mute text-center mt-2">
-          <span data-i18n="noAccount">계정이 없으신가요?</span>
-          <button id="switchToSignUpBtn" class="text-cyan hover:underline bg-transparent border-0 p-0 cursor-pointer ml-1" data-i18n="signUpBtn">회원가입</button>
-        </p>
-      </div>
-      <div id="signUpForm" class="hidden space-y-3">
-        <input id="regId" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="regIdPh" placeholder="Email (example@domain.com)" />
-        <input id="regPw" type="password" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="regPwPh" placeholder="Password (min 8 chars)" />
-        <input id="regPwConfirm" type="password" class="focus-ring w-full rounded-xl bg-black/30 border border-white/10 px-3 py-2 text-sm" data-i18n-placeholder="regPwConfirmPh" placeholder="Confirm Password" />
-        <button id="signUpSubmitBtn" class="focus-ring glass rounded-xl px-4 py-2 text-cyan hover:text-white w-full" data-i18n="register">회원가입</button>
-        <p class="text-xs text-mute text-center mt-2">
-          <span data-i18n="hasAccount">이미 계정이 있으신가요?</span>
-          <button id="switchToLoginBtn" class="text-cyan hover:underline bg-transparent border-0 p-0 cursor-pointer ml-1" data-i18n="loginBtn">로그인</button>
-        </p>
-      </div>
-      <p id="loginDemoHint" class="text-xs text-mute mt-3" data-i18n="loginDemo">Demo: demo / demo1234</p>
-    </div>
-  </section>
-
-  <section id="myPagePanel" class="hidden fixed inset-y-0 right-0 z-[110] w-full sm:w-[420px] glass border-l border-white/10 p-5 overflow-y-auto">
-    <div class="flex items-center justify-between">
-      <h3 class="font-headline text-lg" data-i18n="myPage">마이페이지</h3>
-      <button id="myPageCloseBtn" class="focus-ring rounded-lg px-2 py-1 text-mute">✕</button>
-    </div>
-    <div class="mt-4 space-y-3 text-sm">
-      <div class="glass rounded-xl p-4 border border-white/10 bg-gradient-to-br from-white/[0.02] to-transparent">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="material-symbols-outlined mat text-mute text-sm">person</span>
-          <p class="text-mute text-[10px] uppercase tracking-widest font-headline" data-i18n="mpUser">User</p>
-        </div>
-        <p id="myUserName" class="font-semibold text-white tracking-tight ml-6">-</p>
-      </div>
-      <div class="glass rounded-xl p-4 border border-white/10 bg-gradient-to-br from-white/[0.02] to-transparent">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="material-symbols-outlined mat text-mute text-sm">settings</span>
-          <p class="text-mute text-[10px] uppercase tracking-widest font-headline" data-i18n="mpPrefs">Preferences</p>
-        </div>
-        <div id="myPrefsGrid" class="grid grid-cols-2 gap-2 text-[11px]">
-          <div class="animate-pulse bg-white/5 h-10 rounded-lg"></div>
-          <div class="animate-pulse bg-white/5 h-10 rounded-lg"></div>
-          <div class="animate-pulse bg-white/5 h-10 rounded-lg"></div>
-          <div class="animate-pulse bg-white/5 h-10 rounded-lg"></div>
-        </div>
-      </div>
-      <div class="glass rounded-xl p-4 border border-white/10 bg-gradient-to-br from-white/[0.02] to-transparent">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="material-symbols-outlined mat text-mute text-sm">analytics</span>
-          <p class="text-mute text-[10px] uppercase tracking-widest font-headline" data-i18n="mpUsage">Usage</p>
-        </div>
-        <div id="myUsageList" class="space-y-4">
-          <div class="animate-pulse bg-white/5 h-8 rounded-lg"></div>
-          <div class="animate-pulse bg-white/5 h-8 rounded-lg"></div>
-        </div>
-      </div>
-
-      <div class="glass rounded-xl p-4 border border-white/10 space-y-4 bg-gradient-to-br from-white/[0.02] to-transparent">
-        <div class="flex items-center gap-2 border-b border-white/5 pb-2">
-          <span class="material-symbols-outlined mat text-mute text-sm">key</span>
-          <h4 class="font-headline text-sm" data-i18n="apiAccountsTitle">계좌 및 API 관리</h4>
-        </div>
-        
-        <div class="space-y-1.5">
-          <div class="flex items-center gap-1.5">
-            <span class="material-symbols-outlined mat text-[14px] text-cyan">account_balance</span>
-            <label class="text-mute text-[10px] uppercase tracking-wider" data-i18n="bankAccountLabel">케이뱅크 계좌번호</label>
-          </div>
-          <input id="bankAccount" type="text" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" data-i18n-placeholder="bankAccountPh" placeholder="계좌번호 입력" />
-        </div>
-
-        <div class="space-y-2 border-t border-white/5 pt-3">
-          <div class="flex items-center gap-1.5 mb-1">
-            <span class="material-symbols-outlined mat text-[14px] text-cyan">token</span>
-            <p class="text-mute text-[10px] uppercase tracking-wider">UPBIT API</p>
-          </div>
-          <div class="space-y-1">
-            <div class="flex items-center justify-between">
-              <label class="text-[10px] text-mute/70" data-i18n="upbitApiKeyLabel">Access Key</label>
-              <button id="testUpbitBtn" class="text-[9px] text-cyan hover:underline bg-transparent border-0 p-0 cursor-pointer" data-i18n="testConnShort">Test</button>
-            </div>
-            <input id="upbitKey" type="password" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" placeholder="Upbit Access Key" />
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] text-mute/70" data-i18n="upbitApiSecretLabel">Secret Key</label>
-            <input id="upbitSecret" type="password" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" placeholder="Upbit Secret Key" />
-          </div>
-        </div>
-
-        <div class="space-y-2 border-t border-white/5 pt-3">
-          <div class="flex items-center gap-1.5 mb-1">
-            <span class="material-symbols-outlined mat text-[14px] text-cyan">account_balance_wallet</span>
-            <p class="text-mute text-[10px] uppercase tracking-wider">BINANCE API</p>
-          </div>
-          <div class="space-y-1">
-            <div class="flex items-center justify-between">
-              <label class="text-[10px] text-mute/70" data-i18n="binanceApiKeyLabel">API Key</label>
-              <button id="testBinanceBtn" class="text-[9px] text-cyan hover:underline bg-transparent border-0 p-0 cursor-pointer" data-i18n="testConnShort">Test</button>
-            </div>
-            <input id="binanceKey" type="password" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" placeholder="Binance API Key" />
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] text-mute/70" data-i18n="binanceApiSecretLabel">Secret Key</label>
-            <input id="binanceSecret" type="password" class="focus-ring w-full rounded-lg bg-black/20 border border-white/10 px-3 py-1.5 text-xs font-mono" placeholder="Binance Secret Key" />
-          </div>
-        </div>
-
-        <button id="saveApiSettingsBtn" class="focus-ring glass rounded-xl px-4 py-2 text-cyan hover:text-white w-full text-xs font-headline" data-i18n="saveSettings">설정 저장</button>
-      </div>
-
-      <button id="logoutBtn" class="focus-ring glass rounded-xl px-4 py-2 text-bad hover:text-white w-full flex items-center justify-center gap-2" data-i18n="logout">
-        <span class="material-symbols-outlined mat text-sm">logout</span>
-        Logout
-      </button>
-    </div>
-  </section>
-
-  <nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-stretch justify-around gap-1 px-2" aria-label="Mobile quick actions">
-    <a href="#top" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan">
-      <span class="material-symbols-outlined mat text-xl">home</span>
-      <span data-i18n="navHome">Home</span>
-    </a>
-    <button type="button" onclick="loadStatus()" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-cyan">
-      <span class="material-symbols-outlined mat text-xl">sync</span>
-      <span data-i18n="navSync">Sync</span>
-    </button>
-    <button type="button" id="apiStatusViewerBtnMobile" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan bg-transparent border-0">
-      <span class="material-symbols-outlined mat text-xl">code</span>
-      <span data-i18n="apiShort">API</span>
-    </button>
-    <button type="button" id="metricsViewerBtnMobile" class="tap-target flex flex-col items-center justify-center gap-0.5 text-[10px] font-headline uppercase tracking-wider text-mute hover:text-cyan bg-transparent border-0">
-      <span class="material-symbols-outlined mat text-xl">monitoring</span>
-      <span data-i18n="navMetrics">Metrics</span>
-    </button>
-  </nav>
-
   <script>
     function switchTab(tabId) {
-      // Hide all contents
-      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-      // Show target content
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.add("hidden"));
       const target = document.getElementById("tab-" + tabId);
-      if (target) target.classList.add("active");
+      if (target) target.classList.remove("hidden");
       
-      // Update tab buttons
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-      // Find the button that was clicked or matching tabId
       const buttons = document.querySelectorAll(".tab-btn");
       buttons.forEach(btn => {
         if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + tabId + "'")) {
@@ -796,1212 +361,82 @@
         }
       });
       
-      // Store current tab
+      const titles = {
+        'dashboard': 'Dashboard',
+        'tasks': 'Task Management',
+        'agents': 'Agent Office Map',
+        'analysis': 'Operational Analysis',
+        'governance': 'Compliance & Governance',
+        'logs': 'Audit Logs'
+      };
+      const descs = {
+        'dashboard': '운영 현황을 한눈에 확인하세요',
+        'tasks': '진행 중인 모든 자동화 테스크를 관리합니다',
+        'agents': 'AI 에이전트들의 실시간 활동 현황입니다',
+        'analysis': '데이터 기반의 성과 분석 지표입니다',
+        'governance': '시스템 보안 및 의사결정 규칙 관리',
+        'logs': '모든 변경 및 활동의 원장 기록'
+      };
+      
+      document.getElementById("currentTabTitle").innerText = titles[tabId] || 'Dashboard';
+      document.getElementById("currentTabDesc").innerText = descs[tabId] || '';
       localStorage.setItem("activeTab", tabId);
     }
 
-    // On Load: Restore active tab
+    async function loadStatus() {
+      console.log("Status update triggered...");
+      // Mock loading for visual feedback
+      const btn = document.querySelector('button[onclick="loadStatus()"] span');
+      btn.classList.add('animate-spin');
+      
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        updateUI(data);
+      } catch (e) {
+        console.error("Fetch failed", e);
+      } finally {
+        setTimeout(() => btn.classList.remove('animate-spin'), 1000);
+      }
+    }
+
+    function updateUI(data) {
+      // 1. KPI 지표 업데이트 (Image 1 상단 위젯)
+      if (data.kpis) {
+        const kpiMap = {};
+        data.kpis.forEach(item => kpiMap[item.metric_key] = item.metric_value);
+        
+        document.querySelector('[data-kpi="total_users"]').innerText = (kpiMap['total_users'] || 0).toLocaleString();
+        document.querySelector('[data-kpi="active_subs"]').innerText = (kpiMap['active_subs'] || 0).toLocaleString();
+        document.querySelector('[data-kpi="mtd_revenue"]').innerText = '$' + (kpiMap['mtd_revenue'] || 0).toFixed(2);
+        document.querySelector('[data-kpi="total_sessions"]').innerText = (kpiMap['total_sessions'] || 0).toLocaleString();
+        document.querySelector('[data-kpi="total_tool_usage"]').innerText = (kpiMap['total_tool_usage'] || 0).toLocaleString();
+        document.querySelector('[data-kpi="crm_leads"]').innerText = (kpiMap['crm_leads'] || 0).toLocaleString();
+      }
+
+      // 2. 게이트 상태 업데이트 (Image 1 중앙)
+      const gateRows = document.getElementById("gateRows");
+      if (gateRows && data.gates) {
+        gateRows.innerHTML = data.gates.map(g => `
+          <tr class="hover:bg-white/[0.02] transition-colors border-b border-white/[0.03]">
+            <td class="px-8 py-5 text-sm font-medium text-white">${g.name}</td>
+            <td class="px-8 py-5 text-right">
+              <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${g.passed ? 'bg-cyan/10 text-cyan border border-cyan/20' : 'bg-bad/10 text-bad border border-bad/20'}">
+                ${g.passed ? 'Passed' : 'Failed'}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+        document.getElementById("gatePassCount").innerText = data.gates.filter(g => g.passed).length;
+        document.getElementById("gateFailCount").innerText = data.gates.filter(g => !g.passed).length;
+      }
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       const savedTab = localStorage.getItem("activeTab") || "dashboard";
       switchTab(savedTab);
-    });
-
-    let latestPaths = {};
-    let latestStatus = {};
-    const chatHistory = [];
-    const appState = {
-      theme: localStorage.getItem("ops_theme") || "dark",
-      lang: localStorage.getItem("ops_lang") || "ko",
-      user: JSON.parse(localStorage.getItem("ops_user") || "null"),
-      usageChats: Number(localStorage.getItem("ops_usage_chats") || "0"),
-      favorites: JSON.parse(localStorage.getItem("ops_favorites") || "[]"),
-    };
-    const QUICK_PROMPTS = {
-      risk: {
-        ko: "지금 가장 위험한 이슈 3개와 우선순위를 알려줘",
-        en: "List the top 3 operational risks in priority order with brief actions.",
-      },
-      checklist: {
-        ko: "실패 게이트별 즉시 조치 체크리스트를 알려줘",
-        en: "Give an immediate checklist per failing gate.",
-      },
-      plan30: {
-        ko: "다음 30분 운영계획을 제안해줘",
-        en: "Propose a focused 30-minute operations plan.",
-      },
-    };
-    const i18n = {
-      ko: {
-        docTitle: "Sovereign Ops | AutonomousCompanyMVP",
-        theme: "테마",
-        langBtn: "English",
-        login: "로그인",
-        myPage: "마이페이지",
-        loginTitle: "로그인",
-        serviceHub: "서비스 허브",
-        apiJson: "API JSON",
-        apiShort: "API",
-        apiJsonTitle: "상태 API (JSON)",
-        copyJson: "복사",
-        refreshJson: "새로고침",
-        openRawTab: "원문(새 탭)",
-        apiJsonHint: "새 탭으로 열면 브라우저 기본 화면(흰 배경)으로 JSON만 보일 수 있습니다.",
-        metricsModalTitle: "Prometheus 메트릭",
-        copyMetrics: "복사",
-        refreshMetrics: "새로고침",
-        metricsModalHint: "표는 파싱 요약입니다. 전체 원문은 접기 영역 또는 새 탭에서 확인하세요.",
-        metricsRawToggle: "원문 (Prometheus 형식)",
-        metricsThName: "메트릭",
-        metricsThType: "타입",
-        metricsThValue: "값",
-        metricsThHelp: "설명",
-        navOverview: "개요",
-        prometheus: "Prometheus",
-        liveSync: "동기화",
-        refresh: "새로고침",
-        navHome: "홈",
-        navSync: "동기화",
-        navMetrics: "메트릭",
-        heroTitle: "오라클급 런타임 컨트롤",
-        heroSub: "실시간 전략·리스크·게이트 상태를 한 화면에서 운영합니다.",
-        labelMode: "모드",
-        labelKill: "킬스위치",
-        fetching: "불러오는 중…",
-        generatedUtc: "생성 시각 (UTC)",
-        gateStatus: "게이트 상태",
-        passLabel: "통과",
-        failLabel: "실패",
-        thCheck: "항목",
-        thState: "상태",
-        artifacts: "아티팩트",
-        artifactPh: "키 또는 경로 검색…",
-        thKey: "키",
-        thPath: "경로",
-        opsAssistant: "운영 어시스턴트",
-        chatIntro: "자유롭게 질문하세요. 현재 운영 상태를 기반으로 요약·가이드 답변을 제공합니다.",
-        chipRisk: "위험 요약",
-        chipChecklist: "조치 체크리스트",
-        chipPlan30: "30분 운영계획",
-        labelTone: "톤",
-        toneFriendly: "친근",
-        tonePro: "전문",
-        toneConcise: "간결",
-        labelRoute: "라우팅",
-        routeAuto: "자동",
-        routeOps: "운영 기반",
-        routeGen: "일반",
-        labelLength: "응답 길이",
-        lenOne: "한 줄",
-        lenThree: "3줄",
-        lenDetail: "상세",
-        labelMemory: "메모리",
-        memOff: "끔",
-        mem2: "2턴",
-        mem4: "4턴",
-        mem8: "8턴",
-        roleAssistant: "어시스턴트",
-        chatWelcome: "안녕하세요. 운영 상태 요약, 실패 게이트 조치, 우선순위 액션 플랜을 도와드릴게요.",
-        chatPh: "예) 지금 가장 위험한 이슈 3개와 즉시 조치 순서를 알려줘",
-        rawPayload: "원시 페이로드",
-        apiAccountsTitle: "계좌 및 API 관리",
-        bankAccountLabel: "케이뱅크 계좌번호",
-        bankAccountPh: "계좌번호 입력 (예: 100-123-456789)",
-        upbitApiKeyLabel: "Upbit Access Key",
-        upbitApiSecretLabel: "Upbit Secret Key",
-        binanceApiKeyLabel: "Binance API Key",
-        binanceApiSecretLabel: "Binance Secret Key",
-        saveSettings: "설정 저장",
-        settingsSaved: "API 및 계좌 정보가 저장되었습니다.",
-        testConnShort: "연결 테스트",
-        connSuccess: "연결 성공!",
-        connFail: "연결 실패: 키를 확인하세요.",
-        mpUser: "사용자",
-        mpPrefs: "환경 설정",
-        mpUsage: "사용량",
-        logout: "로그아웃",
-        signUpBtn: "회원가입",
-        loginBtn: "로그인",
-        noAccount: "계정이 없으신가요?",
-        hasAccount: "이미 계정이 있으신가요?",
-        signUpTitle: "회원가입",
-        register: "가입하기",
-        regIdPh: "이메일 주소",
-        regPwPh: "비밀번호 (8자 이상)",
-        regPwConfirmPh: "비밀번호 확인",
-        pwMismatch: "비밀번호가 일치하지 않습니다.",
-        regSuccess: "회원가입 성공! 이제 로그인해주세요.",
-        regFail: "회원가입 실패. 이미 존재하는 이메일이거나 형식이 잘못되었습니다.",
-        loginIdPh: "아이디 (데모)",
-        loginPwPh: "비밀번호 (demo1234)",
-        loginDemo: "데모: demo / demo1234",
-        noGateData: "게이트 데이터 없음",
-        noArtifactMatch: "검색과 일치하는 아티팩트가 없습니다.",
-        loadFail: "데이터 로딩 실패",
-        serverHint: "서버: python scripts/monitoring_server.py --port 8787",
-        implemented: "구현됨",
-        svcRealtimeName: "실시간 상태 동기화",
-        svcRealtimeDesc: "대시보드 지표·게이트 자동 갱신",
-        svcChatName: "Ops Assistant",
-        svcChatDesc: "Gemini 대화, 메모리·톤·라우팅·길이",
-        svcThemeName: "다크/라이트",
-        svcThemeDesc: "눈에 편한 라이트 팔레트 지원",
-        svcLangName: "국문/영문",
-        svcLangDesc: "주요 UI 문자열 전환",
-        svcAuthName: "로그인·마이페이지",
-        svcAuthDesc: "데모 계정, 프로필·사용량",
-        svcArtifactName: "아티팩트 검색",
-        svcArtifactDesc: "키/경로 필터",
-        svcFavName: "즐겨찾기 프롬프트",
-        svcFavDesc: "퀵칩 더블클릭으로 저장",
-        svcNotifyName: "알림 힌트",
-        svcNotifyDesc: "오류 시 배너 안내",
-        svcExportName: "원시 JSON",
-        svcExportDesc: "Raw 페이로드 확인",
-      },
-      en: {
-        docTitle: "Sovereign Ops | AutonomousCompanyMVP",
-        theme: "Theme",
-        langBtn: "한국어",
-        login: "Login",
-        myPage: "My Page",
-        loginTitle: "Login",
-        serviceHub: "Service Hub",
-        apiJson: "API JSON",
-        apiShort: "API",
-        apiJsonTitle: "Status API (JSON)",
-        copyJson: "Copy",
-        refreshJson: "Refresh",
-        openRawTab: "Raw (new tab)",
-        apiJsonHint: "A new tab shows plain JSON on the browser default white page.",
-        metricsModalTitle: "Prometheus metrics",
-        copyMetrics: "Copy",
-        refreshMetrics: "Refresh",
-        metricsModalHint: "The table is a parsed summary. Full text is in the foldout or a new tab.",
-        metricsRawToggle: "Raw exposition (Prometheus format)",
-        metricsThName: "Metric",
-        metricsThType: "Type",
-        metricsThValue: "Value",
-        metricsThHelp: "Help",
-        navOverview: "Overview",
-        prometheus: "Prometheus",
-        liveSync: "Live Sync",
-        refresh: "Refresh",
-        navHome: "Home",
-        navSync: "Sync",
-        navMetrics: "Metrics",
-        heroTitle: "Oracle-Grade Runtime Control",
-        heroSub: "Operate strategy, risk, and gates in one live view.",
-        labelMode: "Mode",
-        labelKill: "Kill-switch",
-        fetching: "Fetching…",
-        generatedUtc: "Generated (UTC)",
-        gateStatus: "Gate Status",
-        passLabel: "PASS",
-        failLabel: "FAIL",
-        thCheck: "Check",
-        thState: "State",
-        artifacts: "Artifacts",
-        artifactPh: "Search key or path…",
-        thKey: "Key",
-        thPath: "Path",
-        opsAssistant: "Ops Assistant",
-        chatIntro: "Ask anything. Answers use live ops context when relevant.",
-        chipRisk: "Risk summary",
-        chipChecklist: "Action checklist",
-        chipPlan30: "30-min plan",
-        labelTone: "Tone",
-        toneFriendly: "Friendly",
-        tonePro: "Pro",
-        toneConcise: "Concise",
-        labelRoute: "Routing",
-        routeAuto: "Auto",
-        routeOps: "Ops context",
-        routeGen: "General",
-        labelLength: "Length",
-        lenOne: "One line",
-        lenThree: "3 lines",
-        lenDetail: "Detailed",
-        labelMemory: "Memory",
-        memOff: "Off",
-        mem2: "2 turns",
-        mem4: "4 turns",
-        mem8: "8 turns",
-        roleAssistant: "Assistant",
-        apiAccountsTitle: "Accounts & API Keys",
-        bankAccountLabel: "K-Bank Account",
-        bankAccountPh: "Enter account number",
-        upbitApiKeyLabel: "Upbit Access Key",
-        upbitApiSecretLabel: "Upbit Secret Key",
-        binanceApiKeyLabel: "Binance API Key",
-        binanceApiSecretLabel: "Binance Secret Key",
-        saveSettings: "Save Settings",
-        settingsSaved: "API and account settings saved.",
-        testConnShort: "Test Conn",
-        connSuccess: "Connection Success!",
-        connFail: "Connection Failed: check keys.",
-        chatWelcome: "Hi. I can summarize ops status, gate failures, and next actions.",
-        chatPh: "e.g. Top 3 risks and the order of immediate actions",
-        rawPayload: "Raw Payload",
-        mpUser: "User",
-        mpPrefs: "Preferences",
-        mpUsage: "Usage",
-        logout: "Logout",
-        signUpBtn: "Sign Up",
-        loginBtn: "Login",
-        noAccount: "Don't have an account?",
-        hasAccount: "Already have an account?",
-        signUpTitle: "Create Account",
-        register: "Register",
-        regIdPh: "Email address",
-        regPwPh: "Password (min 8 chars)",
-        regPwConfirmPh: "Confirm Password",
-        pwMismatch: "Passwords do not match.",
-        regSuccess: "Sign up successful! Please log in.",
-        regFail: "Sign up failed. User may already exist.",
-        loginIdPh: "ID (demo)",
-        loginPwPh: "Password (demo1234)",
-        loginDemo: "Demo: demo / demo1234",
-        noGateData: "No gate data.",
-        noArtifactMatch: "No artifacts match search.",
-        loadFail: "Failed to load data",
-        serverHint: "Server: python scripts/monitoring_server.py --port 8787",
-        implemented: "live",
-        svcRealtimeName: "Live status sync",
-        svcRealtimeDesc: "Auto-refresh KPIs and gates",
-        svcChatName: "Ops Assistant",
-        svcChatDesc: "Gemini chat, memory, tone, routing, length",
-        svcThemeName: "Dark / Light",
-        svcThemeDesc: "Soft paper-toned light mode",
-        svcLangName: "KO / EN",
-        svcLangDesc: "Full UI string toggle",
-        svcAuthName: "Login & profile",
-        svcAuthDesc: "Demo auth, usage counters",
-        svcArtifactName: "Artifact search",
-        svcArtifactDesc: "Filter keys and paths",
-        svcFavName: "Favorite prompts",
-        svcFavDesc: "Double-click a quick chip to save",
-        svcNotifyName: "Alert hints",
-        svcNotifyDesc: "Banner on load errors",
-        svcExportName: "Raw JSON",
-        svcExportDesc: "Inspect payload",
-      },
-    };
-    const serviceCatalog = [
-      { nameKey: "svcRealtimeName", descKey: "svcRealtimeDesc" },
-      { nameKey: "svcChatName", descKey: "svcChatDesc" },
-      { nameKey: "svcThemeName", descKey: "svcThemeDesc" },
-      { nameKey: "svcLangName", descKey: "svcLangDesc" },
-      { nameKey: "svcAuthName", descKey: "svcAuthDesc" },
-      { nameKey: "svcArtifactName", descKey: "svcArtifactDesc" },
-      { nameKey: "svcFavName", descKey: "svcFavDesc" },
-      { nameKey: "svcNotifyName", descKey: "svcNotifyDesc" },
-      { nameKey: "svcExportName", descKey: "svcExportDesc" },
-    ];
-    const chatSettings = {
-      tone: "friendly",
-      route_mode: "auto",
-      length: "three_lines",
-      memory_turns: 4,
-    };
-    function normalizeLang() {
-      const v = String(appState.lang || "ko").toLowerCase();
-      appState.lang = v === "en" ? "en" : "ko";
-    }
-    function t(key) {
-      const lang = appState.lang === "en" ? "en" : "ko";
-      const pack = i18n[lang] || i18n.ko;
-      const val = pack[key];
-      return val != null ? val : (i18n.ko[key] != null ? i18n.ko[key] : key);
-    }
-    function fmt(v) {
-      if (v === null || v === undefined) return "—";
-      if (typeof v === "number" && Number.isFinite(v)) {
-        if (Math.abs(v) < 0.01 && v !== 0) return v.toExponential(2);
-        return v.toLocaleString(undefined, { maximumFractionDigits: 4 });
-      }
-      return String(v);
-    }
-    function badge(ok) {
-      const label = ok ? t("passLabel") : t("failLabel");
-      if (ok) {
-        return `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-good bg-green-500/10 border border-green-500/25">${label}</span>`;
-      }
-      return `<span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-mono text-bad bg-red-500/10 border border-red-500/25">${label}</span>`;
-    }
-    function applyTheme() {
-      const root = document.documentElement;
-      if (appState.theme === "light") {
-        root.classList.add("light");
-        root.classList.remove("dark");
-      } else {
-        root.classList.remove("light");
-        root.classList.add("dark");
-      }
-      localStorage.setItem("ops_theme", appState.theme);
-      const metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) metaTheme.setAttribute("content", appState.theme === "light" ? "#cbd5e1" : "#0e0e0e");
-    }
-    function applyQuickChips() {
-      document.querySelectorAll("[data-quick-id]").forEach((btn) => {
-        const id = btn.getAttribute("data-quick-id");
-        const labels = { risk: t("chipRisk"), checklist: t("chipChecklist"), plan30: t("chipPlan30") };
-        btn.textContent = labels[id] || id;
-        const qp = QUICK_PROMPTS[id];
-        if (qp) btn.setAttribute("data-quick-q", qp[appState.lang] || qp.ko);
-      });
-    }
-    function applyLang() {
-      normalizeLang();
-      const pack = i18n[appState.lang] || i18n.ko;
-      document.documentElement.lang = appState.lang;
-      document.querySelectorAll("[data-i18n]").forEach((el) => {
-        const k = el.getAttribute("data-i18n");
-        if (pack[k] != null) el.textContent = pack[k];
-      });
-      document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
-        const k = el.getAttribute("data-i18n-placeholder");
-        if (pack[k] != null) el.setAttribute("placeholder", pack[k]);
-      });
-      document.title = t("docTitle");
-      applyQuickChips();
-      renderServiceHub();
-      refreshAccountUi();
-      localStorage.setItem("ops_lang", appState.lang);
       loadStatus();
-    }
-    let apiJsonText = "";
-    function openApiJsonModal() {
-      const m = document.getElementById("apiJsonModal");
-      m.classList.remove("hidden");
-      m.classList.add("flex");
-      loadApiJsonIntoModal();
-    }
-    function closeApiJsonModal() {
-      const m = document.getElementById("apiJsonModal");
-      m.classList.add("hidden");
-      m.classList.remove("flex");
-    }
-    async function loadApiJsonIntoModal() {
-      const pre = document.getElementById("apiJsonPre");
-      pre.textContent = "…";
-      try {
-        const r = await fetch("/api/status", { cache: "no-store" });
-        const data = await r.json();
-        apiJsonText = JSON.stringify(data, null, 2);
-        pre.textContent = apiJsonText;
-      } catch (e) {
-        apiJsonText = "";
-        pre.textContent = String(e?.message || e);
-      }
-    }
-    let metricsText = "";
-    function parsePrometheusMetrics(text) {
-      const byName = Object.create(null);
-      const lines = String(text).split(/\r?\n/);
-      function ensure(name) {
-        if (!byName[name]) byName[name] = { help: "", type: "", lines: [] };
-        return byName[name];
-      }
-      for (const line of lines) {
-        if (line.startsWith("# HELP ")) {
-          const rest = line.slice(7).trim();
-          const idx = rest.indexOf(" ");
-          const name = idx >= 0 ? rest.slice(0, idx) : rest;
-          const help = idx >= 0 ? rest.slice(idx + 1).trim() : "";
-          ensure(name).help = help;
-        } else if (line.startsWith("# TYPE ")) {
-          const rest = line.slice(7).trim();
-          const parts = rest.split(/\s+/);
-          const name = parts[0];
-          const typ = parts[1] || "";
-          ensure(name).type = typ;
-        } else if (line.trim() && !line.startsWith("#")) {
-          const lastSpace = line.lastIndexOf(" ");
-          if (lastSpace <= 0) continue;
-          const valPart = line.slice(lastSpace + 1).trim();
-          const namePart = line.slice(0, lastSpace).trim();
-          const brace = namePart.indexOf("{");
-          const baseName = brace >= 0 ? namePart.slice(0, brace) : namePart;
-          if (!baseName) continue;
-          ensure(baseName).lines.push({ series: namePart, value: valPart });
-        }
-      }
-      return byName;
-    }
-    function renderMetricsTable(parsed) {
-      const tbody = document.getElementById("metricsTableBody");
-      const wrap = document.getElementById("metricsTableWrap");
-      tbody.textContent = "";
-      const names = Object.keys(parsed).sort();
-      if (names.length === 0) {
-        wrap.classList.add("hidden");
-        return;
-      }
-      wrap.classList.remove("hidden");
-      for (const name of names) {
-        const x = parsed[name];
-        const first = x.lines && x.lines[0];
-        const v = first ? first.value : "—";
-        const extra = x.lines && x.lines.length > 1 ? ` (+${x.lines.length - 1})` : "";
-        const tr = document.createElement("tr");
-        tr.className = "border-t border-white/5";
-        const tdName = document.createElement("td");
-        tdName.className = "px-3 py-2 text-cyan align-top";
-        tdName.textContent = name;
-        const tdType = document.createElement("td");
-        tdType.className = "px-3 py-2 text-mute align-top";
-        tdType.textContent = x.type || "—";
-        const tdVal = document.createElement("td");
-        tdVal.className = "px-3 py-2 align-top break-all";
-        tdVal.textContent = v + extra;
-        const tdHelp = document.createElement("td");
-        tdHelp.className = "px-3 py-2 text-mute align-top max-w-[220px] hidden sm:table-cell";
-        tdHelp.textContent = x.help || "—";
-        tdHelp.title = x.help || "";
-        tr.append(tdName, tdType, tdVal, tdHelp);
-        tbody.appendChild(tr);
-      }
-    }
-    function openMetricsModal() {
-      const m = document.getElementById("metricsModal");
-      m.classList.remove("hidden");
-      m.classList.add("flex");
-      loadMetricsIntoModal();
-    }
-    function closeMetricsModal() {
-      const m = document.getElementById("metricsModal");
-      m.classList.add("hidden");
-      m.classList.remove("flex");
-    }
-    async function loadMetricsIntoModal() {
-      const pre = document.getElementById("metricsPre");
-      pre.textContent = "…";
-      try {
-        const r = await fetch("/metrics", { cache: "no-store", credentials: "include" });
-        metricsText = await r.text();
-        pre.textContent = metricsText;
-        renderMetricsTable(parsePrometheusMetrics(metricsText));
-      } catch (e) {
-        metricsText = "";
-        pre.textContent = String(e?.message || e);
-        renderMetricsTable({});
-      }
-    }
-    async function apiFetchJson(url, options = {}) {
-      const res = await fetch(url, { credentials: "include", ...options });
-      let data = {};
-      try {
-        data = await res.json();
-      } catch (_) {}
-      return { res, data };
-    }
-    function workflowActionButtons(item) {
-      const s = String(item.status || "");
-      if (s === "requested") return `<button class="quick-chip" onclick="wfAction('${item.id}','review')">review</button>`;
-      if (s === "in_review") {
-        return `<div class="flex gap-1"><button class="quick-chip" onclick="wfAction('${item.id}','approve')">approve</button><button class="quick-chip" onclick="wfAction('${item.id}','reject')">reject</button></div>`;
-      }
-      if (s === "approved") return `<button class="quick-chip" onclick="wfAction('${item.id}','execute')">execute</button>`;
-      if (s === "executed") return `<button class="quick-chip" onclick="wfAction('${item.id}','audit')">audit</button>`;
-      return `<span class="text-mute">done</span>`;
-    }
-    async function loadGovernance() {
-      const userRes = await apiFetchJson("/api/auth/me");
-      const me = userRes.data?.user || null;
-      const wf = await apiFetchJson("/api/workflows");
-      const wfItems = Array.isArray(wf.data?.items) ? wf.data.items : [];
-      document.getElementById("wfRows").innerHTML = wfItems.slice(0, 40).map((x) => `
-        <tr class="border-t border-white/5">
-          <td class="px-2 py-2">${x.title || "-"}</td>
-          <td class="px-2 py-2 font-mono">${x.status || "-"}</td>
-          <td class="px-2 py-2">${workflowActionButtons(x)}</td>
-        </tr>
-      `).join("") || `<tr><td colspan="3" class="px-2 py-3 text-mute">No workflow items.</td></tr>`;
-
-      const ev = await apiFetchJson("/api/audit/events?limit=20");
-      const evItems = Array.isArray(ev.data?.items) ? ev.data.items : [];
-      document.getElementById("auditEventsRows").innerHTML = evItems.map(x => {
-        const payload = typeof x.payload_json === 'string' ? x.payload_json : JSON.stringify(x.payload_json || {});
-        return `
-          <tr class="border-t border-white/5">
-            <td class="px-2 py-2 truncate max-w-[70px] text-mute" title="${x.created_at || ''}">${(x.created_at || '').split('T')[1]?.split('.')[0] || '-'}</td>
-            <td class="px-2 py-2 font-mono text-cyan">${x.event_type || '-'}</td>
-            <td class="px-2 py-2"><span class="px-1.5 py-0.5 rounded text-[9px] uppercase ${x.severity === 'error' || x.severity === 'high' ? 'bg-red-500/20 text-red-300' : 'bg-white/5 text-mute'}">${x.severity || '-'}</span></td>
-            <td class="px-2 py-2 truncate max-w-[150px] text-mute italic" title='${payload}'>${payload}</td>
-          </tr>
-        `;
-      }).join("") || '<tr><td colspan="4" class="px-2 py-3 text-mute text-center">No events</td></tr>';
-
-      const pd = await apiFetchJson("/api/audit/policy-decisions?limit=20");
-      const pdItems = Array.isArray(pd.data?.items) ? pd.data.items : [];
-      document.getElementById("policyDecisionsRows").innerHTML = pdItems.map(x => `
-        <tr class="border-t border-white/5">
-          <td class="px-2 py-2 truncate max-w-[70px] text-mute" title="${x.created_at || ''}">${(x.created_at || '').split('T')[1]?.split('.')[0] || '-'}</td>
-          <td class="px-2 py-2 font-mono text-cyan">${x.action || '-'}</td>
-          <td class="px-2 py-2 truncate max-w-[100px] text-mute">${x.resource || '-'}</td>
-          <td class="px-2 py-2">${x.allowed ? '<span class="text-good font-bold">ALLOW</span>' : '<span class="text-bad font-bold">DENY</span>'}</td>
-        </tr>
-      `).join("") || '<tr><td colspan="4" class="px-2 py-3 text-mute text-center">No decisions</td></tr>';
-      const usersRes = await apiFetchJson("/api/admin/users");
-      const users = Array.isArray(usersRes.data?.items) ? usersRes.data.items : [];
-      document.getElementById("adminUsersRows").innerHTML = users.map((u) => `
-        <tr class="border-t border-white/5">
-          <td class="px-2 py-2">${u.email || u.id}</td>
-          <td class="px-2 py-2">
-            <select id="admRole_${u.id}" class="focus-ring rounded bg-black/25 border border-white/10 px-2 py-1">
-              <option value="viewer" ${u.role === "viewer" ? "selected" : ""}>viewer</option>
-              <option value="auditor" ${u.role === "auditor" ? "selected" : ""}>auditor</option>
-              <option value="operator" ${u.role === "operator" ? "selected" : ""}>operator</option>
-              <option value="admin" ${u.role === "admin" ? "selected" : ""}>admin</option>
-            </select>
-          </td>
-          <td class="px-2 py-2">
-            <select id="admMfa_${u.id}" class="focus-ring rounded bg-black/25 border border-white/10 px-2 py-1">
-              <option value="0" ${u.mfa_enabled ? "" : "selected"}>off</option>
-              <option value="1" ${u.mfa_enabled ? "selected" : ""}>on</option>
-            </select>
-          </td>
-          <td class="px-2 py-2">
-            <button class="quick-chip" onclick="updateAdminUser('${u.id}')">save</button>
-          </td>
-        </tr>
-      `).join("") || `<tr><td colspan="4" class="px-2 py-3 text-mute">No admin data or insufficient role.</td></tr>`;
-      if (!me) {
-        document.getElementById("policyResultPre").textContent = JSON.stringify({ note: "login required" }, null, 2);
-      }
-    }
-    async function createWorkflow() {
-      const title = (document.getElementById("wfTitleInput").value || "").trim();
-      const risk = (document.getElementById("wfRiskInput").value || "medium").trim();
-      if (!title) return;
-      await apiFetchJson("/api/workflows", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, risk_level: risk, request_type: "ops_change", payload: { source: "dashboard" } }),
-      });
-      document.getElementById("wfTitleInput").value = "";
-      await loadGovernance();
-    }
-    async function wfAction(id, action) {
-      await apiFetchJson(`/api/workflows/${encodeURIComponent(id)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, note: "dashboard_action" }),
-      });
-      await loadGovernance();
-    }
-    window.wfAction = wfAction;
-    async function updateAdminUser(id) {
-      const role = (document.getElementById(`admRole_${id}`)?.value || "viewer").trim();
-      const mfaEnabled = Number(document.getElementById(`admMfa_${id}`)?.value || "0") === 1;
-      await apiFetchJson("/api/admin/users", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, role, mfa_enabled: mfaEnabled }),
-      });
-      await loadGovernance();
-    }
-    window.updateAdminUser = updateAdminUser;
-    async function runPolicyCheck() {
-      const action = (document.getElementById("policyActionInput").value || "").trim();
-      const resource = (document.getElementById("policyResourceInput").value || "").trim();
-      const risk = (document.getElementById("policyRiskInput").value || "medium").trim();
-      if (!action || !resource) return;
-      const out = await apiFetchJson("/api/policy/enforce", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, resource, risk_level: risk }),
-      });
-      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
-      await loadGovernance();
-    }
-    async function runRecovery() {
-      const type = (document.getElementById("recoveryIncidentInput").value || "latency_spike").trim();
-      const n = Number((document.getElementById("recoveryRetryInput").value || "1").trim());
-      const out = await apiFetchJson("/api/ops/recovery", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ incident_type: type, simulate_failures: Number.isFinite(n) ? n : 1 }),
-      });
-      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
-      await loadGovernance();
-    }
-    async function runPlaybook() {
-      const playbookId = (document.getElementById("playbookIdInput").value || "latency_spike").trim();
-      const out = await apiFetchJson("/api/ops/playbook", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playbook_id: playbookId }),
-      });
-      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
-      await loadGovernance();
-    }
-    async function checkReadiness() {
-      const out = await apiFetchJson("/api/system/readiness");
-      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
-    }
-    async function evalPolicyTemplate() {
-      const templateId = (document.getElementById("policyTemplateInput").value || "").trim();
-      const checksRaw = (document.getElementById("policyChecksInput").value || "").trim();
-      const checks = checksRaw ? checksRaw.split(",").map((x) => x.trim()).filter(Boolean) : [];
-      const out = await apiFetchJson("/api/policy/templates", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ template_id: templateId, checks }),
-      });
-      document.getElementById("policyResultPre").textContent = JSON.stringify(out.data || {}, null, 2);
-    }
-    function renderServiceHub() {
-      const grid = document.getElementById("serviceHubGrid");
-      const st = t("implemented");
-      grid.innerHTML = serviceCatalog.map((f) => `
-        <article class="glass rounded-xl border border-white/10 p-3">
-          <div class="flex items-center justify-between">
-            <h4 class="font-semibold text-sm">${t(f.nameKey)}</h4>
-            <span class="text-[10px] font-mono px-2 py-1 rounded-full bg-green-500/15 text-green-300">${st}</span>
-          </div>
-          <p class="text-xs text-mute mt-2">${t(f.descKey)}</p>
-        </article>
-      `).join("");
-    }
-    function refreshAccountUi() {
-      const btn = document.getElementById("accountBtn");
-      const label = btn && btn.querySelector("span:last-child");
-      if (!label) return;
-      label.textContent = appState.user ? t("myPage") : t("login");
-    }
-    function openAuthModal() {
-      const m = document.getElementById("authModal");
-      m.classList.remove("hidden");
-      m.classList.add("flex");
-    }
-    function closeAuthModal() {
-      const m = document.getElementById("authModal");
-      m.classList.add("hidden");
-      m.classList.remove("flex");
-    }
-    function openMyPage() {
-      const p = document.getElementById("myPagePanel");
-      const who = appState.user ? `${appState.user.email || appState.user.id} (${appState.user.role || "viewer"})` : "-";
-      document.getElementById("myUserName").textContent = who;
-
-      const prefsGrid = document.getElementById("myPrefsGrid");
-      const prefs = [
-        { icon: "palette", label: t("theme"), value: appState.theme },
-        { icon: "language", label: "Lang", value: appState.lang },
-        { icon: "psychology", label: t("labelTone"), value: chatSettings.tone },
-        { icon: "alt_route", label: t("labelRoute"), value: chatSettings.route_mode },
-        { icon: "format_align_left", label: t("labelLength"), value: chatSettings.length }
-      ];
-      if (prefsGrid) {
-        prefsGrid.innerHTML = prefs.map(pr => `
-          <div class="flex items-center gap-2 bg-white/5 rounded-lg px-2 py-1.5 border border-white/5">
-            <span class="material-symbols-outlined mat text-base text-cyan">${pr.icon}</span>
-            <div>
-              <p class="text-[9px] text-mute uppercase tracking-tighter leading-none mb-0.5">${pr.label}</p>
-              <p class="font-mono text-[10px] text-white/90 truncate">${pr.value}</p>
-            </div>
-          </div>
-        `).join("");
-      }
-
-      const usageList = document.getElementById("myUsageList");
-      const usages = [
-        { icon: "chat", label: t("svcChatName") || "Chats", value: appState.usageChats, total: 100 },
-        { icon: "star", label: t("svcFavName") || "Favorites", value: appState.favorites.length, total: 20 }
-      ];
-      if (usageList) {
-        usageList.innerHTML = usages.map(us => {
-          const pct = Math.min(100, (us.value / us.total) * 100);
-          return `
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined mat text-base text-good">${us.icon}</span>
-                <span class="text-xs text-mute">${us.label}</span>
-              </div>
-              <span class="font-mono text-xs text-white">${us.value}</span>
-            </div>
-            <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
-              <div class="h-full bg-good transition-all duration-700" style="width: ${pct}%"></div>
-            </div>
-          </div>
-        `}).join("");
-      }
-      
-      // Load saved API settings
-      const savedApis = JSON.parse(localStorage.getItem("ops_api_settings") || "{}");
-      document.getElementById("bankAccount").value = savedApis.bankAccount || "";
-      document.getElementById("upbitKey").value = savedApis.upbitKey || "";
-      document.getElementById("upbitSecret").value = savedApis.upbitSecret || "";
-      document.getElementById("binanceKey").value = savedApis.binanceKey || "";
-      document.getElementById("binanceSecret").value = savedApis.binanceSecret || "";
-      
-      p.classList.remove("hidden");
-    }
-    function closeMyPage() {
-      document.getElementById("myPagePanel").classList.add("hidden");
-    }
-    async function refreshSessionUser() {
-      try {
-        const r = await fetch("/api/auth/me", { credentials: "include", cache: "no-store" });
-        const d = await r.json();
-        appState.user = d?.authenticated ? d.user : null;
-        if (appState.user) localStorage.setItem("ops_user", JSON.stringify(appState.user));
-        else localStorage.removeItem("ops_user");
-      } catch (_) {
-        appState.user = null;
-      }
-      refreshAccountUi();
-      loadGovernance();
-    }
-    async function loadStatus() {
-      const pulse = document.getElementById("livePulse");
-      pulse.textContent = t("fetching");
-      document.getElementById("errorBanner").classList.add("hidden");
-      try {
-        const r = await fetch("/api/status", { cache: "no-store" });
-        if (!r.ok) throw new Error(`status_http_${r.status}`);
-        const d = await r.json();
-        latestStatus = d || {};
-        const m = d.metrics || {};
-        const s = d.summary || {};
-        document.getElementById("generatedAt").textContent = `${t("generatedUtc")}: ${d.generated_at_utc || "—"}`;
-        
-        // Calculate Evaluator rejection rate based on fills (if data is exposed, otherwise simple count placeholder)
-        const evalRejRate = s.evaluator_rejections ? `${s.evaluator_rejections} rejected` : "0 rejections";
-
-        // Render modular widgets
-        const widgetConfig = [
-          { id: "sharpe", title: "Sharpe", icon: "query_stats", colorClass: "text-cyan", render: (m) => fmt(m.sharpe) },
-          { id: "mdd", title: "MDD", icon: "trending_down", colorClass: "text-bad", render: (m) => fmt(m.mdd) },
-          { id: "win_rate", title: "Win Rate", dotClass: "bg-good", render: (m) => fmt(m.win_rate) },
-          { id: "cum_return", title: "Cumulative Return", render: (m) => fmt(m.cum_return) },
-          { id: "latency", title: "Latency p99", rawRender: (m) => `<p class="font-mono text-2xl sm:text-3xl font-semibold mt-2 sm:mt-4 tabular-nums"><span>${fmt(m.latency_p99_ms)}</span><span class="text-xs sm:text-sm text-mute ml-1">ms</span></p>` },
-          { id: "fills", title: "Fills", borderClass: "border-cyan/30", rawRender: (m, s) => `<p class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">${s.n_fills != null ? fmt(s.n_fills) : "—"}</p><p class="font-mono text-[11px] text-mute truncate mt-1">run ${s.run_id ? s.run_id.slice(0, 8) : "—"}…</p>` },
-          // New Extension Widgets
-          { id: "llm_fallback", title: "LLM Status", icon: "psychology", colorClass: "text-cyan", render: (m, s) => s.llm_provider || "Gemini" },
-          { id: "dyn_risk", title: "Risk Limit", icon: "shield", colorClass: "text-bad", render: (m, s) => fmt(s.dynamic_risk_limit || 1.0) },
-          { id: "eval_rej", title: "AI Evaluator", icon: "policy", colorClass: "text-bad", rawRender: () => `<p class="font-headline text-lg sm:text-xl md:text-2xl font-bold mt-2 sm:mt-4 text-bad">${evalRejRate}</p>` }
-        ];
-
-        document.getElementById("widgetContainer").innerHTML = widgetConfig.map(w => {
-          let headHtml = `<p class="text-[10px] uppercase tracking-widest text-mute font-headline">${w.title}</p>`;
-          if (w.icon) {
-            headHtml = `<div class="flex justify-between">${headHtml}<span class="material-symbols-outlined mat ${w.colorClass} text-base">${w.icon}</span></div>`;
-          } else if (w.dotClass) {
-            headHtml = `<div class="flex justify-between">${headHtml}<span class="h-1.5 w-1.5 rounded-full ${w.dotClass} mt-1"></span></div>`;
-          }
-          
-          let bodyHtml = w.rawRender ? w.rawRender(m, s) : `<p class="font-headline text-2xl sm:text-3xl md:text-4xl font-bold mt-2 sm:mt-4 tabular-nums">${w.render(m, s)}</p>`;
-          
-          return `<article class="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 kpi-card ${w.borderClass || ''}">
-            ${headHtml}
-            ${bodyHtml}
-          </article>`;
-        }).join("");
-
-        document.getElementById("heroMode").textContent = s.execution_mode || "—";
-        document.getElementById("heroKill").textContent = s.kill_switch ? "ON" : "OFF";
-        document.getElementById("badgePipeline").textContent = `pipeline: ${(d.gates||{}).mlops_pipeline_ok ? "ok" : "fail"}`;
-        document.getElementById("badgeReconcile").textContent = `reconcile: ${(d.gates||{}).reconcile_ok ? "ok" : "fail"}`;
-        document.getElementById("badgeGate").textContent = `gate: ${(d.gates||{}).full_operational_ok ? "ok" : "fail"}`;
-        document.getElementById("badgeDrift").textContent = `drift: ${((s.drift||{}).drift_detected ? "detected" : "normal")}`;
-
-        const gates = d.gates || {};
-        let passCount = 0;
-        let failCount = 0;
-        Object.values(gates).forEach((v) => (v ? passCount++ : failCount++));
-        document.getElementById("gatePassCount").textContent = String(passCount);
-        document.getElementById("gateFailCount").textContent = String(failCount);
-        const gateEntries = Object.entries(gates);
-        document.getElementById("gateRows").innerHTML = gateEntries.map(([k, v]) =>
-          `<tr class="border-t border-white/5"><td class="px-5 py-3 font-mono text-xs text-mute">${k}</td><td class="px-5 py-3">${badge(Boolean(v))}</td></tr>`
-        ).join("");
-        document.getElementById("gateCardsMobile").innerHTML = gateEntries.map(([k, v]) =>
-          `<div class="glass rounded-xl px-4 py-3 flex items-center justify-between gap-3 border border-white/5">
-            <span class="font-mono text-[11px] text-mute break-all flex-1 min-w-0">${k}</span>
-            <span class="shrink-0">${badge(Boolean(v))}</span>
-          </div>`
-        ).join("") || `<p class="text-xs text-mute font-mono px-1">${t("noGateData")}</p>`;
-        latestPaths = d.paths || {};
-        renderPathRows();
-        document.getElementById("raw").textContent = JSON.stringify(d, null, 2);
-        pulse.textContent = t("liveSync");
-      } catch (e) {
-        pulse.textContent = "Error";
-        const msg = `${t("loadFail")}: ${e.message || e}`;
-        document.getElementById("generatedAt").textContent = msg;
-        const b = document.getElementById("errorBanner");
-        b.textContent = `${msg} (${t("serverHint")})`;
-        b.classList.remove("hidden");
-      }
-    }
-    function appendChatMessage(role, text) {
-      const thread = document.getElementById("chatThread");
-      const isUser = role === "user";
-      const wrap = document.createElement("div");
-      wrap.className = `${isUser ? "chat-msg-user ml-auto" : "chat-msg-assistant"} rounded-2xl px-4 py-3 border border-white/10 max-w-[92%]`;
-      wrap.innerHTML = `<p class="text-xs text-mute mb-1 font-mono">${isUser ? "You" : "Assistant"}</p><p class="text-sm leading-relaxed whitespace-pre-wrap"></p>`;
-      wrap.querySelector("p:last-child").textContent = text;
-      thread.appendChild(wrap);
-      thread.scrollTop = thread.scrollHeight;
-    }
-    function appendAssistantCard(model) {
-      const thread = document.getElementById("chatThread");
-      const wrap = document.createElement("div");
-      wrap.className = "chat-msg-assistant rounded-2xl px-4 py-3 border border-white/10 max-w-[92%]";
-      const risksHtml = (model.risks || []).map((r) => `<li>${r}</li>`).join("");
-      const actionsHtml = (model.actions || []).map((a, i) => `<li>${i + 1}. ${a}</li>`).join("");
-      wrap.innerHTML = `
-        <p class="text-xs text-mute mb-1 font-mono">Assistant</p>
-        <div class="chat-card-title">${model.title}</div>
-        <div class="chat-kv"><b>실행 모드</b>: ${model.mode} &nbsp;|&nbsp; <b>킬스위치</b>: ${model.kill}</div>
-        <div class="chat-kv"><b>샤프</b>: ${model.sharpe} &nbsp;|&nbsp; <b>지연 p99</b>: ${model.latency} ms</div>
-        <div class="chat-kv"><b>드리프트</b>: ${model.drift}</div>
-        <div class="chat-card-subtitle" style="margin-top:10px;">핵심 리스크</div>
-        <ul class="chat-kv list-disc pl-5 space-y-1">${risksHtml || "<li>특이 리스크 없음</li>"}</ul>
-        <div class="chat-card-subtitle" style="margin-top:10px;">권장 다음 조치</div>
-        <ul class="chat-kv list-none pl-0 space-y-1">${actionsHtml}</ul>
-      `;
-      thread.appendChild(wrap);
-      thread.scrollTop = thread.scrollHeight;
-    }
-    function appendLoadingBubble() {
-      const thread = document.getElementById("chatThread");
-      const wrap = document.createElement("div");
-      wrap.id = "assistantLoadingBubble";
-      wrap.className = "chat-msg-assistant rounded-2xl px-4 py-3 border border-white/10 max-w-[92%]";
-      wrap.innerHTML = `
-        <p class="text-xs text-mute mb-1 font-mono">Assistant</p>
-        <div class="flex items-center gap-1.5" aria-label="assistant typing">
-          <span class="typing-dot"></span>
-          <span class="typing-dot"></span>
-          <span class="typing-dot"></span>
-          <span class="text-xs text-mute font-mono ml-2">thinking...</span>
-        </div>
-      `;
-      thread.appendChild(wrap);
-      thread.scrollTop = thread.scrollHeight;
-      return wrap;
-    }
-    function removeLoadingBubble(node) {
-      if (node && node.parentNode) node.parentNode.removeChild(node);
-      const stale = document.getElementById("assistantLoadingBubble");
-      if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
-    }
-    function buildAssistantReply(userText) {
-      const text = (userText || "").toLowerCase();
-      const gates = (latestStatus.gates || {});
-      const failed = Object.entries(gates).filter(([, v]) => !v).map(([k]) => k);
-      const m = latestStatus.metrics || {};
-      const s = latestStatus.summary || {};
-      const drift = (s.drift || {}).drift_detected ? "감지됨" : "정상";
-      const formatNum = (v, d = 4) => (typeof v === "number" && Number.isFinite(v) ? v.toFixed(d) : "-");
-      const model = {
-        title: "운영 상태 분석 결과",
-        mode: s.execution_mode || "-",
-        kill: s.kill_switch ? "ON" : "OFF",
-        drift,
-        sharpe: formatNum(m.sharpe, 4),
-        latency: formatNum(m.latency_p99_ms, 4),
-        risks: [],
-        actions: [],
-      };
-      if (failed.length) model.risks.push(`실패 게이트 ${failed.length}개: ${failed.join(", ")}`);
-      if ((s.drift || {}).drift_detected) model.risks.push("드리프트 감지: 보수 운용 필요");
-      if ((m.latency_p99_ms || 0) > 5.0) model.risks.push("지연시간 임계 초과");
-      if (!model.risks.length) model.risks.push("치명적 리스크는 현재 보이지 않음");
-
-      if (text.includes("위험") || text.includes("리스크") || text.includes("이슈")) {
-        model.actions = [
-          "실패 게이트부터 복구 후 전체 검증 재실행",
-          "drift/latency 수치를 10분 간격으로 추적",
-          "reconcile 상태를 마지막으로 확인",
-        ];
-      } else if (text.includes("게이트") || text.includes("통과")) {
-        model.actions = [
-          "FAIL 게이트 항목별 담당/기한 지정",
-          "증빙 JSON 갱신 후 verify 스크립트 재실행",
-          "PASS/FAIL 변화 로그를 운영 노트에 기록",
-        ];
-      } else if (text.includes("조치") || text.includes("다음") || text.includes("계획")) {
-        model.actions = [
-          "production/full gate 리포트 최신화",
-          "실패 항목 증빙 경로 업데이트",
-          "strict 기준으로 최종 재검증",
-        ];
-      } else {
-        model.actions = [
-          "우선 실패 게이트 복구 여부 확인",
-          "latency/drift 추세 확인",
-          "필요 시 '위험요약' 또는 '조치체크리스트' 질문",
-        ];
-      }
-      return model;
-    }
-    function autoResizeTextarea(el) {
-      el.style.height = "auto";
-      el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
-    }
-    async function askGemini(message) {
-      const turns = Number(chatSettings.memory_turns) || 0;
-      const keep = Math.max(0, turns * 2);
-      const history = keep > 0 ? chatHistory.slice(-keep) : [];
-      const r = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, history, settings: chatSettings }),
-      });
-      const data = await r.json();
-      if (!r.ok || !data.ok) {
-        throw new Error(data.error || `chat_http_${r.status}`);
-      }
-      return String(data.reply || "").trim();
-    }
-    function pushHistory(role, text) {
-      chatHistory.push({ role, text });
-      if (chatHistory.length > 40) chatHistory.splice(0, chatHistory.length - 40);
-    }
-    async function sendChat() {
-      const input = document.getElementById("chatInput");
-      const btn = document.getElementById("chatSendBtn");
-      const val = (input.value || "").trim();
-      if (!val) return;
-      appendChatMessage("user", val);
-      pushHistory("user", val);
-      input.value = "";
-      autoResizeTextarea(input);
-      btn.disabled = true;
-      btn.classList.add("opacity-60", "cursor-not-allowed");
-      const loadingNode = appendLoadingBubble();
-      try {
-        const text = await askGemini(val);
-        removeLoadingBubble(loadingNode);
-        appendChatMessage("assistant", text);
-        pushHistory("assistant", text);
-        appState.usageChats += 1;
-        localStorage.setItem("ops_usage_chats", String(appState.usageChats));
-      } catch (_) {
-        removeLoadingBubble(loadingNode);
-        const fallback = buildAssistantReply(val);
-        appendAssistantCard(fallback);
-        pushHistory("assistant", "운영 상태 분석 카드 기반 응답");
-      } finally {
-        removeLoadingBubble(loadingNode);
-        btn.disabled = false;
-        btn.classList.remove("opacity-60", "cursor-not-allowed");
-      }
-    }
-    function bindSingleChoice(selector, key) {
-      document.querySelectorAll(selector).forEach((el) => {
-        el.addEventListener("click", () => {
-          document.querySelectorAll(selector).forEach((x) => x.classList.remove("active"));
-          el.classList.add("active");
-          const next = el.getAttribute(`data-${key}`) || "";
-          if (key === "route") chatSettings.route_mode = next;
-          else chatSettings[key] = next;
-        });
-      });
-    }
-    function renderPathRows() {
-      const q = (document.getElementById("artifactSearch").value || "").toLowerCase().trim();
-      const rows = Object.entries(latestPaths).filter(([k, v]) => {
-        if (!q) return true;
-        return k.toLowerCase().includes(q) || String(v).toLowerCase().includes(q);
-      });
-      const emptyMsg = `<tr><td colspan="2" class="px-5 py-6 text-xs text-mute font-mono">${t("noArtifactMatch")}</td></tr>`;
-      document.getElementById("pathRows").innerHTML = rows.map(([k, v]) =>
-        `<tr class="border-t border-white/5"><td class="px-5 py-3 font-mono text-xs text-cyan">${k}</td><td class="px-5 py-3 font-mono text-xs text-mute break-all">${v}</td></tr>`
-      ).join("") || emptyMsg;
-      const mobileEmpty = `<p class="text-xs text-mute font-mono py-4 text-center">${t("noArtifactMatch")}</p>`;
-      document.getElementById("pathCardsMobile").innerHTML = rows.map(([k, v]) =>
-        `<div class="glass rounded-xl p-4 border border-white/5 space-y-2">
-          <p class="font-mono text-xs text-cyan font-semibold break-all">${k}</p>
-          <p class="font-mono text-[11px] text-mute break-all leading-relaxed">${v}</p>
-        </div>`
-      ).join("") || mobileEmpty;
-    }
-    document.getElementById("artifactSearch").addEventListener("input", renderPathRows);
-    const chatInput = document.getElementById("chatInput");
-    const chatSendBtn = document.getElementById("chatSendBtn");
-    chatSendBtn.addEventListener("click", sendChat);
-    document.querySelectorAll("[data-quick-id]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        chatInput.value = btn.getAttribute("data-quick-q") || "";
-        autoResizeTextarea(chatInput);
-        sendChat();
-      });
-      btn.addEventListener("dblclick", () => {
-        const q = btn.getAttribute("data-quick-q") || "";
-        if (q && !appState.favorites.includes(q)) {
-          appState.favorites.push(q);
-          localStorage.setItem("ops_favorites", JSON.stringify(appState.favorites));
-        }
-      });
     });
-    bindSingleChoice("[data-tone]", "tone");
-    bindSingleChoice("[data-route]", "route");
-    bindSingleChoice("[data-length]", "length");
-    document.getElementById("memoryTurns").addEventListener("change", (e) => {
-      chatSettings.memory_turns = Number(e.target.value || "0");
-    });
-    chatInput.addEventListener("input", () => autoResizeTextarea(chatInput));
-    chatInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendChat();
-      }
-    });
-    document.getElementById("themeToggleBtn").addEventListener("click", () => {
-      appState.theme = appState.theme === "dark" ? "light" : "dark";
-      applyTheme();
-    });
-    document.getElementById("langToggleBtn").addEventListener("click", () => {
-      appState.lang = appState.lang === "ko" ? "en" : "ko";
-      applyLang();
-    });
-    document.getElementById("accountBtn").addEventListener("click", () => {
-      if (appState.user) openMyPage();
-      else openAuthModal();
-    });
-    document.getElementById("authCloseBtn").addEventListener("click", closeAuthModal);
-    document.getElementById("myPageCloseBtn").addEventListener("click", closeMyPage);
-    document.getElementById("switchToSignUpBtn").addEventListener("click", () => {
-      document.getElementById("loginForm").classList.add("hidden");
-      document.getElementById("signUpForm").classList.remove("hidden");
-      document.getElementById("authTitle").textContent = t("signUpTitle");
-      document.getElementById("loginDemoHint").classList.add("hidden");
-    });
-    document.getElementById("switchToLoginBtn").addEventListener("click", () => {
-      document.getElementById("signUpForm").classList.add("hidden");
-      document.getElementById("loginForm").classList.remove("hidden");
-      document.getElementById("authTitle").textContent = t("loginTitle");
-      document.getElementById("loginDemoHint").classList.remove("hidden");
-    });
-    document.getElementById("signUpSubmitBtn").addEventListener("click", async () => {
-      const email = document.getElementById("regId").value.trim();
-      const password = document.getElementById("regPw").value;
-      const confirm = document.getElementById("regPwConfirm").value;
-      if (!email || !password) return;
-      if (password !== confirm) {
-        alert(t("pwMismatch"));
-        return;
-      }
-      try {
-        const r = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
-        const d = await r.json();
-        if (r.ok && d.ok) {
-          alert(t("regSuccess"));
-          document.getElementById("switchToLoginBtn").click();
-        } else {
-          alert(t("regFail"));
-        }
-      } catch (e) {
-        alert(t("regFail"));
-      }
-    });
-    document.getElementById("loginSubmitBtn").addEventListener("click", async () => {
-      const id = (document.getElementById("loginId").value || "").trim();
-      const pw = (document.getElementById("loginPw").value || "").trim();
-      if (!id || !pw) return;
-      try {
-        const r = await fetch("/api/auth/login", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: id.includes("@") ? id : `${id}@acmvp.local`, password: pw }),
-        });
-        const d = await r.json();
-        if (!r.ok || !d.ok) {
-          alert("Login failed: " + JSON.stringify(d));
-          return;
-        }
-        appState.user = d.user || null;
-        if (appState.user) localStorage.setItem("ops_user", JSON.stringify(appState.user));
-        refreshAccountUi();
-        closeAuthModal();
-        openMyPage();
-      } catch (_) {}
-    });
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      try {
-        await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-      } catch (_) {}
-      appState.user = null;
-      localStorage.removeItem("ops_user");
-      refreshAccountUi();
-      closeMyPage();
-    });
-    document.getElementById("saveApiSettingsBtn").addEventListener("click", () => {
-      const settings = {
-        bankAccount: document.getElementById("bankAccount").value,
-        upbitKey: document.getElementById("upbitKey").value,
-        upbitSecret: document.getElementById("upbitSecret").value,
-        binanceKey: document.getElementById("binanceKey").value,
-        binanceSecret: document.getElementById("binanceSecret").value,
-      };
-      localStorage.setItem("ops_api_settings", JSON.stringify(settings));
-      alert(t("settingsSaved"));
-    });
-    async function testApiConn(venue) {
-      const key = document.getElementById(venue === "upbit" ? "upbitKey" : "binanceKey").value;
-      const secret = document.getElementById(venue === "upbit" ? "upbitSecret" : "binanceSecret").value;
-      if (!key || !secret) {
-        alert(t("connFail"));
-        return;
-      }
-      try {
-        const out = await apiFetchJson("/api/ops/verify-credentials", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ venue, key, secret }),
-        });
-        if (out.data?.ok) alert(t("connSuccess"));
-        else alert(`${t("connFail")} (${out.data?.error || "unknown"})`);
-      } catch (e) {
-        alert(`${t("connFail")} (${e.message})`);
-      }
-    }
-    document.getElementById("testUpbitBtn").addEventListener("click", () => testApiConn("upbit"));
-    document.getElementById("testBinanceBtn").addEventListener("click", () => testApiConn("binance"));
-    document.getElementById("apiStatusViewerBtn").addEventListener("click", openApiJsonModal);
-    document.getElementById("apiStatusViewerBtnMobile").addEventListener("click", openApiJsonModal);
-    document.getElementById("apiJsonCloseBtn").addEventListener("click", closeApiJsonModal);
-    document.getElementById("apiJsonRefreshBtn").addEventListener("click", loadApiJsonIntoModal);
-    document.getElementById("apiJsonCopyBtn").addEventListener("click", async () => {
-      if (!apiJsonText) return;
-      try {
-        await navigator.clipboard.writeText(apiJsonText);
-      } catch (_) {}
-    });
-    document.getElementById("metricsViewerBtn").addEventListener("click", openMetricsModal);
-    document.getElementById("metricsViewerBtnMobile").addEventListener("click", openMetricsModal);
-    document.getElementById("metricsCloseBtn").addEventListener("click", closeMetricsModal);
-    document.getElementById("metricsRefreshBtn").addEventListener("click", loadMetricsIntoModal);
-    document.getElementById("metricsCopyBtn").addEventListener("click", async () => {
-      if (!metricsText) return;
-      try {
-        await navigator.clipboard.writeText(metricsText);
-      } catch (_) {}
-    });
-    document.getElementById("wfCreateBtn").addEventListener("click", createWorkflow);
-    document.getElementById("policyCheckBtn").addEventListener("click", runPolicyCheck);
-    document.getElementById("recoveryRunBtn").addEventListener("click", runRecovery);
-    document.getElementById("playbookRunBtn").addEventListener("click", runPlaybook);
-    document.getElementById("readinessBtn").addEventListener("click", checkReadiness);
-    document.getElementById("policyTemplateEvalBtn").addEventListener("click", evalPolicyTemplate);
-    document.getElementById("adminUsersRefreshBtn").addEventListener("click", loadGovernance);
-    applyTheme();
-    applyLang();
-    refreshSessionUser();
-    loadGovernance();
-    setInterval(loadStatus, 10000);
-    setInterval(loadGovernance, 15000);
   </script>
 </body>
 </html>
