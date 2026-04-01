@@ -26,8 +26,14 @@ from src.agentic.pipeline_engine import PipelineEngine
 WEB_DIR = ROOT / "web" / "monitoring"
 OUTPUTS_DIR = ROOT / "outputs"
 
-# Global engine instance for the API
-_engine = PipelineEngine()
+# Global engine instance for the API (initialized lazily)
+_engine = None
+
+def get_engine():
+    global _engine
+    if _engine is None:
+        _engine = PipelineEngine()
+    return _engine
 
 def _read_json(path: Path) -> dict:
     if not path.exists():
@@ -482,7 +488,7 @@ class MonitoringHandler(SimpleHTTPRequestHandler):
                     return
                 
                 print(f"🚀 [API] Received Mission: {mission_text}")
-                result = _engine.run_workflow(mission_text)
+                result = get_engine().run_workflow(mission_text)
                 
                 raw = json.dumps(result, ensure_ascii=True, indent=2).encode("utf-8")
                 self.send_response(200)

@@ -313,27 +313,27 @@
     </div>
 
     <!-- ChatGPT Style Sovereign Command Center (Bottom Prompt) -->
-    <div class="fixed bottom-6 left-64 right-0 px-8 z-50 transition-all pointer-events-none" id="commandCenter">
-      <div class="max-w-3xl mx-auto pointer-events-auto">
-        <div class="relative flex items-center bg-[#1a1a1a] border border-white/10 rounded-full shadow-2xl p-1.5 focus-within:border-cyan/30 transition-all">
-          <form id="missionForm" class="flex-1 flex items-center">
+    <div class="fixed bottom-6 left-64 right-0 px-8 z-50 transition-all flex justify-center" id="commandCenter">
+      <div class="w-full max-w-3xl">
+        <div class="relative flex items-center bg-[#1a1a1a] border border-white/10 rounded-full shadow-2xl p-1.5 focus-within:border-cyan/50 focus-within:shadow-[0_0_30px_rgba(129,236,255,0.1)] transition-all">
+          <form id="missionForm" class="flex-1 flex items-center w-full">
             <input 
               type="text" 
               id="missionInput" 
               autocomplete="off"
               placeholder="에이전트에게 명령을 내리세요..." 
-              class="flex-1 bg-transparent border-none py-2.5 px-6 text-sm text-white placeholder:text-mute focus:ring-0 outline-none"
+              class="flex-1 bg-transparent border-none py-3 px-6 text-sm text-white placeholder:text-mute focus:ring-0 outline-none w-full"
             />
             <button 
               type="submit" 
               id="submitBtn"
-              class="w-9 h-9 rounded-full bg-cyan text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-[0_0_10px_rgba(129,236,255,0.2)] disabled:opacity-50 disabled:grayscale"
+              class="w-10 h-10 rounded-full bg-cyan text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(129,236,255,0.3)] disabled:opacity-50 disabled:grayscale ml-2"
             >
-              <span class="material-symbols-outlined font-bold text-base">arrow_upward</span>
+              <span class="material-symbols-outlined font-bold text-lg">arrow_upward</span>
             </button>
           </form>
         </div>
-        <p class="text-[8px] text-center text-mute mt-2 uppercase tracking-widest opacity-30">Sovereign Mission Control • QJC-OS v1.0</p>
+        <p class="text-[10px] text-center text-mute mt-3 uppercase tracking-widest opacity-40 font-mono">Sovereign Mission Control • QJC-OS v1.0</p>
       </div>
     </div>
   </main>
@@ -410,11 +410,13 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mission })
         });
+        if (!response.ok) throw new Error("서버 에러가 발생했습니다. (" + response.status + ")");
         const result = await response.json();
         addActivityToLog(mission, result.workflow_status || "In-Progress");
         input.value = "";
       } catch (err) {
         console.error("Mission failed", err);
+        alert(err.message || "명령 수행 중 오류가 발생했습니다. 서버 로그를 확인해주세요.");
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<span class="material-symbols-outlined font-bold text-lg">arrow_upward</span>`;

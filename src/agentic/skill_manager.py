@@ -70,9 +70,9 @@ class SkillManager:
 
                 self.skills[skill_id] = module.run
                 self.tool_definitions.append(tool_def)
-                print(f"✅ Skill loaded: {skill_id}")
+                print(f"[OK] Skill loaded: {skill_id}")
         except Exception as e:
-            print(f"❌ Failed to load skill {path}: {str(e)}")
+            print(f"[ERROR] Failed to load skill {path}: {str(e)}")
 
     def get_tool_definitions(self) -> List[Dict[str, Any]]:
         """AI 에이전트에게 전달할 툴 목록을 반환합니다."""
