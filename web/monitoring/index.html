@@ -117,7 +117,7 @@
   </aside>
 
   <!-- Main Content Area -->
-  <main class="lg:ml-64 min-h-screen relative pb-64">
+  <main class="lg:ml-64 min-h-screen relative pb-64 overflow-x-hidden">
     
     <!-- Top Bar -->
     <header class="sticky top-0 h-20 px-8 flex items-center justify-between bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 z-40">
@@ -137,7 +137,7 @@
       </div>
     </header>
 
-    <div class="p-8 space-y-8 max-w-[1600px] mx-auto">
+    <div class="p-8 space-y-8 max-w-[1600px] mx-auto pb-40">
       
       <!-- Dashboard Tab -->
       <div id="tab-dashboard" class="tab-content active space-y-8">
@@ -291,6 +291,8 @@
             </div>
           </section>
         </div>
+        <!-- Spacer: prevents last row from being hidden under the fixed prompt bar -->
+        <div class="h-32 shrink-0" aria-hidden="true"></div>
       </div>
 
       <!-- Other Tabs -->
